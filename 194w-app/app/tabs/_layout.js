@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import theme from "../../assets/theme";
+import theme from "../../src/theme/theme";
 
 export default function TabLayout() {
   return (

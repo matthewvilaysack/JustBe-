@@ -25,6 +25,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": ["expo-router"],
-    "scheme": "expo-router-test"
+    "scheme": "expo-router-test",
+    "fonts": [
+      {
+        "asset": "./assets/fonts/LexendDeca-Regular.ttf"
+      },
+      {
+        "asset": "./assets/fonts/LexendDeca-Bold.ttf"
+      }
+    ]
   }
 }

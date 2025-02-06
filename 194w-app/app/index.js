@@ -1,9 +1,10 @@
 import "react-native-url-polyfill/auto";
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
-import Auth from "@/components/Auth";
+import { supabase } from "../src/lib/supabase";
+import Auth from "@/src/components/Auth";
 import { View, Text, ImageBackground, StyleSheet } from "react-native";
 import { Session } from "@supabase/supabase-js";
+import { useFonts } from "expo-font";
 import { Redirect } from "expo-router";
 
 export default function App() {
