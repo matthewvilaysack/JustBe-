@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { supabase } from "../lib/supabase";
-import Theme from "@/src/theme/theme";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -92,51 +91,48 @@ export default function Auth() {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: Theme.spacing.xl,
-    padding: Theme.spacing.lg,
+    marginVertical: "20%",
+    padding: 30,
     minWidth: "85%",
-    backgroundColor: Theme.colors.primary[400],
-    borderRadius: Theme.radius.xl,
+    backgroundColor: "#526AA6",
+    borderRadius: 40,
   },
   verticallySpaced: {
-    paddingTop: Theme.spacing.xs,
-    paddingBottom: Theme.spacing.xs,
+    paddingTop: 4,
+    paddingBottom: 4,
     alignSelf: "stretch",
   },
   mt20: {
-    marginTop: Theme.spacing.md,
+    marginTop: 20,
   },
   inputText: {
-    backgroundColor: Theme.colors.white,
-    borderRadius: Theme.radius.lg,
+    backgroundColor: "white",
+    borderRadius: 20,
     minHeight: 50,
-    padding: Theme.spacing.md,
-    color: Theme.colors.text.primary,
-    fontSize: Theme.typography.sizes.md,
+    padding: 20,
+    color: "black",
+    fontSize: 16,
     fontFamily: "Helvetica",
   },
   inputLabel: {
     minHeight: 30,
-    paddingLeft: Theme.spacing.sm,
-    color: Theme.colors.text.inverse,
-    fontSize: Theme.typography.sizes.lg,
-    marginTop: Theme.spacing.md,
+    paddingLeft: 10,
+    color: "white",
+    fontSize: 20,
+    marginTop: 20,
     fontFamily: "Helvetica-Bold",
   },
   button: {
-    backgroundColor: Theme.colors.button.primary.background,
-    paddingVertical: Theme.spacing.sm,
-    paddingHorizontal: Theme.spacing.lg,
-    borderRadius: Theme.radius.lg,
+    backgroundColor: "white",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
-  disabledButton: {
-    opacity: 0.7,
-  },
   buttonText: {
-    color: Theme.colors.button.primary.text,
-    fontSize: Theme.typography.sizes.lg,
+    color: "#344A66",
+    fontSize: 20,
     fontFamily: "Helvetica-Bold",
   },
 });

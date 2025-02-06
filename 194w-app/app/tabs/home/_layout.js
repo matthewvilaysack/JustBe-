@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 import { View, Text, Platform, TouchableOpacity } from "react-native";
-import theme from "../../../assets/theme";
+import theme from "../../../src/theme/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 
