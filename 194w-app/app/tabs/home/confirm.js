@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -14,9 +14,14 @@ import Theme from "@/src/theme/theme";
 import Button from "@/src/components/Button";
 
 export default function Page() {
-  const [text, setText] = useState("");
   const router = useRouter();
-  const currentDate = new Date().toLocaleDateString();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push("/tabs/home");
+    }, 2000);
+
+    return () => clearTimeout(timer); // Cleanup in case component unmounts
+  }, [router]);
 
   return (
     <ImageBackground
@@ -25,25 +30,7 @@ export default function Page() {
       style={styles.background}
     >
       <View style={styles.container}>
-        <Text style={styles.heading}>What symptoms are you feeling?</Text>
-        <View style={styles.journalContainer}>
-          <Text style={styles.dateText}>{currentDate}</Text>
-          <TextInput
-            style={styles.textArea}
-            multiline={true}
-            numberOfLines={4}
-            onChangeText={setText}
-            value={text}
-            placeholder="Type your journal entry here..."
-            placeholderTextColor={Theme.colors.lightGray}
-          />
-        </View>
-      </View>
-      <View style={styles.footer}>
-        <Button
-          onPress={() => router.push("/tabs/home/confirm")}
-          showArrow={true}
-        />
+        <Text style={styles.heading}>Logged!</Text>
       </View>
     </ImageBackground>
   );
