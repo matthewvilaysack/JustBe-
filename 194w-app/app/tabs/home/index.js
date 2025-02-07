@@ -2,8 +2,11 @@ import { StyleSheet, View, ImageBackground, Image, Text } from "react-native";
 import { Link } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/Button";
+import { useRouter } from "expo-router";
 
 export default function Page() {
+  const router = useRouter();
+
   return (
     <ImageBackground
       source={require("@/assets/background.png")}
@@ -12,21 +15,18 @@ export default function Page() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Hi Bob,{"\n"}how's your pain today?</Text>
-        
-        <Image 
-          source={require("@/assets/blob-smile.png")} 
+        <Image
+          source={require("@/assets/blob-no-pain.png")}
           style={styles.blobImage}
         />
-        
         <View style={styles.buttonContainer}>
-          <Button 
-            title="Log" 
-            onPress={() => {}}
+          <Button
+            title="Log"
+            onPress={() => router.push("/tabs/home/painscale")}
           />
-          <Button 
-            title="Charts" 
-            onPress={() => {}}
-          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button title="Charts" onPress={() => {}} />
         </View>
       </View>
     </ImageBackground>
@@ -41,24 +41,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: Theme.spacing.xl,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
-    textAlign: 'center',
-    marginBottom: Theme.spacing.xl,
+    textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
   },
   blobImage: {
-    width: 200,
-    height: 200,
-    marginVertical: Theme.spacing.xl,
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
   },
   buttonContainer: {
-    position: 'absolute',
-    bottom: Theme.spacing.xxl,
-    alignItems: 'center',
-    gap: Theme.spacing.xl,
+    marginVertical: 10,
   },
 });
