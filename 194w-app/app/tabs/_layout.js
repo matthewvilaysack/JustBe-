@@ -7,10 +7,10 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.tabBarActive,
-        tabBarInactiveTintColor: theme.colors.tabBarInactiveTintColor,
+        tabBarActiveTintColor: theme.colors.white,
+        tabBarInactiveTintColor: theme.colors.primary[200],
         tabBarStyle: {
-          backgroundColor: theme.colors.backgroundPrimary,
+          backgroundColor: theme.colors.primary[400],
         },
         headerStyle: {
           backgroundColor: theme.colors.backgroundPrimary,
@@ -34,6 +34,16 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="export"
+        options={{
+          title: "Export",
+          tabBarIcon: ({ size, color }) => (
+            <FontAwesome size={size} name="share" color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="profile"
         options={{
