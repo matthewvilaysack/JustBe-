@@ -6,7 +6,7 @@ export default {
       100: "#DCE3F8",
       200: "#B9C7F0",
       300: "#96ABE9",
-      400: "#7089E6",  // Main brand color
+      400: "#7089E6", // Main brand color
       500: "#5A6DB9",
       600: "#45518C",
       700: "#2F365E",
@@ -16,6 +16,7 @@ export default {
 
     // Brand Colors
     darkGray: "#3E4454",
+    lightGray: "#AAAAAA",
     lightBlue: "#D0F2FF",
     purple: "#9E96DF",
     white: "#FFFFFF",
@@ -79,8 +80,8 @@ export default {
   // Typography
   typography: {
     fonts: {
-      regular: 'LexendDeca-Regular',
-      bold: 'LexendDeca-Bold',
+      regular: "LexendDeca-Regular",
+      bold: "LexendDeca-Bold",
     },
     sizes: {
       xs: 12,

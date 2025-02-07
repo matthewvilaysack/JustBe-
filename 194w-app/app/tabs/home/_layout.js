@@ -21,6 +21,12 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="journal"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

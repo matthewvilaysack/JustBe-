@@ -57,7 +57,10 @@ export default function Page() {
         </View>
       </View>
       <View style={styles.footer}>
-        <Button onPress={() => router.push("/tabs/home")} showArrow={true} />
+        <Button
+          onPress={() => router.push("/tabs/home/journal")}
+          showArrow={true}
+        />
       </View>
     </ImageBackground>
   );
