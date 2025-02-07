@@ -7,6 +7,8 @@ import {
   Text,
   Dimensions,
   TextInput,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
@@ -19,33 +21,35 @@ export default function Page() {
   const currentDate = new Date().toLocaleDateString();
 
   return (
-    <ImageBackground
-      source={require("@/assets/background.png")}
-      resizeMode="cover"
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Text style={styles.heading}>What symptoms are you feeling?</Text>
-        <View style={styles.journalContainer}>
-          <Text style={styles.dateText}>{currentDate}</Text>
-          <TextInput
-            style={styles.textArea}
-            multiline={true}
-            numberOfLines={4}
-            onChangeText={setText}
-            value={text}
-            placeholder="Type your journal entry here..."
-            placeholderTextColor={Theme.colors.lightGray}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <ImageBackground
+        source={require("@/assets/background.png")}
+        resizeMode="cover"
+        style={styles.background}
+      >
+        <View style={styles.container}>
+          <Text style={styles.heading}>What symptoms are you feeling?</Text>
+          <View style={styles.journalContainer}>
+            <Text style={styles.dateText}>{currentDate}</Text>
+            <TextInput
+              style={styles.textArea}
+              multiline={true}
+              numberOfLines={4}
+              onChangeText={setText}
+              value={text}
+              placeholder="Type your journal entry here..."
+              placeholderTextColor={Theme.colors.lightGray}
+            />
+          </View>
+        </View>
+        <View style={styles.footer}>
+          <Button
+            onPress={() => router.push("/tabs/home/confirm")}
+            showArrow={true}
           />
         </View>
-      </View>
-      <View style={styles.footer}>
-        <Button
-          onPress={() => router.push("/tabs/home/confirm")}
-          showArrow={true}
-        />
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
