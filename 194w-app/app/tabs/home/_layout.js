@@ -15,6 +15,18 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="painscale"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="journal"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

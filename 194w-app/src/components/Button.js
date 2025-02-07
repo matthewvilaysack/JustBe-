@@ -1,16 +1,17 @@
-import { TouchableOpacity, StyleSheet, Text, View } from 'react-native';
-import Theme from '@/src/theme/theme';
-import Arrow from './icons/Arrow';
+import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import Theme from "@/src/theme/theme";
+import Arrow from "./icons/Arrow";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 // Define constants at the top
 const BUTTON_WIDTH = 185;
 const BUTTON_HEIGHT = 72.08; // 144.16/2
 const ARROW_WIDTH = 38.8;
 
-export default function Button({ 
-  title, 
-  onPress, 
-  variant = 'primary', // primary or secondary
+export default function Button({
+  title,
+  onPress,
+  variant = "primary", // primary or secondary
   disabled = false,
   showArrow = false,
   style,
@@ -20,34 +21,44 @@ export default function Button({
       <TouchableOpacity
         style={[
           styles.button,
-          variant === 'secondary' && styles.buttonSecondary,
+          variant === "secondary" && styles.buttonSecondary,
           disabled && styles.buttonDisabled,
           style,
         ]}
         onPress={onPress}
         disabled={disabled}
       >
-        <Text style={[
-          styles.text,
-          variant === 'secondary' && styles.textSecondary,
-          disabled && styles.textDisabled,
-        ]}>
-          {title}
-        </Text>
+        {!showArrow && (
+          <Text
+            style={[
+              styles.text,
+              variant === "secondary" && styles.textSecondary,
+              disabled && styles.textDisabled,
+            ]}
+          >
+            {title}
+          </Text>
+        )}
+        {showArrow && (
+          <MaterialCommunityIcons
+            size={BUTTON_HEIGHT * 0.5}
+            name="arrow-right"
+            color={Theme.colors.button.primary.border}
+          />
+
+          // <Arrow
+          //   style={styles.arrow}
+          //   color={Theme.colors.button.primary.border}
+          // />
+        )}
       </TouchableOpacity>
-      {showArrow && (
-        <Arrow 
-          style={styles.arrow}
-          color={Theme.colors.button.primary.border}
-        />
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrapper: {
-    position: 'relative',
+    position: "relative",
     width: BUTTON_WIDTH,
     height: BUTTON_HEIGHT,
   },
@@ -56,8 +67,8 @@ const styles = StyleSheet.create({
     height: BUTTON_HEIGHT,
     backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     ...Theme.shadows.button,
   },
   buttonSecondary: {
@@ -78,9 +89,4 @@ const styles = StyleSheet.create({
   textDisabled: {
     opacity: 0.5,
   },
-  arrow: {
-    position: 'absolute',
-    right: -ARROW_WIDTH - Theme.spacing.sm,
-    top: BUTTON_HEIGHT/2 - 2.5,
-  },
-}); 
+});
