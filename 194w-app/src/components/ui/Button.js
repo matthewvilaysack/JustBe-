@@ -1,12 +1,10 @@
 import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import Theme from "@/src/theme/theme";
-import Arrow from "./icons/Arrow";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import ArrowRight from "./Arrow";
 
 // Define constants at the top
 const BUTTON_WIDTH = 185;
-const BUTTON_HEIGHT = 72.08; // 144.16/2
-const ARROW_WIDTH = 38.8;
+const BUTTON_HEIGHT = 72.08; // 144
 
 export default function Button({
   title,
@@ -28,6 +26,7 @@ export default function Button({
         onPress={onPress}
         disabled={disabled}
       >
+        {/* Text Button */}
         {!showArrow && (
           <Text
             style={[
@@ -39,18 +38,8 @@ export default function Button({
             {title}
           </Text>
         )}
-        {showArrow && (
-          <MaterialCommunityIcons
-            size={BUTTON_HEIGHT * 0.5}
-            name="arrow-right"
-            color={Theme.colors.button.primary.border}
-          />
 
-          // <Arrow
-          //   style={styles.arrow}
-          //   color={Theme.colors.button.primary.border}
-          // />
-        )}
+        {showArrow && <ArrowRight />}
       </TouchableOpacity>
     </View>
   );

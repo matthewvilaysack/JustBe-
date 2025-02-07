@@ -9,7 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { supabase } from "@/src/lib/supabase";
+import { supabase } from "@/src/lib/api/supabase";
 import Theme from "@/src/theme/theme";
 
 export default function Auth() {
