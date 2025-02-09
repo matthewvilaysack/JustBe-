@@ -1,7 +1,7 @@
 import { StyleSheet, View, ImageBackground, Image, Text } from "react-native";
 import { Link } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/Button";
+import Button from "@/src/components/ui/Button";
 import { useRouter } from "expo-router";
 
 export default function Page() {

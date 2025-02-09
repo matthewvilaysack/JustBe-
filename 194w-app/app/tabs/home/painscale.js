@@ -10,7 +10,7 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/Button";
+import Button from "@/src/components/ui/Button";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.7; // Normal size

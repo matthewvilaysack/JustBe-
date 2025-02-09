@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter, Link } from "expo-router";
-import { supabase } from "@/src/lib/supabase";
+import { supabase } from "@/src/lib/api/supabase";
 import Theme from "@/src/theme/theme";
 
 export default function Profile() {
