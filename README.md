@@ -7,7 +7,7 @@
 
 # Meet the Team:
 Sarah Teaw - BSCS \
-Matthew Vilaysack - BS/MSCS. I like to eat chicken and sweet potatoes. \
-Made by Andrea \
-Felicity
-Em
+Matthew Vilaysack - BS/MSCS \
+Andrea Hurtado - BSCS \
+Felicity Huang -  BSCS \
+Em Ho - BSCS
