@@ -14,6 +14,7 @@ import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
+import { extractKeywords } from "@/src/lib/api/togetherai";
 
 export default function Page() {
   const [text, setText] = useState("");
