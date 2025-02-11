@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -6,16 +6,17 @@ import {
   Image,
   Text,
   Dimensions,
+  FlatList,
+  Animated,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
 
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = width * 0.7; // Normal size
-const ITEM_HEIGHT = 200;
-const SPACING = 10; // Space between items
+const ITEM_WIDTH = width * 0.5;
+const ITEM_MARGIN = 30;
+const SPACING = 10;
 
 const images = [
   { id: 1, src: require("@/assets/blob-no-pain.png"), label: "No Pain" },
@@ -31,8 +32,21 @@ const images = [
 ];
 
 export default function Page() {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    { useNativeDriver: false } // Must be false for `useState`
+  );
+
+  const handleMomentumScrollEnd = (event) => {
+    const index = Math.round(
+      event.nativeEvent.contentOffset.x / (ITEM_WIDTH + ITEM_MARGIN)
+    );
+    setCurrentIndex(index);
+  };
 
   return (
     <ImageBackground
@@ -43,10 +57,22 @@ export default function Page() {
       <View style={styles.container}>
         <Text style={styles.heading}>How would you rate your pain?</Text>
         <View style={styles.carousel}>
-          <Carousel
-            width={width}
-            //   height={width / 2}
+          <FlatList
             data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={true}
+            snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
+            decelerationRate="fast"
+            keyExtractor={(item, index) => index.toString()}
+            onMomentumScrollEnd={handleMomentumScrollEnd}
+            scrollEventThrottle={16}
+            contentContainerStyle={{
+              paddingHorizontal: (width - ITEM_WIDTH) / 2,
+            }}
+            ItemSeparatorComponent={() => (
+              <View style={{ width: ITEM_MARGIN }} />
+            )}
             renderItem={({ item }) => (
               <View style={styles.carouselItem}>
                 <Image source={item.src} style={styles.blobImage} />
@@ -84,16 +110,16 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.bold,
   },
   carousel: {
-    height: width / 2 + Theme.typography.sizes.xl * 2 + 10,
+    height: width / 2 + Theme.typography.sizes.xl * 2 + 20,
+    minWidth: width,
   },
   carouselItem: {
     alignItems: "center",
     justifyContent: "center",
-    margin: 10,
   },
   blobImage: {
-    width: 200,
-    height: 200,
+    width: ITEM_WIDTH,
+    height: ITEM_WIDTH,
     resizeMode: "contain",
   },
   buttonContainer: {
