@@ -10,7 +10,7 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@env";  // load from .env
 // const supabaseAnonKey =
 //  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqemdybHRlamh1b2RvaGtzb2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0ODExMjQsImV4cCI6MjA1NDA1NzEyNH0.dZiemGp7D3fd-UOzciGxH-lKHeHQ7OqddWIOrjhGHJY";
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+export const supabase = createClient( `${SUPABASE_URL}`, `${SUPABASE_ANON_KEY}`, { // supabaseUrl, supabaseAnonKey, { 
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,

@@ -26,7 +26,7 @@ export default function Page() {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <Button title="Charts" onPress={() => {}} />
+          <Button title="Charts" onPress={() => router.push("/tabs/home/charts")} />
         </View>
       </View>
     </ImageBackground>
