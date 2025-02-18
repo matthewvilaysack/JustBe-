@@ -16,6 +16,14 @@ import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
 import { extractKeywords } from "@/src/lib/api/togetherai";
 
+    const fetchData = async () => {
+      const { data, error } = await supabase.from('fruit').insert([
+        { name: 'someValue', color: 'otherValue' },
+      ])
+      .select()
+      console.log("done");
+    };
+
 export default function Page() {
   const [text, setText] = useState("");
   const router = useRouter();
