@@ -20,7 +20,7 @@ import { supabase } from '../../../src/lib/api/supabase';
 const UpdateSupabaseData = async (text, router) => {
   try {
     const { data, error } = await supabase.from('journal_entries').insert([
-      { entry_text: text, pain_rating: 5, summary: 'llm summary' },
+      { entry_text: text, pain_rating: 5, summary: 'llm summary' }, // need to be filled in with actual user values
     ]);
 
     if (error) {
