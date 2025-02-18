@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { supabase } from '../../../src/lib/api/supabase';
-import { createClient } from '@supabase/supabase-js';
 
 const FetchSupabaseData = () => {
   const [data, setData] = useState([]);
