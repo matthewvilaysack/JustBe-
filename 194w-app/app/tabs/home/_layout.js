@@ -28,6 +28,12 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="charts"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="confirm"
         options={{
           headerShown: false,

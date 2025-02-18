@@ -15,6 +15,24 @@ import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
 import { extractKeywords } from "@/src/lib/api/togetherai";
+import { supabase } from '../../../src/lib/api/supabase';
+
+const UpdateSupabaseData = async (text, router) => {
+  try {
+    const { data, error } = await supabase.from('journal_entries').insert([
+      { entry_text: text, pain_rating: 5, summary: 'llm summary' }, // need to be filled in with actual user values
+    ]);
+
+    if (error) {
+      console.error("Error updating data:", error);
+    } else {
+      console.log("Updated data:");
+      router.push("/tabs/home/confirm"); // confirm tab
+    }
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+};
 
 export default function Page() {
   const [text, setText] = useState("");
@@ -45,7 +63,7 @@ export default function Page() {
         </View>
         <View style={styles.footer}>
           <Button
-            onPress={() => router.push("/tabs/home/confirm")}
+            onPress={() => UpdateSupabaseData(text, router)}
             showArrow={true}
           />
         </View>
