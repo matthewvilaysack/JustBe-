@@ -1,6 +1,4 @@
-import { Stack, Slot } from "expo-router";
-import { PaperProvider } from 'react-native-paper';
-import { paperTheme } from '@/src/theme/paperTheme';
+import { Stack } from "expo-router";
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from "@/src/lib/api/supabase";
@@ -13,8 +11,8 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAppState = async () => {
       try {
-        // test async storage
-        await AsyncStorage.clear();
+        // ! TESTING ONLY
+        // await AsyncStorage.clear();
 
         const [{ data: { session } }, hasOnboarded] = await Promise.all([
           supabase.auth.getSession(),
@@ -45,9 +43,8 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={paperTheme}>
+    <>
       {session ? (
-        // Logged in - show main app
         <Stack>
           <Stack.Screen 
             name="tabs" 
@@ -58,7 +55,6 @@ export default function RootLayout() {
           />
         </Stack>
       ) : (
-        // Not logged in - show onboarding or auth
         <Stack screenOptions={{ headerShown: false }}>
           {!hasCompletedOnboarding ? (
             <Stack.Screen 
@@ -73,6 +69,6 @@ export default function RootLayout() {
           )}
         </Stack>
       )}
-    </PaperProvider>
+    </>
   );
 }
