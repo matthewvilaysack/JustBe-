@@ -1,46 +1,74 @@
-import "react-native-url-polyfill/auto";
-import { useState, useEffect } from "react";
-import { supabase } from "../src/lib/api/supabase";
-import Auth from "./components/Auth";
-import { View, Text, ImageBackground, StyleSheet } from "react-native";
-import { Session } from "@supabase/supabase-js";
-import { useFonts } from "expo-font";
-import { Redirect } from "expo-router";
+// app/index.js
+import { useEffect, useState } from 'react';
+import { Redirect } from 'expo-router';
+import { supabase } from "@/src/lib/api/supabase";
+import Auth from './components/Auth';
+import { View, ActivityIndicator, ImageBackground } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function App() {
+export default function Index() {
   const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [firstVisit, setFirstVisit] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initialize = async () => {
+      try {
+        const [{ data: { session } }, hasCompletedOnboarding] = await Promise.all([
+          supabase.auth.getSession(),
+          AsyncStorage.getItem('hasCompletedOnboarding')
+        ]);
+
+        setSession(session);
+        setFirstVisit(hasCompletedOnboarding !== 'true');
+        setLoading(false);
+      } catch (error) {
+        console.error('Error during initialization:', error);
+        setLoading(false);
+      }
+    };
+
+    initialize();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    return () => subscription?.unsubscribe();
   }, []);
 
-  if (session) {
-    return <Redirect href="/tabs/home" />;
-  } else {
+  if (loading) {
     return (
       <ImageBackground
-        source={require("@/assets/background.png")} // Local image
+        source={require("@/assets/background.png")}
         resizeMode="cover"
-        style={styles.background}
+        style={{ flex: 1 }}
       >
-        <View>
-          <Auth />
-          {session && session.user && <Text>{session.user.id}</Text>}
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" />
         </View>
       </ImageBackground>
     );
   }
+
+  // Check session first - if logged in, go to main app
+  if (session) {
+    return <Redirect href="/tabs/home" />;
+  }
+
+  // Then check if it's first visit - if yes, go to onboarding
+  if (firstVisit) {
+    return <Redirect href="/onboarding" />;
+  }
+
+  // If not first visit and not logged in, show auth
+  return (
+    <ImageBackground
+      source={require("@/assets/background.png")}
+      resizeMode="cover"
+      style={{ flex: 1 }}
+    >
+      <Auth />
+    </ImageBackground>
+  );
 }
-const styles = StyleSheet.create({
-  background: {
-    flex: 1, // Ensures full-screen background
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
