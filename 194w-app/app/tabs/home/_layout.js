@@ -4,6 +4,7 @@ import theme from "../../../src/theme/theme";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const queryClient = new QueryClient();
 
@@ -12,6 +13,7 @@ export default function Layout() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <StatusBar style="light" />
       <Stack>
         <Stack.Screen
           name="index"
@@ -25,6 +27,13 @@ export default function Layout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="summary"
+          options={{
+            headerShown: false,
+          }}
+        />
+
         <Stack.Screen
           name="journal"
           options={{

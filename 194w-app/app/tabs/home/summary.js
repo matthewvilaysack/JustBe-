@@ -11,89 +11,77 @@ import {
   TouchableWithoutFeedback,
   Animated,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
-import { extractKeywords } from "@/src/lib/api/togetherai";
+import { useKeywordStore } from "@/src/store/summaryStore";
+
 const { width, height } = Dimensions.get("window");
-
-const words = [
-  "React",
-  "Native",
-  "Animation",
-  "Cloud",
-  "Expo",
-  "UI",
-  "Mobile",
-  "JavaScript",
-  "CSS",
-  "Flexbox",
-];
-
 export default function Page() {
-  const [text, setText] = useState("");
+  const { keywords } = useKeywordStore();
   const router = useRouter();
-  const currentDate = new Date().toLocaleDateString();
-
-  const animations = useRef(words.map(() => new Animated.Value(0))).current; // Array of animations
+  const [animations, setAnimations] = useState([]);
 
   useEffect(() => {
-    // Animate each word one by one
-    Animated.stagger(
-      200, // Delay between animations
-      animations.map((anim) =>
-        Animated.timing(anim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        })
-      )
-    ).start();
-  }, []);
+    const newAnimations = keywords.map(() => new Animated.Value(0));
+    setAnimations(newAnimations);
+
+    if (newAnimations.length > 0) {
+      Animated.stagger(
+        500,
+        newAnimations.map((anim) =>
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          })
+        )
+      ).start();
+    }
+  }, [keywords]);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <ImageBackground
-        source={require("@/assets/background.png")}
-        resizeMode="cover"
-        style={styles.background}
-      >
-        <View style={styles.container}>
-          <Text style={styles.heading}>I hear you're feeling</Text>
-          <View style={styles.journalContainer}>
-            {words.map((word, index) => {
-              const opacity = animations[index];
+    <ImageBackground
+      source={require("@/assets/background.png")}
+      resizeMode="cover"
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <Text style={styles.heading}>I hear you're feeling</Text>
+        <View style={styles.journalContainer}>
+          {keywords.map((word, index) => {
+            const opacity = animations[index];
 
-              const leftOffset = index % 2 === 0 ? -120 : 80;
-              const left = width / 2 + leftOffset;
+            const leftOffset = index % 2 === 0 ? -width / 3 : 0;
+            const left = width / 2 + leftOffset;
 
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.word,
-                    {
-                      opacity,
-                      top: index * 30 + 10,
-                      left,
-                    },
-                  ]}
-                >
-                  <Text style={styles.wordText}>{word}</Text>
-                </Animated.View>
-              );
-            })}
-          </View>
+            return (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.word,
+                  {
+                    opacity,
+                    top: index * 30 + 10,
+                    left,
+                  },
+                ]}
+              >
+                <View style={styles.symptomContainer}>
+                  <Text style={styles.symptomText}>{word}</Text>
+                </View>
+              </Animated.View>
+            );
+          })}
         </View>
-        <View style={styles.footer}>
-          <Button
-            onPress={() => router.push("/tabs/home/confirm")}
-            showArrow={true}
-          />
-        </View>
-      </ImageBackground>
-    </TouchableWithoutFeedback>
+      </View>
+      <View style={styles.footer}>
+        <Button
+          onPress={() => router.push("/tabs/home/confirm")}
+          showArrow={true}
+        />
+      </View>
+    </ImageBackground>
   );
 }
 
@@ -112,6 +100,17 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     marginBottom: Theme.spacing.lg,
+    fontFamily: Theme.typography.fonts.bold,
+  },
+  symptomContainer: {
+    backgroundColor: Theme.colors.white,
+    padding: 10,
+    borderRadius: Theme.radius.lg,
+    alignSelf: "flex-start",
+  },
+  symptomText: {
+    fontSize: Theme.typography.sizes.sm,
+    color: Theme.colors.darkGray,
     fontFamily: Theme.typography.fonts.bold,
   },
   dateText: {

@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   ImageBackground,
-  Image,
   Text,
   Dimensions,
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
@@ -16,40 +18,54 @@ import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
 import { useQuery } from "@tanstack/react-query";
 import { extractKeywords } from "@/src/lib/api/togetherai";
-import { supabase } from '../../../src/lib/api/supabase';
-
-const UpdateSupabaseData = async (text, router) => {
-  try {
-    const { data, error } = await supabase.from('journal_entries').insert([
-      { entry_text: text, pain_rating: 5, summary: 'llm summary' }, // need to be filled in with actual user values
-    ]);
-
-    if (error) {
-      console.error("Error updating data:", error);
-    } else {
-      console.log("Updated data:");
-      router.push("/tabs/home/confirm"); // confirm tab
-    }
-  } catch (err) {
-    console.error("Unexpected error:", err);
-  }
-};
+import { supabase } from "../../../src/lib/api/supabase";
+import { useKeywordStore } from "@/src/store/summaryStore";
 
 export default function Page() {
   const [text, setText] = useState("");
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
-
-  const {
-    data: keywords = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["keywords", text], // auto-caches results based on `text`
-    queryFn: () => extractKeywords(text), // calls API function
-    enabled: false, // only runs when refetch() is called
+  const { setKeywords, keywords } = useKeywordStore();
+  const { isLoading, isError, refetch } = useQuery({
+    queryKey: ["keywords", text],
+    queryFn: async () => {
+      const fetchedKeywords = await extractKeywords(text);
+      setKeywords(fetchedKeywords);
+      return fetchedKeywords;
+    },
+    enabled: false,
   });
+
+  const UpdateSupabaseData = async (text, router) => {
+    try {
+      refetch();
+
+      const { data, error } = await supabase.from("journal_entries").insert([
+        { entry_text: text, pain_rating: 5, summary: "llm summary" }, // need to be filled in with actual user values
+      ]);
+
+      if (error) {
+        Alert.alert(
+          "Sorry, we encountered a problem on our end!",
+          "Would you like to retry?",
+          [
+            {
+              text: "Cancel",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
+            },
+            { text: "OK", onPress: () => UpdateSupabaseData(text, router) },
+          ]
+        );
+        console.error("Error updating data:", error);
+      } else {
+        console.log("Updated data:");
+        router.push("/tabs/home/summary");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -73,10 +89,20 @@ export default function Page() {
             />
           </View>
         </View>
+
+        {isLoading && (
+          <ActivityIndicator
+            size="large"
+            color="white"
+            style={{ marginTop: 20 }}
+          />
+        )}
+
         <View style={styles.footer}>
           <Button
             onPress={() => UpdateSupabaseData(text, router)}
             showArrow={true}
+            disabled={text.trim().length === 0}
           />
         </View>
       </ImageBackground>
@@ -126,6 +152,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Theme.spacing.xl,
   },
+  errorText: { color: "red", marginTop: 10 },
+  keywordsContainer: {
+    marginTop: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    padding: 15,
+    borderRadius: 10,
+    width: "90%",
+  },
+  keywordsHeading: {
+    fontSize: Theme.typography.sizes.md,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
+  },
+  keyword: { fontSize: Theme.typography.sizes.md, color: "white" },
   footer: {
     flexDirection: "row",
     justifyContent: "flex-end",
