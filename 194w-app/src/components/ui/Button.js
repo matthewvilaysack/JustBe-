@@ -2,10 +2,6 @@ import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import Theme from "@/src/theme/theme";
 import ArrowRight from "./Arrow";
 
-// Define constants at the top
-const BUTTON_WIDTH = 185;
-const BUTTON_HEIGHT = 72.08; // 144
-
 export default function Button({
   title,
   onPress,
@@ -15,45 +11,38 @@ export default function Button({
   style,
 }) {
   return (
-    <View style={styles.wrapper}>
-      <TouchableOpacity
-        style={[
-          styles.button,
-          variant === "secondary" && styles.buttonSecondary,
-          disabled && styles.buttonDisabled,
-          style,
-        ]}
-        onPress={onPress}
-        disabled={disabled}
-      >
-        {/* Text Button */}
-        {!showArrow && (
-          <Text
-            style={[
-              styles.text,
-              variant === "secondary" && styles.textSecondary,
-              disabled && styles.textDisabled,
-            ]}
-          >
-            {title}
-          </Text>
-        )}
+    <TouchableOpacity
+      style={[
+        styles.button,
+        variant === "secondary" && styles.buttonSecondary,
+        disabled && styles.buttonDisabled,
+        style,
+      ]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      {/* Text Button */}
+      {!showArrow && (
+        <Text
+          style={[
+            styles.text,
+            variant === "secondary" && styles.textSecondary,
+            disabled && styles.textDisabled,
+          ]}
+        >
+          {title}
+        </Text>
+      )}
 
-        {showArrow && <ArrowRight />}
-      </TouchableOpacity>
-    </View>
+      {showArrow && <ArrowRight />}
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    position: "relative",
-    width: BUTTON_WIDTH,
-    height: BUTTON_HEIGHT,
-  },
   button: {
-    width: BUTTON_WIDTH,
-    height: BUTTON_HEIGHT,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
     backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
     alignItems: "center",
