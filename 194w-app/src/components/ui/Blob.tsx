@@ -7,12 +7,12 @@ interface BlobProps {
 }
 
 export default function Blob({ size = 120 }: BlobProps) {
-  const scale = size / 314; // normalize to original SVG size
+  const scale = size / 314; 
 
   return (
     <Svg
       width={size}
-      height={size * (271/314)} // maintain aspect ratio
+      height={size * (271/314)}
       viewBox="0 0 314 271"
     >
       <Defs>

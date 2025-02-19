@@ -13,14 +13,15 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAppState = async () => {
       try {
-        await AsyncStorage.clear(); // Uncomment this line temporarily to test first launch
+        // test async storage
+        await AsyncStorage.clear();
 
         const [{ data: { session } }, hasOnboarded] = await Promise.all([
           supabase.auth.getSession(),
           AsyncStorage.getItem('hasCompletedOnboarding')
         ]);
 
-        console.log('Onboarding status:', hasOnboarded); // Debug log
+        console.log('Onboarding status:', hasOnboarded);
         setSession(session);
         setHasCompletedOnboarding(hasOnboarded === 'true');
       } catch (error) {

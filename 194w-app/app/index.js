@@ -51,17 +51,17 @@ export default function Index() {
     );
   }
 
-  // Check session first - if logged in, go to main app
+  // if logged in, go to main app
   if (session) {
     return <Redirect href="/tabs/home" />;
   }
 
-  // Then check if it's first visit - if yes, go to onboarding
+  // if yes, go to onboarding
   if (firstVisit) {
     return <Redirect href="/onboarding" />;
   }
 
-  // If not first visit and not logged in, show auth
+  // if not first visit and not logged in, show auth
   return (
     <ImageBackground
       source={require("@/assets/background.png")}
