@@ -1,15 +1,15 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, { 
-  useAnimatedStyle, 
-  withRepeat, 
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  withRepeat,
   withSequence,
   useSharedValue,
   withSpring,
   withTiming,
-  Easing
-} from 'react-native-reanimated';
-import Blob from '@/src/components/ui/Blob';
+  Easing,
+} from "react-native-reanimated";
+import Blob from "@/src/components/ui/Blob";
 
 interface LoadingBlobProps {
   style?: any;
@@ -46,7 +46,7 @@ export default function LoadingBlob({ style }: LoadingBlobProps) {
         withTiming(1, {
           duration: 1000,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-        }),
+        })
       ),
       -1,
       true
@@ -54,10 +54,7 @@ export default function LoadingBlob({ style }: LoadingBlobProps) {
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateY: translateY.value }
-    ],
+    transform: [{ scale: scale.value }, { translateY: translateY.value }],
   }));
 
   return (
@@ -71,8 +68,7 @@ export default function LoadingBlob({ style }: LoadingBlobProps) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
+    alignItems: "center",
+    justifyContent: "center",
   },
-}); 
+});

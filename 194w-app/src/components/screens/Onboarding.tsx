@@ -1,54 +1,69 @@
 // src/components/screens/Onboarding.tsx
-import React, { useState, useRef, useEffect } from 'react';
-import { View, FlatList, Dimensions, TouchableOpacity, SafeAreaView, Text, ImageBackground } from 'react-native';
-import { useRouter } from 'expo-router';
-import theme from '@/src/theme/theme';
-import Button from '../ui/Button';
-import LoadingBlob from '@/src/animations/LoadingBlob';
-import SelectionButton from '../ui/SelectionButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  View,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+  SafeAreaView,
+  Text,
+  ImageBackground,
+} from "react-native";
+import { useRouter } from "expo-router";
+import theme from "@/src/theme/theme";
+import Button from "../ui/Button";
+import LoadingBlob from "@/src/animations/LoadingBlob";
+import SelectionButton from "../ui/SelectionButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const slides = [
   {
-    id: '1',
-    type: 'loading',
-    title: '...',
-    character: true
+    id: "1",
+    type: "loading",
+    title: "...",
+    character: true,
   },
   {
-    id: '2',
-    type: 'question',
-    title: 'What kind of chronic pain do you experience?',
-    subtitle: '(Choose one)',
-    options: ['Sciatic', 'OCD', 'Arthritis', 'Fibromyalgia', 'CKD', 'Alzheimers'],
+    id: "2",
+    type: "question",
+    title: "What kind of chronic pain do you experience?",
+    subtitle: "(Choose one)",
+    options: [
+      "Sciatic",
+      "OCD",
+      "Arthritis",
+      "Fibromyalgia",
+      "CKD",
+      "Alzheimers",
+    ],
     character: true,
-    showNext: true
+    showNext: true,
   },
   {
-    id: '3',
-    type: 'question',
-    title: 'How long have you been experiencing this?',
-    subtitle: 'This helps us understand your journey',
-    options: ['< 1 year', '1-3 years', '3-5 years', '5+ years'],
+    id: "3",
+    type: "question",
+    title: "How long have you been experiencing this?",
+    subtitle: "This helps us understand your journey",
+    options: ["< 1 year", "1-3 years", "3-5 years", "5+ years"],
     character: true,
-    showNext: true
+    showNext: true,
   },
   {
-    id: '4',
-    type: 'welcome',
-    title: 'My name is blob by the way!',
-    subtitle: 'I will do my best to help you better manage your OCD',
+    id: "4",
+    type: "welcome",
+    title: "My name is blob by the way!",
+    subtitle: "I will do my best to help you better manage your OCD",
     character: true,
-    showNext: true
-  }
+    showNext: true,
+  },
 ];
 
 export default function Onboarding() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState("");
   const flatListRef = useRef<FlatList<any>>(null);
 
   useEffect(() => {
@@ -58,7 +73,7 @@ export default function Onboarding() {
           moveToNextSlide();
         }
       }, 2000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [currentIndex]);
@@ -67,89 +82,93 @@ export default function Onboarding() {
     const nextIndex = currentIndex + 1;
     flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
   };
-  
+
   const renderSlide = ({ item }: { item: any }) => (
-    <View style={{ 
-      width, 
-      alignItems: 'center',
-      padding: theme.spacing.lg,
-      height: '100%',
-      position: 'relative'
-    }}>
-      {item.type === 'loading' ? (
-        <View style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center'
-        }}>
-          <LoadingBlob style={{transform: [{scale: 1.5}]}} />
+    <View
+      style={{
+        width,
+        alignItems: "center",
+        padding: theme.spacing.lg,
+        position: "relative",
+      }}
+    >
+      {item.type === "loading" ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <LoadingBlob style={{ transform: [{ scale: 1.5 }] }} />
         </View>
       ) : (
         <>
-          <View style={{
-            position: 'absolute',
-            top: 40,
-            left: 0,
-            right: 0,
-            alignItems: 'center',
-            zIndex: 1
-          }}>
+          <View
+            style={{
+              position: "relative",
+            }}
+          >
             <LoadingBlob />
           </View>
 
-          <View style={{
-            marginTop: 280,
-            width: '100%',
-            alignItems: 'center',
-            flex: 1,
-            justifyContent: 'flex-start'
-          }}>
-            <Text 
-              style={{ 
+          <View
+            style={{
+              marginTop: theme.spacing.lg,
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
+          >
+            <Text
+              style={{
                 fontSize: theme.typography.sizes.xl,
                 color: theme.colors.white,
                 fontFamily: theme.typography.fonts.bold,
-                marginBottom: theme.spacing.md,
-                textAlign: 'center'
+                marginBottom: theme.spacing.sm,
+                textAlign: "center",
               }}
             >
               {item.title}
             </Text>
-            
+
             {item.subtitle && (
-              <Text style={{ 
-                color: theme.colors.white,
-                textAlign: 'center',
-                opacity: 0.8,
-                marginBottom: theme.spacing.lg,
-                fontSize: theme.typography.sizes.lg,
-                fontFamily: theme.typography.fonts.bold,
-              }}>
+              <Text
+                style={{
+                  color: theme.colors.white,
+                  textAlign: "center",
+                  opacity: 0.8,
+                  marginBottom: theme.spacing.lg,
+                  fontSize: theme.typography.sizes.lg,
+                  fontFamily: theme.typography.fonts.bold,
+                }}
+              >
                 {item.subtitle}
               </Text>
             )}
 
             {item.options && (
-              <View style={{ 
-                flexDirection: 'row', 
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                gap: theme.spacing.xs,
-                paddingHorizontal: theme.spacing.lg,
-                width: '100%',
-                maxWidth: 350,
-                marginBottom: theme.spacing.xl
-              }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                  gap: theme.spacing.xs,
+                  paddingHorizontal: theme.spacing.lg,
+                  width: "100%",
+                  maxWidth: 350,
+                }}
+              >
                 {item.options.map((option: string) => (
                   <SelectionButton
                     key={option}
                     title={option}
                     onPress={() => setSelectedOption(option)}
                     selected={selectedOption === option}
-                    style={{ 
+                    style={{
                       width: option.length > 8 ? 150 : 120,
                       height: 40,
-                      marginBottom: theme.spacing.xs
+                      marginBottom: theme.spacing.xs,
                     }}
                   />
                 ))}
@@ -163,35 +182,38 @@ export default function Onboarding() {
 
   const completeOnboarding = async () => {
     try {
-      console.log('Setting onboarding completed...'); // Debug log
-      await AsyncStorage.setItem('hasCompletedOnboarding', 'true');
-      console.log('Onboarding completed set successfully'); // Debug log
-      router.replace('/');
+      console.log("Setting onboarding completed..."); // Debug log
+      await AsyncStorage.setItem("hasCompletedOnboarding", "true");
+      console.log("Onboarding completed set successfully"); // Debug log
+      router.replace("/");
     } catch (error) {
-      console.error('Error completing onboarding:', error);
-      router.replace('/');
+      console.error("Error completing onboarding:", error);
+      router.replace("/");
     }
   };
 
   return (
     <View style={{ flex: 1 }}>
       <ImageBackground
-        source={require('@/assets/background.png')}
+        source={require("@/assets/background.png")}
         resizeMode="cover"
         style={{
           flex: 1,
-          width: '100%',
-          height: '100%'
+          width: "100%",
+          height: "100%",
         }}
-      > 
-        <SafeAreaView style={{ 
-          flex: 1, 
-          backgroundColor: 'transparent'
-        }}>
-          <View style={{ 
-            flex: 1, 
-            paddingVertical: theme.spacing.lg,
-          }}>
+      >
+        <SafeAreaView
+          style={{
+            flex: 1,
+            backgroundColor: "transparent",
+          }}
+        >
+          <View
+            style={{
+              paddingVertical: theme.spacing.lg,
+            }}
+          >
             <FlatList
               data={slides}
               renderItem={renderSlide}
@@ -204,16 +226,18 @@ export default function Onboarding() {
                 setCurrentIndex(currentIndex);
               }}
               scrollEventThrottle={16}
-              keyExtractor={item => item.id}
+              keyExtractor={(item) => item.id}
               ref={flatListRef}
             />
-            
+
             {/* dots  */}
-            <View style={{ 
-              flexDirection: 'row', 
-              justifyContent: 'center',
-              marginBottom: theme.spacing.lg
-            }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                marginBottom: theme.spacing.lg,
+              }}
+            >
               {slides.map((_, index) => (
                 <View
                   key={index}
@@ -223,7 +247,7 @@ export default function Onboarding() {
                     borderRadius: 4,
                     backgroundColor: theme.colors.white,
                     marginHorizontal: 4,
-                    opacity: currentIndex === index ? 1 : 0.5
+                    opacity: currentIndex === index ? 1 : 0.5,
                   }}
                 />
               ))}
@@ -238,23 +262,33 @@ export default function Onboarding() {
                   onPress={completeOnboarding}
                   variant="primary"
                   showArrow={false}
-                  style={{ alignSelf: 'center', width: 200 }}
-                />
-              </View>
-            )}
-            {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
-              <View style={{ paddingHorizontal: theme.spacing.lg, alignItems: 'flex-end' }}>
-                <Button
-                  title="Next" 
-                  onPress={() => moveToNextSlide()}
-                  variant="primary"
-                  showArrow={true}
-                  style={{ alignSelf: 'flex-end', width: 120 }}
+                  style={{ alignSelf: "center", width: 200 }}
                 />
               </View>
             )}
           </View>
         </SafeAreaView>
+        {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
+          <View
+            style={{
+              paddingHorizontal: theme.spacing.lg,
+              alignItems: "flex-end",
+            }}
+          >
+            <Button
+              title="Next"
+              onPress={() => moveToNextSlide()}
+              variant="primary"
+              showArrow={true}
+              style={{
+                position: "absolute",
+                bottom: 50,
+                right: 25,
+                width: 120,
+              }}
+            />
+          </View>
+        )}
       </ImageBackground>
     </View>
   );

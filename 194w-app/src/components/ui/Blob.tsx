@@ -1,13 +1,13 @@
-import * as React from 'react';
-import Svg, { 
-  Path, 
-  Circle, 
-  Ellipse, 
-  Defs, 
-  LinearGradient, 
+import * as React from "react";
+import Svg, {
+  Path,
+  Circle,
+  Ellipse,
+  Defs,
+  LinearGradient,
   Stop,
-} from 'react-native-svg';
-import theme from '@/src/theme/theme';
+} from "react-native-svg";
+import theme from "@/src/theme/theme";
 
 interface BlobProps {
   size?: number;
@@ -43,7 +43,7 @@ export default function Blob({ size = 347 }: BlobProps) {
         fill="#333333"
         fillOpacity="0.3"
       />
-      
+
       {/* Main Blob Shape */}
       <Path
         d="M20.7117 172.436C27.5472 110.127 45.695 86.5216 85.1234 53.7999C140.451 7.88342 209.675 22.5799 258.641 47.5558C307.607 72.5318 337.512 151.403 323.71 195.44C309.907 239.476 207.046 282.527 144.606 276.283C82.1657 270.039 12.1672 250.321 20.7117 172.436Z"
@@ -84,7 +84,9 @@ export default function Blob({ size = 347 }: BlobProps) {
         stroke="black"
         strokeWidth="10"
         strokeLinecap="round"
+        fill="none"
+        fillOpacity={0}
       />
     </Svg>
   );
-} 
+}
