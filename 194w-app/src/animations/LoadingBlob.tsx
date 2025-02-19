@@ -12,7 +12,7 @@ import Animated, {
 import Blob from '@/src/components/ui/Blob';
 
 interface LoadingBlobProps {
-  style?: any;  // or use ViewStyle from react-native
+  style?: any;
 }
 
 export default function LoadingBlob({ style }: LoadingBlobProps) {
