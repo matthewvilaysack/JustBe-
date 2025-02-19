@@ -46,48 +46,50 @@ export default function Auth() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Text style={styles.inputLabel}>Email</Text>
-          <TextInput
-            leftIcon={{ type: "font-awesome", name: "envelope" }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="email@address.com"
-            autoCapitalize={"none"}
-            style={styles.inputText}
-          />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Text style={styles.inputLabel}>Password</Text>
-          <TextInput
-            label="Password"
-            leftIcon={{ type: "font-awesome", name: "lock" }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            placeholder="Password"
-            autoCapitalize={"none"}
-            style={styles.inputText}
-          />
-        </View>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <TouchableOpacity
-            style={[styles.button, loading && styles.disabledButton]}
-            onPress={() => signInWithEmail()}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>Sign in</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.verticallySpaced}>
-          <TouchableOpacity
-            style={[styles.button, loading && styles.disabledButton]}
-            onPress={() => signUpWithEmail()}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
+      <View style={styles.outerContainer}>
+        <View style={styles.container}>
+          <View style={[styles.verticallySpaced, styles.mt20]}>
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              leftIcon={{ type: "font-awesome", name: "envelope" }}
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+              placeholder="email@address.com"
+              autoCapitalize={"none"}
+              style={styles.inputText}
+            />
+          </View>
+          <View style={styles.verticallySpaced}>
+            <Text style={styles.inputLabel}>Password</Text>
+            <TextInput
+              label="Password"
+              leftIcon={{ type: "font-awesome", name: "lock" }}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+              secureTextEntry={true}
+              placeholder="Password"
+              autoCapitalize={"none"}
+              style={styles.inputText}
+            />
+          </View>
+          <View style={[styles.verticallySpaced, styles.mt20]}>
+            <TouchableOpacity
+              style={[styles.button, loading && styles.disabledButton]}
+              onPress={() => signInWithEmail()}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>Sign in</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.verticallySpaced}>
+            <TouchableOpacity
+              style={[styles.button, loading && styles.disabledButton]}
+              onPress={() => signUpWithEmail()}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -95,12 +97,27 @@ export default function Auth() {
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Theme.spacing.lg,
+  },
   container: {
     marginVertical: Theme.spacing.xl,
-    padding: Theme.spacing.lg,
-    minWidth: "85%",
+    padding: Theme.spacing.xl,
+    width: '90%',
+    maxWidth: 400,
     backgroundColor: Theme.colors.primary[400],
     borderRadius: Theme.radius.xl,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   verticallySpaced: {
     paddingTop: Theme.spacing.xs,
