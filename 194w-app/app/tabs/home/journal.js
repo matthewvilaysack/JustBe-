@@ -14,6 +14,7 @@ import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
+import { useQuery } from "@tanstack/react-query";
 import { extractKeywords } from "@/src/lib/api/togetherai";
 import { supabase } from '../../../src/lib/api/supabase';
 
@@ -38,6 +39,17 @@ export default function Page() {
   const [text, setText] = useState("");
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
+
+  const {
+    data: keywords = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["keywords", text], // auto-caches results based on `text`
+    queryFn: () => extractKeywords(text), // calls API function
+    enabled: false, // only runs when refetch() is called
+  });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
