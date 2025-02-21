@@ -38,7 +38,7 @@ export default function Page() {
 
   const UpdateSupabaseData = async (text, router) => {
     try {
-      refetch();
+      await refetch();
 
       const { data, error } = await supabase.from("journal_entries").insert([
         { entry_text: text, pain_rating: 5, summary: "llm summary" }, // need to be filled in with actual user values
