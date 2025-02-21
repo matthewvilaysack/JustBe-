@@ -9,14 +9,16 @@ import {
   FlatList,
   Animated,
 } from "react-native";
+import Slider from "@react-native-community/slider";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/Button";
+import theme from "@/src/theme/theme";
+import { usePainLevelStore } from "@/src/store/painlevelStore";
 
 const { width } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.5;
 const ITEM_MARGIN = 30;
-const SPACING = 10;
 
 const images = [
   { id: 1, src: require("@/assets/blob-no-pain.png"), label: "No Pain" },
@@ -31,21 +33,36 @@ const images = [
   { id: 5, src: require("@/assets/blob-worst.png"), label: "Worst" },
 ];
 
+const painLevelDescriptions = {
+  0: "No pain",
+  1: "Hardly noticeable pain",
+  2: "Mild pain but doesn't interfere",
+  3: "Sometimes distracting pain",
+  4: "Distracting pain but no interruptions",
+  5: "Moderate pain that interrupts",
+  6: "Hard to ignore pain and avoiding activities",
+  7: "Severe pain that is focus of attention",
+  8: "Very severe pain that is hard to tolerate",
+  9: "Can't bear the pain, unable to do anything",
+  10: "Worst pain imaginable, nothing else matters",
+};
+
 export default function Page() {
   const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const { painLevel, setPainLevel } = usePainLevelStore();
+  const flatListRef = useRef(null);
 
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-    { useNativeDriver: false } // Must be false for `useState`
-  );
-
-  const handleMomentumScrollEnd = (event) => {
-    const index = Math.round(
-      event.nativeEvent.contentOffset.x / (ITEM_WIDTH + ITEM_MARGIN)
-    );
-    setCurrentIndex(index);
+  const mapSliderToIndex = (value) => Math.ceil(value / 2);
+  const handleSliderChange = (value) => {
+    setPainLevel(value);
+    const index = mapSliderToIndex(value);
+    setSelectedIndex(index);
+    flatListRef.current?.scrollToIndex({
+      index,
+      animated: true,
+      viewPosition: 0.5,
+    });
   };
 
   return (
@@ -58,15 +75,14 @@ export default function Page() {
         <Text style={styles.heading}>How would you rate your pain?</Text>
         <View style={styles.carousel}>
           <FlatList
+            ref={flatListRef}
             data={images}
             horizontal
             pagingEnabled
-            showsHorizontalScrollIndicator={true}
+            showsHorizontalScrollIndicator={false}
             snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
-            decelerationRate="fast"
-            keyExtractor={(item, index) => index.toString()}
-            onMomentumScrollEnd={handleMomentumScrollEnd}
-            scrollEventThrottle={16}
+            keyExtractor={(_, index) => index.toString()}
+            scrollEnabled={false}
             contentContainerStyle={{
               paddingHorizontal: (width - ITEM_WIDTH) / 2,
             }}
@@ -76,12 +92,30 @@ export default function Page() {
             renderItem={({ item }) => (
               <View style={styles.carouselItem}>
                 <Image source={item.src} style={styles.blobImage} />
-                <Text style={styles.heading}>{item.label}</Text>
               </View>
             )}
           />
         </View>
       </View>
+      <View style={styles.sliderContainer}>
+        <View style={styles.levelContainer}>
+          <Text style={styles.heading}>
+            {painLevel} - {painLevelDescriptions[painLevel]}
+          </Text>
+        </View>
+        <Slider
+          style={styles.slider}
+          minimumValue={0}
+          maximumValue={10}
+          step={1}
+          value={selectedIndex * 2}
+          onValueChange={handleSliderChange}
+          minimumTrackTintColor={theme.colors.primary[200]}
+          maximumTrackTintColor={theme.colors.white}
+          thumbTintColor={theme.colors.white}
+        />
+      </View>
+
       <View style={styles.footer}>
         <Button
           onPress={() => router.push("/tabs/home/journal")}
@@ -98,9 +132,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: Theme.spacing.xl,
+    marginTop: Theme.spacing.xxl * 2,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
@@ -121,6 +156,16 @@ const styles = StyleSheet.create({
     width: ITEM_WIDTH,
     height: ITEM_WIDTH,
     resizeMode: "contain",
+  },
+  sliderContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    padding: Theme.spacing.xl,
+    marginTop: Theme.spacing.xxl * 2,
+  },
+  slider: {
+    width: width - Theme.spacing.xl * 2,
   },
   buttonContainer: {
     position: "absolute",

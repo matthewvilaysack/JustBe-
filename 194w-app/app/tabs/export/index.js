@@ -130,13 +130,15 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: theme.typography.sizes.xl,
     color: "white",
+    fontWeight: "bold",
     fontFamily: theme.typography.fonts.bold, // erm... why is she not bold...
     marginBottom: theme.spacing.sm,
   },
   cardSubtitle: {
     color: "white",
     opacity: 0.8,
-    fontSize: theme.typography.sizes.md,
+    fontFamily: theme.typography.fonts.regular, // also not bold ??
+    fontSize: theme.typography.sizes.lg,
     marginBottom: theme.spacing.md,
   },
 
@@ -152,10 +154,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: theme.typography.sizes.xl,
     color: "white",
-    fontFamily: theme.typography.fonts.bold, // also not bold ??
+    fontFamily: theme.typography.fonts.bold,
     marginBottom: theme.spacing.lg,
   },
   logItem: {
+    fontFamily: theme.typography.fonts.regular,
     backgroundColor: theme.colors.primaryDark,
     padding: theme.spacing.md,
     borderRadius: theme.radius.md,
@@ -174,5 +177,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.sizes.md,
     color: "white",
     marginLeft: theme.spacing.sm,
+    fontFamily: theme.typography.fonts.regular,
   },
 });

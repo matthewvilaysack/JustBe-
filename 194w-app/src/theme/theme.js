@@ -80,8 +80,8 @@ export default {
   // Typography
   typography: {
     fonts: {
-      regular: "LexendDeca-Regular",
-      bold: "LexendDeca-Bold",
+      regular: "LexendDecaRegular",
+      bold: "LexendDecaBold",
     },
     sizes: {
       xs: 12,
