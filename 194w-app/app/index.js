@@ -1,35 +1,47 @@
-import { useEffect, useState } from 'react';
-import { Redirect } from 'expo-router';
+import { useEffect, useState } from "react";
+import { Redirect } from "expo-router";
 import { supabase } from "@/src/lib/api/supabase";
-import Auth from './components/Auth';
-import { View, ActivityIndicator, ImageBackground } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts } from "expo-font";
+import Auth from "./components/Auth";
+import { View, ActivityIndicator, ImageBackground } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [firstVisit, setFirstVisit] = useState(true);
+  const [fontsLoaded] = useFonts({
+    LexendDecaBold: require("@/assets/fonts/LexendDeca-Bold.ttf"),
+    LexendDecaRegular: require("@/assets/fonts/LexendDeca-Regular.ttf"),
+  });
 
   useEffect(() => {
     const initialize = async () => {
       try {
-        const [{ data: { session } }, hasCompletedOnboarding] = await Promise.all([
+        const [
+          {
+            data: { session },
+          },
+          hasCompletedOnboarding,
+        ] = await Promise.all([
           supabase.auth.getSession(),
-          AsyncStorage.getItem('hasCompletedOnboarding')
+          AsyncStorage.getItem("hasCompletedOnboarding"),
         ]);
 
         setSession(session);
-        setFirstVisit(hasCompletedOnboarding !== 'true');
+        setFirstVisit(hasCompletedOnboarding !== "true");
         setLoading(false);
       } catch (error) {
-        console.error('Error during initialization:', error);
+        console.error("Error during initialization:", error);
         setLoading(false);
       }
     };
 
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
@@ -43,7 +55,9 @@ export default function Index() {
         resizeMode="cover"
         style={{ flex: 1 }}
       >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" />
         </View>
       </ImageBackground>

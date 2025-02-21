@@ -20,6 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { extractKeywords } from "@/src/lib/api/togetherai";
 import { supabase } from "../../../src/lib/api/supabase";
 import { useKeywordStore } from "@/src/store/summaryStore";
+import { use } from "@/src/store/painlevelStore";
 
 export default function Page() {
   const [text, setText] = useState("");

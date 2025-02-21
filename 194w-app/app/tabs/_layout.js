@@ -12,16 +12,6 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: theme.colors.primary[400],
         },
-        headerStyle: {
-          backgroundColor: theme.colors.backgroundPrimary,
-          elevation: 0, // Android
-          shadowOpacity: 0, // iOS
-          borderBottomWidth: 0, // General
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
       }}
     >
       <Tabs.Screen
@@ -39,8 +29,9 @@ export default function TabLayout() {
         options={{
           title: "Export",
           tabBarIcon: ({ size, color }) => (
-            <FontAwesome size={size} name="share" color={color} />
+            <FontAwesome size={size} name="bars" color={color} />
           ),
+          headerShown: false,
         }}
       />
 
@@ -51,6 +42,7 @@ export default function TabLayout() {
           tabBarIcon: ({ size, color }) => (
             <FontAwesome size={size} name="user" color={color} />
           ),
+          headerShown: false,
         }}
       />
     </Tabs>

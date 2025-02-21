@@ -14,7 +14,7 @@ export default function Page() {
       style={styles.background}
     >
       <View style={styles.container}>
-        <Text style={styles.heading}>Hi Bob,{"\n"}how's your pain today?</Text>
+        <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
         <Image
           source={require("@/assets/blob-no-pain.png")}
           style={styles.blobImage}
@@ -26,7 +26,10 @@ export default function Page() {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <Button title="Charts" onPress={() => router.push("/tabs/home/charts")} />
+          <Button
+            title="Charts"
+            onPress={() => router.push("/tabs/home/charts")}
+          />
         </View>
       </View>
     </ImageBackground>
