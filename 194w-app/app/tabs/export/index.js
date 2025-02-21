@@ -46,8 +46,8 @@ export default function Export() {
         onPress={() => router.push("/tabs/export/summary")}
       >
         <LinearGradient
-          colors={["#69BBDE", "#31A4D5", "#2B4F8E"]}
-          locations={[0, 0.1, 0.8]}
+          colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
+          locations={[0, 0.05, 0.8]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradient}
@@ -73,8 +73,8 @@ export default function Export() {
       </TouchableOpacity>
       <View style={styles.logContainer}>
         <LinearGradient
-          colors={["#69BBDE", "#31A4D5", "#6580D8", "#8794E3"]}
-          locations={[0, 0.1, 0.8, 1]}
+          colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
+          locations={[0, 0.01, 0.8, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[styles.gradient, { padding: theme.spacing.md }]}
