@@ -60,17 +60,17 @@ export default function Export() {
   const selectedLog = logs.find((log) => log.date === selectedDate);
 
   const markedDates = logs.reduce((acc, log) => {
-    acc[log.date] = { marked: true, dotColor: "purple" };
+    acc[log.date] = { marked: true, dotColor: "white" };
     return acc;
   }, {});
 
   return (
-    <ScrollView>
-      <ImageBackground
-        source={require("@/assets/background.png")}
-        resizeMode="cover"
-        style={styles.background}
-      >
+    <ImageBackground
+      source={require("@/assets/background.png")}
+      resizeMode="cover"
+      style={styles.background}
+    >
+      <ScrollView>
         <TouchableOpacity
           style={styles.summaryWrapper}
           onPress={() => router.push("/tabs/export/summary")}
@@ -103,23 +103,38 @@ export default function Export() {
         </TouchableOpacity>
 
         <View style={styles.calendarContainer}>
-          <Calendar
-            onDayPress={(day) => setSelectedDate(day.dateString)}
-            markedDates={{
-              ...markedDates,
-              ...(selectedDate && {
-                [selectedDate]: { selected: true, selectedColor: "#5CA2C0" },
-              }),
-            }}
-            style={styles.calendar}
-            theme={{
-              arrowColor: "white",
-              //calendarBackground: "red",
-              selectedDayBackgroundColor: "#5CA2C0",
-              todayTextColor: "red",
-              textMonthFontSize: 18,
-            }}
-          />
+          <LinearGradient
+            colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
+            locations={[0, 0.2, 0.9, 0.5]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.calendarGradient}
+          >
+            <Calendar
+              onDayPress={(day) => setSelectedDate(day.dateString)}
+              markedDates={{
+                ...markedDates,
+                ...(selectedDate && {
+                  [selectedDate]: { selected: true, selectedColor: "#17336b" },
+                }),
+              }}
+              style={styles.calendar}
+              theme={{
+                arrowColor: "white",
+                calendarBackground: "transparent", //theme.colors.border.default,
+                selectedDayBackgroundColor: "#20348a",
+                selectedDayTextColor: "white",
+                dayTextColor: "white",
+                textDisabledColor: "#b8c0cc",
+                todayTextColor: "#17336b",
+                textMonthFontSize: 18,
+                monthTextColor: "white",
+                textDayFontFamily: theme.typography.fonts.regular,
+                textMonthFontFamily: theme.typography.fonts.regular,
+                textDayHeaderFontFamily: theme.typography.fonts.regular,
+              }}
+            />
+          </LinearGradient>
         </View>
 
         <View style={styles.logContainer}>
@@ -132,9 +147,19 @@ export default function Export() {
           >
             <Text style={styles.sectionTitle}>Log History</Text>
 
+            <Text style={styles.logDate}>
+              {new Date(selectedDate).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })}
+              ,{" "}
+              {new Date(selectedDate).toLocaleDateString("en-US", {
+                weekday: "long",
+              })}
+            </Text>
+
             {selectedLog ? (
               <View style={styles.logContent}>
-                <Text style={styles.logDate}>{selectedLog.date}</Text>
                 <Text style={styles.logDate}>{selectedLog.summary}</Text>
                 <Text style={styles.logText}>{selectedLog.text}</Text>
               </View>
@@ -147,8 +172,8 @@ export default function Export() {
             )}
           </LinearGradient>
         </View>
-      </ImageBackground>
-    </ScrollView>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
@@ -222,8 +247,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
   },
+  calendarGradient: {
+    borderRadius: 15,
+    paddingBottom: 5,
+  },
   calendar: {
-    backgroundColor: theme.colors.testColor,
+    backgroundColor: "transparent",
     elevation: 5,
     // is this shadow actually doing anything...
     shadowColor: "#000",
