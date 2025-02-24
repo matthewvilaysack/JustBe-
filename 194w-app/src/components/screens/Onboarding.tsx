@@ -1,4 +1,10 @@
-// src/components/screens/Onboarding.tsx
+/**
+ * @file Onboarding.tsx
+ * @description Onboarding flow component that guides new users through initial setup,
+ * collecting information about their pain type and duration. Uses a slide-based
+ * interface with animated transitions.
+ */
+
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
@@ -36,6 +42,8 @@ export default function Onboarding() {
   const [selectedPainType, setSelectedPainType] = useState("");
   const [selectedDuration, setSelectedDuration] = useState("");
   const [customPainType, setCustomPainType] = useState("");
+  const [isManualScrolling, setIsManualScrolling] = useState(false);
+  const [lastOffset, setLastOffset] = useState(0);
   const flatListRef = useRef<FlatList<any>>(null);
 
   const slides: Slide[] = [
@@ -98,10 +106,16 @@ export default function Onboarding() {
   }, [currentIndex]);
 
   const moveToNextSlide = () => {
-    if (currentIndex === 1 && selectedPainType === "Other" && !customPainType.trim()) {
-      return;
+    if (isManualScrolling) return;
+
+    // Validation checks
+    if (currentIndex === 1) {
+      if (selectedPainType === "Other" && !customPainType.trim()) return;
+      if (!selectedPainType) return;
     }
     
+    if (currentIndex === 2 && !selectedDuration) return;
+
     const nextIndex = currentIndex + 1;
     setCurrentIndex(nextIndex);
     flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
@@ -181,6 +195,7 @@ export default function Onboarding() {
   const handleOptionSelect = (option: string) => {
     if (currentIndex === 1) {
       setSelectedPainType(option);
+      // Only clear customPainType if switching away from "Other"
       if (option !== "Other") {
         setCustomPainType("");
       }
@@ -233,11 +248,25 @@ export default function Onboarding() {
               renderItem={renderSlide}
               horizontal
               pagingEnabled
+              scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
-              onScroll={(e) => {
+              snapToInterval={width}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              onScrollBeginDrag={(e) => {
+                setLastOffset(e.nativeEvent.contentOffset.x);
+                setIsManualScrolling(true);
+              }}
+              onScrollEndDrag={() => setIsManualScrolling(false)}
+              onMomentumScrollEnd={(e) => {
                 const contentOffset = e.nativeEvent.contentOffset.x;
-                const currentIndex = Math.round(contentOffset / width);
-                setCurrentIndex(currentIndex);
+                const newIndex = Math.round(contentOffset / width);
+                
+                // Only allow backward scrolling manually
+                if (contentOffset < lastOffset || !isManualScrolling) {
+                  setCurrentIndex(newIndex);
+                }
+                setIsManualScrolling(false);
               }}
               scrollEventThrottle={16}
               keyExtractor={(item) => item.id}
