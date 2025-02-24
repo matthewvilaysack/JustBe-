@@ -3,15 +3,10 @@ import {
   StyleSheet,
   View,
   ImageBackground,
-  Image,
   Text,
-  Dimensions,
-  TextInput,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/ui/Button";
 
 export default function Page() {
   const router = useRouter();
