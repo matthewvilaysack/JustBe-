@@ -20,13 +20,15 @@ import { useQuery } from "@tanstack/react-query";
 import { extractKeywords } from "@/src/lib/api/togetherai";
 import { supabase } from "../../../src/lib/api/supabase";
 import { useKeywordStore } from "@/src/store/summaryStore";
-import { use } from "@/src/store/painlevelStore";
+import { usePainLevelStore } from "@/src/store/painlevelStore";
 
 export default function Page() {
   const [text, setText] = useState("");
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
+  const { painLevel } = usePainLevelStore();
+
   const { isLoading, isError, refetch } = useQuery({
     queryKey: ["keywords", text],
     queryFn: async () => {
@@ -41,9 +43,11 @@ export default function Page() {
     try {
       await refetch();
 
-      const { data, error } = await supabase.from("journal_entries").insert([
-        { entry_text: text, pain_rating: 5, summary: "llm summary" }, // need to be filled in with actual user values
-      ]);
+      const { data, error } = await supabase
+        .from("journal_entries")
+        .insert([
+          { entry_text: text, pain_rating: painLevel, summary: keywords },
+        ]);
 
       if (error) {
         Alert.alert(
