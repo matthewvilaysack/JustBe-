@@ -15,7 +15,9 @@ import {
 import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/ui/Button";
+import NextButton from "@/src/components/ui/NextButton";
+import BackButton from "@/src/components/ui/BackButton";
+
 import { useQuery } from "@tanstack/react-query";
 import { extractKeywords } from "@/src/lib/api/togetherai";
 import { supabase } from "../../../src/lib/api/supabase";
@@ -114,7 +116,13 @@ export default function Page() {
         )}
 
         <View style={styles.footer}>
-          <Button
+          <BackButton
+            onPress={() => {
+              router.back();
+            }}
+            showArrow={true}
+          />
+          <NextButton
             onPress={() => UpdateSupabaseData(text, router)}
             showArrow={true}
             disabled={text.trim().length === 0}
@@ -184,8 +192,9 @@ const styles = StyleSheet.create({
   keyword: { fontSize: Theme.typography.sizes.md, color: "white" },
   footer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     paddingBottom: Theme.spacing.lg,
+    paddingLeft: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
   },
 });

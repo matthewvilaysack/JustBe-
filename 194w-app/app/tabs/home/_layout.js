@@ -41,7 +41,7 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
-          name="charts"
+          name="history"
           options={{
             headerShown: false,
           }}

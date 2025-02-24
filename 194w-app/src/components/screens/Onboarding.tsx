@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
-import Button from "../ui/Button";
+import Button from "../ui/NextButton";
 import LoadingBlob from "@/src/animations/LoadingBlob";
 import SelectionButton from "../ui/SelectionButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
