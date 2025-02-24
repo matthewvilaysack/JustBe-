@@ -1,7 +1,7 @@
 import { StyleSheet, View, ImageBackground, Image, Text } from "react-native";
 import { Link } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/ui/Button";
+import Button from "@/src/components/ui/NextButton";
 import { useRouter } from "expo-router";
 
 export default function Page() {
@@ -27,8 +27,8 @@ export default function Page() {
         </View>
         <View style={styles.buttonContainer}>
           <Button
-            title="Charts"
-            onPress={() => router.push("/tabs/home/charts")}
+            title="History"
+            onPress={() => router.push("/tabs/home/history")}
           />
         </View>
       </View>

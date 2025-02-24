@@ -12,7 +12,9 @@ import {
 import Slider from "@react-native-community/slider";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/ui/Button";
+import NextButton from "@/src/components/ui/NextButton";
+import BackButton from "@/src/components/ui/BackButton";
+
 import theme from "@/src/theme/theme";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 
@@ -117,7 +119,13 @@ export default function Page() {
       </View>
 
       <View style={styles.footer}>
-        <Button
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+        <NextButton
           onPress={() => router.push("/tabs/home/journal")}
           showArrow={true}
         />
@@ -175,8 +183,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     paddingBottom: Theme.spacing.lg,
+    paddingLeft: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
   },
 });
