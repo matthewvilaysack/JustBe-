@@ -41,15 +41,25 @@ export default function Page() {
 
   const UpdateSupabaseData = async (text, router) => {
     try {
-      await refetch();
+      console.log("🔹 Fetching latest keywords...");
+
+      const refetchResult = await refetch();  
+      const fetchedKeywords = refetchResult.data; 
+
+      console.log("✅ Extracted Keywords:", fetchedKeywords);
+
+      if (!fetchedKeywords || fetchedKeywords.length === 0) {
+        console.warn("⚠️ No keywords extracted, inserting empty summary.");
+      }
 
       const { data, error } = await supabase
         .from("journal_entries")
         .insert([
-          { entry_text: text, pain_rating: painLevel, summary: keywords },
+          { entry_text: text, pain_rating: painLevel, summary: fetchedKeywords },
         ]);
 
       if (error) {
+        console.error("❌ Supabase Error:", error);
         Alert.alert(
           "Sorry, we encountered a problem on our end!",
           "Would you like to retry?",
@@ -64,11 +74,11 @@ export default function Page() {
         );
         console.error("Error updating data:", error);
       } else {
-        console.log("Updated data:");
+        console.log("✅ Updated data:", data);
         router.push("/tabs/home/summary");
       }
     } catch (err) {
-      console.error("Unexpected error:", err);
+      console.error("❌ Unexpected error:", err);
     }
   };
 
