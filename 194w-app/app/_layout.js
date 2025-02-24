@@ -13,7 +13,7 @@ export default function RootLayout() {
     const checkAppState = async () => {
       try {
         // ! TESTING ONLY
-        // await AsyncStorage.clear();
+        await AsyncStorage.clear();
         const { data: { session } } = await supabase.auth.getSession();
         const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
         setSession(session);
