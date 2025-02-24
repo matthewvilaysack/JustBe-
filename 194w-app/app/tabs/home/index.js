@@ -19,15 +19,13 @@ export default function Page() {
           source={require("@/assets/blob-no-pain.png")}
           style={styles.blobImage}
         />
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
           <Button
-            title="Log"
+            title="Log Entry"
             onPress={() => router.push("/tabs/home/painscale")}
           />
-        </View>
-        <View style={styles.buttonContainer}>
           <Button
-            title="Charts"
+            title="View Charts"
             onPress={() => router.push("/tabs/home/charts")}
           />
         </View>
@@ -58,5 +56,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginVertical: 10,
+    flexDirection: "row",
   },
 });
