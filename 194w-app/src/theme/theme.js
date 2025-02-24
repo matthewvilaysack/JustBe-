@@ -20,6 +20,7 @@ export default {
     lightBlue: "#D0F2FF",
     purple: "#9E96DF",
     white: "#FFFFFF",
+    darkPurple: "#2C4DC7",
 
     // UI States
     button: {

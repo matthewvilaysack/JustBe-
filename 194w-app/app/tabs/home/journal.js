@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     fontSize: Theme.typography.sizes.xl,
-    fontFamily: Theme.typography.fonts.bold,
+    fontFamily: Theme.typography.fonts.regular,
   },
   buttonContainer: {
     position: "absolute",

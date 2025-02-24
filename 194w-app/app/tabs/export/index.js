@@ -73,8 +73,8 @@ export default function Export() {
       </TouchableOpacity>
       <View style={styles.logContainer}>
         <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
-          locations={[0, 0.01, 0.8, 1]}
+          colors={["#69BBDE", "#5CA2C0", "#2C4DC7"]}
+          locations={[0, 0.01, 1]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={[styles.gradient, { padding: theme.spacing.md }]}
