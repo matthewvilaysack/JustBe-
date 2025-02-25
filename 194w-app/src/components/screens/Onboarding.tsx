@@ -42,8 +42,8 @@ export default function Onboarding() {
   const [selectedPainType, setSelectedPainType] = useState("");
   const [selectedDuration, setSelectedDuration] = useState("");
   const [customPainType, setCustomPainType] = useState("");
-  const [isManualScrolling, setIsManualScrolling] = useState(false);
-  const [lastOffset, setLastOffset] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const flatListRef = useRef<FlatList<any>>(null);
 
   const slides: Slide[] = [
@@ -105,20 +105,30 @@ export default function Onboarding() {
     }
   }, [currentIndex]);
 
-  const moveToNextSlide = () => {
-    if (isManualScrolling) return;
-
-    // Validation checks
+  const isValidScroll = (targetIndex: number) => {  
+    if (targetIndex <= currentIndex) return true;
+    
     if (currentIndex === 1) {
-      if (selectedPainType === "Other" && !customPainType.trim()) return;
-      if (!selectedPainType) return;
+      if (selectedPainType === "Other" && !customPainType.trim()) return false;
+      if (!selectedPainType) return false;
     }
     
-    if (currentIndex === 2 && !selectedDuration) return;
+    if (currentIndex === 2 && !selectedDuration) return false;
+    
+    return true;
+  };
 
+  const moveToNextSlide = () => {
+    if (isDragging) return;
+    
     const nextIndex = currentIndex + 1;
-    setCurrentIndex(nextIndex);
-    flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+    if (isValidScroll(nextIndex)) {
+      setCurrentIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({ 
+        index: nextIndex, 
+        animated: true 
+      });
+    }
   };
 
   const renderSlide = ({ item }: { item: Slide }) => (
@@ -162,7 +172,13 @@ export default function Onboarding() {
                         key={option}
                         title={option}
                         onPress={() => handleOptionSelect(option)}
-                        selected={currentIndex === 2 ? selectedDuration === option : selectedPainType === option}
+                        selected={
+                          item.id === "2" 
+                            ? selectedPainType === option 
+                            : item.id === "3" 
+                              ? selectedDuration === option 
+                              : false
+                        }
                         isOther={option === "Other"}
                         customValue={customPainType}
                         onCustomValueChange={setCustomPainType}
@@ -193,9 +209,10 @@ export default function Onboarding() {
   );
 
   const handleOptionSelect = (option: string) => {
+    console.log('Option selected:', option, 'on slide:', currentIndex);
+    
     if (currentIndex === 1) {
       setSelectedPainType(option);
-      // Only clear customPainType if switching away from "Other"
       if (option !== "Other") {
         setCustomPainType("");
       }
@@ -207,16 +224,14 @@ export default function Onboarding() {
   const completeOnboarding = async () => {
     try {
       const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
-      console.log('💾 Saving to AsyncStorage:', { painType, selectedDuration });
+      console.log('Saving to AsyncStorage:', { painType, selectedDuration });
       
       await AsyncStorage.setItem("painType", painType);
       await AsyncStorage.setItem("painDuration", selectedDuration);
       await AsyncStorage.setItem("hasCompletedOnboarding", "true");
       
-      console.log('✅ Successfully saved to AsyncStorage');
       router.replace("/");
     } catch (error) {
-      console.error("❌ Error completing onboarding:", error);
       router.replace("/");
     }
   };
@@ -253,22 +268,20 @@ export default function Onboarding() {
               snapToInterval={width}
               snapToAlignment="center"
               decelerationRate="fast"
-              onScrollBeginDrag={(e) => {
-                setLastOffset(e.nativeEvent.contentOffset.x);
-                setIsManualScrolling(true);
-              }}
-              onScrollEndDrag={() => setIsManualScrolling(false)}
+              onScrollBeginDrag={() => setIsDragging(true)}
               onMomentumScrollEnd={(e) => {
-                const contentOffset = e.nativeEvent.contentOffset.x;
-                const newIndex = Math.round(contentOffset / width);
+                const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
                 
-                // Only allow backward scrolling manually
-                if (contentOffset < lastOffset || !isManualScrolling) {
+                if (newIndex < currentIndex || isValidScroll(newIndex)) {
                   setCurrentIndex(newIndex);
+                } else {
+                  flatListRef.current?.scrollToIndex({ 
+                    index: currentIndex, 
+                    animated: true 
+                  });
                 }
-                setIsManualScrolling(false);
+                setIsDragging(false);
               }}
-              scrollEventThrottle={16}
               keyExtractor={(item) => item.id}
               ref={flatListRef}
             />
@@ -298,12 +311,10 @@ export default function Onboarding() {
           </View>
         </SafeAreaView>
         {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
-          <View
-            style={{
-              paddingHorizontal: theme.spacing.lg,
-              alignItems: "flex-end",
-            }}
-          >
+          <View style={{
+            paddingHorizontal: theme.spacing.lg,
+            alignItems: 'flex-end',
+          }}>
             <Button
               title="Next"
               onPress={() => moveToNextSlide()}
