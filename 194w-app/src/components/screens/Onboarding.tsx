@@ -1,4 +1,10 @@
-// src/components/screens/Onboarding.tsx
+/**
+ * @file Onboarding.tsx
+ * @description Onboarding flow component that guides new users through initial setup,
+ * collecting information about their pain type and duration. Uses a slide-based
+ * interface with animated transitions.
+ */
+
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
@@ -8,6 +14,8 @@ import {
   SafeAreaView,
   Text,
   ImageBackground,
+  TextInput,
+  StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
@@ -18,53 +26,72 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
-const slides = [
-  {
-    id: "1",
-    type: "loading",
-    title: "...",
-    character: true,
-  },
-  {
-    id: "2",
-    type: "question",
-    title: "What kind of chronic pain do you experience?",
-    subtitle: "(Choose one)",
-    options: [
-      "Sciatic",
-      "OCD",
-      "Arthritis",
-      "Fibromyalgia",
-      "CKD",
-      "Alzheimers",
-    ],
-    character: true,
-    showNext: true,
-  },
-  {
-    id: "3",
-    type: "question",
-    title: "How long have you been experiencing this?",
-    subtitle: "This helps us understand your journey",
-    options: ["< 1 year", "1-3 years", "3-5 years", "5+ years"],
-    character: true,
-    showNext: true,
-  },
-  {
-    id: "4",
-    type: "welcome",
-    title: "My name is blob by the way!",
-    subtitle: "I will do my best to help you better manage your OCD",
-    character: true,
-    showNext: true,
-  },
-];
+interface Slide {
+  id: string;
+  type: "loading" | "question" | "welcome";
+  title: string;
+  subtitle?: string | ((painType: string) => string);
+  options?: string[][];
+  character: boolean;
+  showNext: boolean;
+}
 
 export default function Onboarding() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedPainType, setSelectedPainType] = useState("");
+  const [selectedDuration, setSelectedDuration] = useState("");
+  const [customPainType, setCustomPainType] = useState("");
+  const [isScrolling, setIsScrolling] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const flatListRef = useRef<FlatList<any>>(null);
+
+  const slides: Slide[] = [
+    {
+      id: "1",
+      type: "loading",
+      title: "...",
+      character: true,
+      showNext: false,
+    },
+    {
+      id: "2",
+      type: "question",
+      title: "What kind of chronic pain do you experience?",
+      subtitle: "(Choose one)",
+      options: [
+        ["Sciatic", "OCD"],
+        ["Arthritis", "CKD"],
+        ["Joint Pain", "Alzheimers"],
+        ["Other"]
+      ],
+      character: true,
+      showNext: true,
+    },
+    {
+      id: "3",
+      type: "question",
+      title: "How long have you been experiencing this?",
+      subtitle: "This helps us understand your journey",
+      options: [
+        ["< 1 year", "1-3 years"],
+        ["3-5 years", "5+ years"]
+      ],
+      character: true,
+      showNext: true,
+    },
+    {
+      id: "4",
+      type: "welcome",
+      title: "Hi, I'm blob!",
+      subtitle: () => {
+        const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
+        return `I will help you manage your ${painType}`;
+      },
+      character: true,
+      showNext: true,
+    },
+  ];
 
   useEffect(() => {
     if (currentIndex === 0) {
@@ -78,101 +105,102 @@ export default function Onboarding() {
     }
   }, [currentIndex]);
 
-  const moveToNextSlide = () => {
-    const nextIndex = currentIndex + 1;
-    flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+  const isValidScroll = (targetIndex: number) => {  
+    if (targetIndex <= currentIndex) return true;
+    
+    if (currentIndex === 1) {
+      if (selectedPainType === "Other" && !customPainType.trim()) return false;
+      if (!selectedPainType) return false;
+    }
+    
+    if (currentIndex === 2 && !selectedDuration) return false;
+    
+    return true;
   };
 
-  const renderSlide = ({ item }: { item: any }) => (
-    <View
-      style={{
-        width,
-        alignItems: "center",
-        padding: theme.spacing.lg,
-        position: "relative",
-      }}
-    >
+  const moveToNextSlide = () => {
+    if (isDragging) return;
+    
+    const nextIndex = currentIndex + 1;
+    if (isValidScroll(nextIndex)) {
+      setCurrentIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({ 
+        index: nextIndex, 
+        animated: true 
+      });
+    }
+  };
+
+  const renderSlide = ({ item }: { item: Slide }) => (
+    <View style={styles.slideContainer}>
       {item.type === "loading" ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <LoadingBlob style={{ transform: [{ scale: 1.5 }] }} />
-        </View>
+        <LoadingBlob style={{ transform: [{ scale: 1.5 }], marginTop: 100 }} />
       ) : (
         <>
-          <View
-            style={{
-              position: "relative",
-            }}
-          >
-            <LoadingBlob />
-          </View>
-
-          <View
-            style={{
-              marginTop: theme.spacing.lg,
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "flex-start",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: theme.typography.sizes.xl,
-                color: theme.colors.white,
-                fontFamily: theme.typography.fonts.bold,
-                marginBottom: theme.spacing.sm,
-                textAlign: "center",
-              }}
-            >
-              {item.title}
-            </Text>
-
+          <LoadingBlob />
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>{item.title}</Text>
             {item.subtitle && (
-              <Text
-                style={{
-                  color: theme.colors.white,
-                  textAlign: "center",
-                  opacity: 0.8,
-                  marginBottom: theme.spacing.lg,
-                  fontSize: theme.typography.sizes.lg,
-                  fontFamily: theme.typography.fonts.bold,
-                }}
-              >
-                {item.subtitle}
+              <Text style={styles.subtitle}>
+                {typeof item.subtitle === 'function' 
+                  ? item.subtitle(selectedPainType)
+                  : item.subtitle
+                }
               </Text>
             )}
-
+            
             {item.options && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                  gap: theme.spacing.xs,
-                  paddingHorizontal: theme.spacing.lg,
-                  width: "100%",
-                  maxWidth: 350,
-                }}
-              >
-                {item.options.map((option: string) => (
-                  <SelectionButton
-                    key={option}
-                    title={option}
-                    onPress={() => setSelectedOption(option)}
-                    selected={selectedOption === option}
+              <View style={{
+                alignItems: "center",
+                width: "100%",
+                paddingHorizontal: theme.spacing.lg,
+                maxWidth: 350,
+              }}>
+                {item.options.map((row: string[], rowIndex: number) => (
+                  <View 
+                    key={rowIndex}
                     style={{
-                      width: option.length > 8 ? 150 : 120,
-                      height: 40,
-                      marginBottom: theme.spacing.xs,
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      gap: theme.spacing.md,
+                      marginBottom: theme.spacing.sm,
+                      width: "100%",
                     }}
-                  />
+                  >
+                    {row.map((option: string) => (
+                      <SelectionButton
+                        key={option}
+                        title={option}
+                        onPress={() => handleOptionSelect(option)}
+                        selected={
+                          item.id === "2" 
+                            ? selectedPainType === option 
+                            : item.id === "3" 
+                              ? selectedDuration === option 
+                              : false
+                        }
+                        isOther={option === "Other"}
+                        customValue={customPainType}
+                        onCustomValueChange={setCustomPainType}
+                        style={{
+                          width: option === "Other" ? 200 : 150,
+                        }}
+                      />
+                    ))}
+                  </View>
                 ))}
               </View>
+            )}
+
+            {/* Show Get Started button only on welcome slide */}
+            {item.id === "4" && (
+              <Button
+                title="Get Started"
+                onPress={completeOnboarding}
+                variant="primary"
+                showArrow={false}
+                style={{ width: 200, marginTop: theme.spacing.xl }}
+              />
             )}
           </View>
         </>
@@ -180,14 +208,30 @@ export default function Onboarding() {
     </View>
   );
 
+  const handleOptionSelect = (option: string) => {
+    console.log('Option selected:', option, 'on slide:', currentIndex);
+    
+    if (currentIndex === 1) {
+      setSelectedPainType(option);
+      if (option !== "Other") {
+        setCustomPainType("");
+      }
+    } else if (currentIndex === 2) {
+      setSelectedDuration(option);
+    }
+  };
+
   const completeOnboarding = async () => {
     try {
-      console.log("Setting onboarding completed..."); // Debug log
+      const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
+      console.log('Saving to AsyncStorage:', { painType, selectedDuration });
+      
+      await AsyncStorage.setItem("painType", painType);
+      await AsyncStorage.setItem("painDuration", selectedDuration);
       await AsyncStorage.setItem("hasCompletedOnboarding", "true");
-      console.log("Onboarding completed set successfully"); // Debug log
+      
       router.replace("/");
     } catch (error) {
-      console.error("Error completing onboarding:", error);
       router.replace("/");
     }
   };
@@ -219,13 +263,25 @@ export default function Onboarding() {
               renderItem={renderSlide}
               horizontal
               pagingEnabled
+              scrollEnabled={true}
               showsHorizontalScrollIndicator={false}
-              onScroll={(e) => {
-                const contentOffset = e.nativeEvent.contentOffset.x;
-                const currentIndex = Math.round(contentOffset / width);
-                setCurrentIndex(currentIndex);
+              snapToInterval={width}
+              snapToAlignment="center"
+              decelerationRate="fast"
+              onScrollBeginDrag={() => setIsDragging(true)}
+              onMomentumScrollEnd={(e) => {
+                const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
+                
+                if (newIndex < currentIndex || isValidScroll(newIndex)) {
+                  setCurrentIndex(newIndex);
+                } else {
+                  flatListRef.current?.scrollToIndex({ 
+                    index: currentIndex, 
+                    animated: true 
+                  });
+                }
+                setIsDragging(false);
               }}
-              scrollEventThrottle={16}
               keyExtractor={(item) => item.id}
               ref={flatListRef}
             />
@@ -252,29 +308,13 @@ export default function Onboarding() {
                 />
               ))}
             </View>
-
-            {/* show get started only on last slide */}
-
-            {currentIndex === slides.length - 1 && (
-              <View style={{ paddingHorizontal: theme.spacing.lg }}>
-                <Button
-                  title="Get Started"
-                  onPress={completeOnboarding}
-                  variant="primary"
-                  showArrow={false}
-                  style={{ alignSelf: "center", width: 200 }}
-                />
-              </View>
-            )}
           </View>
         </SafeAreaView>
         {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
-          <View
-            style={{
-              paddingHorizontal: theme.spacing.lg,
-              alignItems: "flex-end",
-            }}
-          >
+          <View style={{
+            paddingHorizontal: theme.spacing.lg,
+            alignItems: 'flex-end',
+          }}>
             <Button
               title="Next"
               onPress={() => moveToNextSlide()}
@@ -293,3 +333,36 @@ export default function Onboarding() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  slideContainer: {
+    width,
+    alignItems: "center",
+    padding: theme.spacing.lg,
+  },
+  contentContainer: {
+    marginTop: theme.spacing.lg,
+    width: "100%",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: theme.typography.sizes.xl,
+    color: theme.colors.white,
+    fontFamily: theme.typography.fonts.bold,
+    marginBottom: theme.spacing.sm,
+    textAlign: "center",
+  },
+  subtitle: {
+    color: theme.colors.white,
+    textAlign: "center",
+    opacity: 0.8,
+    marginBottom: theme.spacing.lg,
+    fontSize: theme.typography.sizes.lg,
+    fontFamily: theme.typography.fonts.bold,
+  },
+  optionsContainer: {
+    width: "100%",
+    alignItems: "center",
+    gap: theme.spacing.md,
+  },
+});

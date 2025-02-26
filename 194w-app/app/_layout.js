@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from "@/src/lib/api/supabase";
+import { updateUserProfile } from "@/src/lib/api/utils";
 
 export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,15 +14,22 @@ export default function RootLayout() {
       try {
         // ! TESTING ONLY
         // await AsyncStorage.clear();
-
-        const [{ data: { session } }, hasOnboarded] = await Promise.all([
-          supabase.auth.getSession(),
-          AsyncStorage.getItem('hasCompletedOnboarding')
-        ]);
-
-        console.log('Onboarding status:', hasOnboarded);
+        const { data: { session } } = await supabase.auth.getSession();
+        const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
         setSession(session);
         setHasCompletedOnboarding(hasOnboarded === 'true');
+        // Update profile if needed
+        if (hasOnboarded === 'true' && session?.user) {
+          const painType = await AsyncStorage.getItem("painType");
+          const painDuration = await AsyncStorage.getItem("painDuration");
+          if (painType && painDuration) {
+            await updateUserProfile(session.user.id, {
+              pain_type: painType,
+              pain_duration: painDuration
+            });
+            await AsyncStorage.clear();
+          }
+        }
       } catch (error) {
         console.error('Error checking app state:', error);
       } finally {
