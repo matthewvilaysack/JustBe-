@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  ImageBackground,
-  Text,
-} from "react-native";
+import { StyleSheet, View, ImageBackground, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 

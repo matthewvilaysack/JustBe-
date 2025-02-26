@@ -1,6 +1,6 @@
 import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
 import Theme from "@/src/theme/theme";
-import ArrowRight from "./Arrow";
+import ArrowLeft from "./ArrowLeft";
 
 export default function Button({
   title,
@@ -34,15 +34,15 @@ export default function Button({
         </Text>
       )}
 
-      {showArrow && <ArrowRight />}
+      {showArrow && <ArrowLeft />}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingHorizontal: 25,
+    paddingVertical: 15,
     backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
     alignItems: "center",

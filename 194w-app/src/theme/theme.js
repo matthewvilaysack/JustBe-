@@ -20,6 +20,7 @@ export default {
     lightBlue: "#D0F2FF",
     purple: "#9E96DF",
     white: "#FFFFFF",
+    testColor: "#6b85df",
     darkPurple: "#2742A9",
     darkBlue: "#0B3464",
 
