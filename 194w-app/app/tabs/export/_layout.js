@@ -15,6 +15,12 @@ export default function Layout() {
         }}
       />
       <Stack.Screen
+        name="generating"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name="summary"
         options={{
           headerShown: false,
