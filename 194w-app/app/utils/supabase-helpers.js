@@ -1,5 +1,14 @@
 import { supabase } from '../../src/lib/api/supabase';
 
+async function getUserID() {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+  if (authError || !user) {
+    console.error("getUser failed");
+  }
+  return user.id;
+}
+
 // Called everytime a new entry is made
 // Function to increment the counts of keys (ex nausea) in multiple JSON columns (ex symptoms)
 // Takes in Updates, a JSON object, ex {duration: "sdjak", sensation: "a,b,c", etc}
@@ -11,13 +20,8 @@ async function incrementValues(updates) {
         console.error("Error fetching data for incrementValues:", error);
         return;
     }
-    // Get logged-in user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-    if (authError || !user) {
-      console.error("getUser failed");
-    }
-    const userId = user.id;
+
+    const userId = await getUserID();
 
     // console.log("Function: Increment Values. Updates: ", updates);
     // Loop through updates and modify the relevant column
@@ -74,3 +78,17 @@ export const addNewDetailedEntry = async (detailed_entry) => {
 //     return { error: error.message };
 //   }
 // };
+
+export async function getHighestPainRatingPerDay() {
+  const userId = await getUserID();
+  const { data, error } = await supabase
+      .rpc('get_highest_pain_rating_per_day', { user_id_param: userId });
+
+  if (error) {
+      console.error("Error fetching data from get_highest_pain_rating_per_day:", error);
+      return [];
+  }
+
+  console.log("get_highest_pain_rating_per_day data: ", data);
+  return data;
+}
