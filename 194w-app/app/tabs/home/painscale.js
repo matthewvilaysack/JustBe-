@@ -73,6 +73,14 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
+      <View style={styles.buttonContainer}>
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+      </View>
       <View style={styles.container}>
         <Text style={styles.heading}>How would you rate your pain?</Text>
         <View style={styles.carousel}>
@@ -119,12 +127,6 @@ export default function Page() {
       </View>
 
       <View style={styles.footer}>
-        <BackButton
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
         <NextButton
           onPress={() => router.push("/tabs/home/journal")}
           showArrow={true}
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     padding: Theme.spacing.xl,
-    marginTop: Theme.spacing.xxl * 2,
+    marginTop: Theme.spacing.xxl * 3,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
@@ -181,13 +183,13 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    bottom: Theme.spacing.xxl,
-    alignItems: "center",
-    gap: Theme.spacing.xl,
+    top: "7%",
+    left: "5%",
+    opacity: 0.9,
   },
   footer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     paddingBottom: Theme.spacing.lg,
     paddingLeft: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,

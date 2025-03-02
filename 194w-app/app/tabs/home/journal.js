@@ -143,6 +143,14 @@ export default function Page() {
         resizeMode="cover"
         style={styles.background}
       >
+        <View style={styles.buttonContainer}>
+          <BackButton
+            onPress={() => {
+              router.back();
+            }}
+            showArrow={true}
+          />
+        </View>
         <View style={styles.container}>
           <Text style={styles.heading}>What symptoms are you feeling?</Text>
           <View style={styles.journalContainer}>
@@ -168,12 +176,6 @@ export default function Page() {
         )}
 
         <View style={styles.footer}>
-          <BackButton
-            onPress={() => {
-              router.back();
-            }}
-            showArrow={true}
-          />
           <NextButton
             onPress={() => displayKeywords(text, router)}
             showArrow={true}
@@ -223,9 +225,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    bottom: Theme.spacing.xxl,
-    alignItems: "center",
-    gap: Theme.spacing.xl,
+    top: "7%",
+    left: "5%",
+    opacity: 0.9,
   },
   errorText: { color: "red", marginTop: 10 },
   keywordsContainer: {
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
   keyword: { fontSize: Theme.typography.sizes.md, color: "white" },
   footer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     paddingBottom: Theme.spacing.lg,
     paddingLeft: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
