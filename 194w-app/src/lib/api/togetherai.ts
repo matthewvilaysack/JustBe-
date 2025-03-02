@@ -21,6 +21,81 @@ const axiosInstance = axios.create({
 });
 
 /**
+ * extracts a JSON object from a journal entry using llm.
+ * JSON Format {"symptoms": string, "duration": string, "sensation": string, "causes": string, 
+ *              "what-happened": string, "concerns": string, "when-does-it-hurt": string}
+ * @param {string} journalText user's journal entry
+ * @returns extracted JSON
+ */
+export const extractDetailedEntryJSON = async (
+  journalText: string,
+  retryCount = 3, // Retry logic
+  delay = 2000 // Delay between retries
+) => {
+  if (!journalText.trim()) return {};
+
+  console.log("🔹 Checking internet connection...");
+  const connection = await isConnected();
+  if (!connection) {
+    console.warn("⚠️ No internet connection. Retrying...");
+    return {};
+  }
+
+  console.log("🔹 Sending request to Together AI...");
+
+  while (retryCount > 0) {
+    try {
+      const response = await axiosInstance.post("", {
+          model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+          messages: [
+            // {
+            //   role: "system",
+            //   content:
+            //     "Fill out a JSON string using a journal entry, make sure to capture key medical information. Put null when information is not mentioned in the journal entry",
+            // },
+            {
+              role: "user",
+              content: 
+              `Fill out and return this JSON string {"symptoms": string, "duration": string, "sensation": string, "causes": string, "what-happened": string, "concerns": string, "when-does-it-hurt": string} \
+              using only key medical information from a journal entry. Set values to null if not specified in journal entry: \
+              Duration should be one of the following values (<1min, few minutes, <30 minutes, 1 hour, few hours, a day, few days, a week, > a week). 
+              When-does-it-hurt should be one of the following values: (constant, occasional, once, movement, other triggers). \
+              For example, "my shoulder hurts everytime I move" should be filled out as "movement" and "my head hurts when I smell perfume" should be filled as "other triggers".\
+              Sensations should be a comma separated list, like "sharp, shooting, sore". Symptoms should be a comma separated list. \
+              Concerns should be filled only when the text expresses some concern such as fear for a potential spinal injury. \
+              Remember to return a JSON {symptoms, duration, sensation, causes, what-happened, concerns, when-does-it-hurt} and set values to null if their information is not specified in this journal entry:  ${journalText}`,
+            },
+          ],
+          temperature: 0,
+      });      
+
+      const data = await response.data;
+      console.log("✅ Response from AI:", data);
+
+      let rawText: string = response.data.choices?.[0]?.message?.content || "";
+      console.log("raw text: ", rawText);
+    
+      const obj = JSON.parse(rawText); 
+      return obj;
+    } catch (error) {
+      console.error(`❌ Error extracting info (Attempts left: ${retryCount - 1}):`, error);
+      retryCount--;
+
+      if (retryCount === 0) {
+        console.warn("⚠️ Max retries reached. Returning empty obj.");
+        return {}; // Max retries reached, return empty array
+      }
+      console.warn(`⚠️ Retrying AI Extraction... ${retryCount} attempts left`);
+      await new Promise((resolve) => setTimeout(resolve, delay)); // Exponential backoff
+      delay *= 2; // Increase delay for next attempt
+    }
+  }
+
+  console.warn("⚠️ Returning empty obj.");
+  return {};
+};
+
+/**
  * extracts keywords from a journal entry using llm (flow will be react -> llm -> react).
  * view "write log flow" for more clarity.
  * @param {string} journalText user's journal entry
