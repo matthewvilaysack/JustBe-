@@ -123,4 +123,5 @@ export async function fetchCountData(){
 
   // otherwise split up the data
   console.log("fetch count data: ", data);
+  return data;
 }

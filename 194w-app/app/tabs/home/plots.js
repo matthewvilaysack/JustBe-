@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { fetchCountData, getHighestPainRatingPerDay } from "../../utils/supabase-helpers";
-import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme } from "victory-native";
+import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme, VictoryPie } from "victory-native";
 
 // Pain Chart Component
 const PainChart = ({ data }) => {
@@ -14,7 +14,7 @@ const PainChart = ({ data }) => {
         x: new Date(d.day),  // Convert string to Date object
         y: d.pain_rating
     }));
-    console.log("formatted data: ", formattedData);
+    // console.log("formatted data: ", formattedData);
     return (
       <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
           <VictoryAxis 
@@ -31,31 +31,71 @@ const PainChart = ({ data }) => {
   );
 };
 
+// Pie chart component
+const PieChart = ({ data }) => {
+  if (!data || Object.keys(data).length === 0) {
+      return <Text>Loading data...</Text>;
+  }
+
+  // Convert JSON object into an array format that VictoryPie understands
+  const formattedData = Object.entries(data).map(([key, value]) => ({
+      x: key,  // JSON key as x (label)
+      y: value // JSON value as y (numeric data)
+  }));
+  
+  console.log("Pie chart formatted data: ", formattedData);
+  return (
+    <View style={styles.container}>
+        <VictoryPie 
+            data={formattedData}
+            colorScale={["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"]}
+            labelRadius={50}
+            labels={({ datum }) => `${datum.x}: ${datum.y}`} // Display both key and value
+            style={{
+                labels: { fill: "white", fontSize: 14, fontWeight: "bold" }
+            }}
+        />
+    </View>
+  );
+};
+
 // Parent Component: Fetch Data and Pass to PainChart
 const PainTracker = () => {
-    const [data, setData] = useState([]);
+    const [pain_data, setPainData] = useState([]);
+    const [duration_data, setDurationData] = useState([]);
 
     // Async function to fetch data
-    async function fetchData() {
+    async function fetchPainData() {
         try {
             const response = await getHighestPainRatingPerDay();
-            setData(response);
-            console.log("HighestPainRatingPerDay: ", response);
-
-            await fetchCountData();
+            setPainData(response);
+            // console.log("HighestPainRatingPerDay: ", response);
         } catch (error) {
-            console.error("Error fetching data getHighestPainRatingPerDay:", error);
+            console.error("Error fetching pain data:", error);
         }
     }
+    async function fetchDurationData() {
+      try {
+          const response = await fetchCountData();
+          setDurationData(response.duration);
+          console.log("fetch duration data: ", response.duration);
+      } catch (error) {
+          console.error("Error fetching duration data:", error);
+      }
+  }
 
     // Fetch data on component mount
     useEffect(() => {
-        fetchData();
+        fetchPainData();
+        fetchDurationData();
     }, []);
     return (
       <View style={styles.container}>
           <Text style={styles.title}>Highest Pain Severity Over Time</Text>
-          <PainChart data={data} />
+          <PainChart data={pain_data} />
+          
+          <Text style={styles.title}>Most Common Duration Pie Chart</Text>
+          <PieChart data={duration_data} />
       </View>
     );
 };
