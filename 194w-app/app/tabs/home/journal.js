@@ -32,6 +32,7 @@ export default function Page() {
   const currentDate = new Date().toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
+  // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
 
   const { isLoading, isError, refetch } = useQuery({
@@ -94,16 +95,10 @@ export default function Page() {
     - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
   issue w ios, need to research further into issue
   */
-  const saveToSupabase  = async (text, jsonData, retryCount = 3) => {
+  const saveToSupabase  = async (updateData, retryCount = 3) => {
     console.log("🔹 Attempting to update Supabase...");
     while (retryCount > 0) {
       try {
-
-        // get json from LLM output, add entry_text and pain_rating
-        let updateData = jsonData; 
-        updateData.entry_text = text;
-        updateData.pain_rating = painLevel;
-
         const { data, error } = await addNewDetailedEntry(updateData);
 
         if (error) {
@@ -127,7 +122,7 @@ export default function Page() {
             "An unexpected issue occurred. Would you like to retry?",
             [
               { text: "Cancel", style: "cancel" },
-              { text: "Retry", onPress: () => saveToSupabase(text, jsonData, 3) },
+              { text: "Retry", onPress: () => saveToSupabase(updateData, 3) },
             ]
           );
           return false;
@@ -141,10 +136,20 @@ export default function Page() {
 
   /* display keywords screen */
   const displayKeywords = async (text, router) => {
+    setJSONData(null);
+    
+    console.log("json data should be null", jsonData);
     const keywords = await fetchedKeywords(text);
     if (!keywords) return; // stop if keyword extraction fails
-    console.log("Text: ", text);
-    const success = await saveToSupabase(text, jsonData);
+    console.log("Entry Text: ", text);
+    
+    // get json from LLM output, add entry_text and pain_rating
+    console.log("json data", jsonData);
+    let updateData = jsonData; 
+    updateData.entry_text = text;
+    updateData.pain_rating = painLevel;
+
+    const success = await saveToSupabase(updateData);
     if (!success) return; // stop if Supabase update fails
 
     router.push("/tabs/home/summary");

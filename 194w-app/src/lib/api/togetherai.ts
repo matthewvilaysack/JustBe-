@@ -48,22 +48,22 @@ export const extractDetailedEntryJSON = async (
       const response = await axiosInstance.post("", {
           model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
           messages: [
-            {
-              role: "system",
-              content:
-                "Fill out a JSON string using a journal entry, make sure to capture key medical information. Put null when information is not mentioned in the journal entry",
-            },
+            // {
+            //   role: "system",
+            //   content:
+            //     "Fill out a JSON string using a journal entry, make sure to capture key medical information. Put null when information is not mentioned in the journal entry",
+            // },
             {
               role: "user",
               content: 
-              `Fill out this JSON string using only key medical information from a journal entry. Put null when information is not present in the journal entry: \
-              {"symptoms": string, "duration": string, "sensation": string, "causes": string, "what-happened": string, "concerns": string, "when-does-it-hurt": string}. \
-              Duration should be null or one of the following values (<1min, few minutes, <30 minutes, 1 hour, few hours, a day, few days, a week, > a week). 
-              When-does-it-hurt should be null or one of the following values: (constant, occasional, once, movement, other triggers). \
+              `Fill out and return this JSON string {"symptoms": string, "duration": string, "sensation": string, "causes": string, "what-happened": string, "concerns": string, "when-does-it-hurt": string} \
+              using only key medical information from a journal entry. Set values to null if not specified in journal entry: \
+              Duration should be one of the following values (<1min, few minutes, <30 minutes, 1 hour, few hours, a day, few days, a week, > a week). 
+              When-does-it-hurt should be one of the following values: (constant, occasional, once, movement, other triggers). \
               For example, "my shoulder hurts everytime I move" should be filled out as "movement" and "my head hurts when I smell perfume" should be filled as "other triggers".\
               Sensations should be a comma separated list, like "sharp, shooting, sore". Symptoms should be a comma separated list. \
               Concerns should be filled only when the text expresses some concern such as fear for a potential spinal injury. \
-              Remember to put null for symproms, duration, sensation, causes, what-happened, concerns, when-does-it-hurt if they're not mentioned in this journal entry:  ${journalText}`,
+              Remember to return a JSON {symptoms, duration, sensation, causes, what-happened, concerns, when-does-it-hurt} and set values to null if their information is not specified in this journal entry:  ${journalText}`,
             },
           ],
           temperature: 0,
@@ -73,9 +73,9 @@ export const extractDetailedEntryJSON = async (
       console.log("✅ Response from AI:", data);
 
       let rawText: string = response.data.choices?.[0]?.message?.content || "";
-      console.log(rawText);
+      console.log("raw text: ", rawText);
     
-      const obj = JSON.parse(rawText); // FOR KEYWORDS LIST FOR THE UI, LOOP THROUGH THE JSON OBJ AND SEND THE non-NULL VALUES
+      const obj = JSON.parse(rawText); 
       return obj;
     } catch (error) {
       console.error(`❌ Error extracting info (Attempts left: ${retryCount - 1}):`, error);
