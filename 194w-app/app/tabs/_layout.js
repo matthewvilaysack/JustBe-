@@ -10,7 +10,9 @@ export default function TabLayout() {
         tabBarActiveTintColor: theme.colors.white,
         tabBarInactiveTintColor: theme.colors.primary[200],
         tabBarStyle: {
-          backgroundColor: theme.colors.primary[400],
+          backgroundColor: theme.colors.darkPurple,
+          borderTopWidth: 0,
+          shadowColor: "transparent",
         },
       }}
     >

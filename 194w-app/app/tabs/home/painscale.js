@@ -149,7 +149,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
-    marginBottom: Theme.spacing.xl,
     fontFamily: Theme.typography.fonts.bold,
   },
   carousel: {
@@ -171,6 +170,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: Theme.spacing.xl,
     marginTop: Theme.spacing.xxl * 2,
+  },
+  levelContainer: {
+    backgroundColor: theme.colors.darkPurple,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
   },
   slider: {
     width: width - Theme.spacing.xl * 2,
