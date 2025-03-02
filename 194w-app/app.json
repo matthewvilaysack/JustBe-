@@ -14,6 +14,18 @@
     },
     "jsEngine": "hermes",
     "ios": {
+      "infoPlist": {
+        "NSAppTransportSecurity": { 
+          "NSAllowsArbitraryLoads": true,
+          "CFBundleAllowMixedLocalizations": true,
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSIncludesSubdomains": true,
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        }
+      },
       "supportsTablet": true,
       "jsEngine": "jsc"
     },

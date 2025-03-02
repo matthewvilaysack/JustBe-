@@ -41,47 +41,99 @@ export default function Page() {
     enabled: false,
   });
 
-  const UpdateSupabaseData = async (text, router) => {
+  /* call together ai fetched keywords/symptoms 
+  - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
+  issue w ios, need to research further into issue
+  */
+  const fetchedKeywords = async(text) => {
+    console.log("🔹 Fetching latest keywords...");
     try {
-      console.log("🔹 Fetching latest keywords...");
-
       const refetchResult = await refetch();  
-      const fetchedKeywords = refetchResult.data; 
+      const keywords = refetchResult.data || []; 
 
-      console.log("✅ Extracted Keywords:", fetchedKeywords);
-
-      if (!fetchedKeywords || fetchedKeywords.length === 0) {
-        console.warn("⚠️ No keywords extracted, inserting empty summary.");
+      if (!keywords.length) {
+        console.warn("⚠️ No keywords extracted.");
+        return null;
       }
 
-      const { data, error } = await supabase
-        .from("journal_entries")
-        .insert([
-          { entry_text: text, pain_rating: painLevel, summary: fetchedKeywords },
-        ]);
+      console.log("✅ Extracted Keywords:", keywords);
+      return keywords;
 
-      if (error) {
-        console.error("❌ Supabase Error:", error);
+    } catch (error) {
+      console.error(`❌ Error extracting keywords:`, error);
+
+      if (retryCount === 0) {
         Alert.alert(
-          "Sorry, we encountered a problem on our end!",
-          "Would you like to retry?",
+          "AI Extraction Failed",
+          "Could not process the journal entry. Would you like to retry?",
           [
-            {
-              text: "Cancel",
-              onPress: () => console.log("Cancel Pressed"),
-              style: "cancel",
-            },
-            { text: "OK", onPress: () => UpdateSupabaseData(text, router) },
+            { text: "Cancel", style: "cancel" },
+            { text: "Retry", onPress: () => fetchKeywords(text) },
           ]
         );
-        console.error("Error updating data:", error);
-      } else {
-        console.log("✅ Updated data:", data);
-        router.push("/tabs/home/summary");
+        return null;
       }
-    } catch (err) {
-      console.error("❌ Unexpected error:", err);
     }
+    return null;
+  };
+
+  /* update supabase backend with fetched keywords/symptoms 
+    - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
+  issue w ios, need to research further into issue
+  */
+  const saveToSupabase  = async (text, keywords, retryCount = 3) => {
+    console.log("🔹 Attempting to update Supabase...");
+    while (retryCount > 0) {
+      try {
+        const { data, error } = await supabase
+          .from("journal_entries")
+          .insert([
+            { entry_text: text, pain_rating: painLevel, summary: keywords },
+          ])
+          .select();
+
+        if (error) {
+          console.error(`❌ Supabase Error (Attempts left: ${retryCount - 1}):`, error);
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          console.error("❌ Supabase returned null. Insert might have failed.");
+          throw new Error("Supabase insert failed - No data returned.");
+        }
+        
+        console.log("✅ Supabase Updated:", data);
+        return true;
+      } catch (err) {
+        console.error(`❌ Supabase Update Failed (Attempts left: ${retryCount - 1}):`, err);
+        retryCount--;
+        if (retryCount === 0) {
+          Alert.alert(
+            "Database Error",
+            "An unexpected issue occurred. Would you like to retry?",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Retry", onPress: () => saveToSupabase(text, keywords, 3) },
+            ]
+          );
+          return false;
+        }
+        console.warn(`⚠️ Retrying Supabase Update... ${retryCount} attempts left`);
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay before retry
+      }
+    }
+    return false;
+  };
+
+  /* display keywords screen */
+  const displayKeywords = async (text, router) => {
+    const keywords = await fetchedKeywords(text);
+    if (!keywords) return; // stop if keyword extraction fails
+
+    const success = await saveToSupabase(text, keywords);
+    if (!success) return; // stop if Supabase update fails
+
+    router.push("/tabs/home/summary");
   };
 
   return (
@@ -123,7 +175,7 @@ export default function Page() {
             showArrow={true}
           />
           <NextButton
-            onPress={() => UpdateSupabaseData(text, router)}
+            onPress={() => displayKeywords(text, router)}
             showArrow={true}
             disabled={text.trim().length === 0}
           />
