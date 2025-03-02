@@ -86,9 +86,9 @@ export default function Page() {
     while (retryCount > 0) {
       try {
         const { data, error } = await supabase
-          .from("journal_entries")
+          .from("detailed_entries")
           .insert([
-            { entry_text: text, pain_rating: painLevel, summary: keywords },
+            { entry_text: text, pain_rating: painLevel, duration: "few hours" },
           ])
           .select();
 
