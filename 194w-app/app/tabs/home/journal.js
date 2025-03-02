@@ -48,7 +48,7 @@ export default function Page() {
       console.log("Extracted Keywords ", fetchedKeywords);
       setKeywords(fetchedKeywords);
       setJSONData(fetchedJSON);
-      console.log(fetchedJSON);
+      // console.log(fetchedJSON);
       return fetchedKeywords;
     },
     enabled: false,

@@ -47,6 +47,12 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
+          name="plots"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="confirm"
           options={{
             headerShown: false,
