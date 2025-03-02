@@ -19,23 +19,24 @@ async function incrementValues(updates) {
     }
     const userId = user.id;
 
-    console.log("increment Values: ",updates);
+    // console.log("Function: Increment Values. Updates: ", updates);
     // Loop through updates and modify the relevant column
     for (const column in updates) {
-        console.log("column ", column, " key ", updates[column]);
-        const keys = updates[column];
-        if (keys === null || column == "entry_text" || column == "what-happened") continue;        
+        const keys = String(updates[column]);
+
+        if (keys === null || column == "entry_text" || column == "what-happened") continue;   
+
+        // console.log("Column: ", column, " Keys: ", keys);
+        const jsonData = data[column] || {};  
+
         // parse comma separated string key into array. e.g 'leg pain, headache' -> [leg pain, headache]
-        
-        let jsonData = data[column] || {}; 
-        console.log("jsonData ", jsonData);
-        const keysArray = updates[column].split(",").map(item => item.trim());
-        console.log("keysArray: ", keysArray);
-        for (const key in keysArray) {
-          jsonData[keys] = (jsonData[keys] || 0) + 1; // ++
-          console.log("keys i: ", keys);
+        const keysArray = keys.split(",").map(item => item.trim());
+        // console.log("keysarray ", keysArray);
+        for (const i in keysArray) {
+          jsonData[keysArray[i]] = (jsonData[keysArray[i]] || 0) + 1; // ++
+          // console.log("key ", keysArray[i]);
         }
-        console.log("jsonData ", jsonData);
+        // console.log("jsondata", jsonData);
         // Update the modified JSON objects in Supabase // not super efficient
         const { error: updateError } = await supabase
           .from("count_data")
@@ -50,21 +51,9 @@ async function incrementValues(updates) {
     }
 }
 
-// Usage Example: Increment values in multiple columns
-// const userId = "user-123"; // Replace with actual user ID
-// const updates = [
-//     { column: "causes", key: "stress" }, // Increment "stress" in causes
-//     { column: "causes", key: "fatigue" }, // Increment "fatigue" in causes
-//     { column: "symptoms", key: "headache" }, // Increment "headache" in symptoms
-//     { column: "symptoms", key: "nausea" } // Increment "nausea" in symptoms
-// ];
-// incrementValues(userId, updates);
-// updates detailed_entries
-
 export const addNewDetailedEntry = async (detailed_entry) => {
   const response = await supabase.from("detailed_entries").insert([detailed_entry]).select();
-  incrementValues(detailed_entry);
-  // console.log(response);
+  await incrementValues(detailed_entry);
   return response;
 };
 
