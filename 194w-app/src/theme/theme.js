@@ -22,6 +22,10 @@ export default {
     white: "#FFFFFF",
     testColor: "#6b85df",
 
+    darkPurple: "#2C4DC7",
+    darkBlue: "#0B3464",
+
+
     // UI States
     button: {
       primary: {
