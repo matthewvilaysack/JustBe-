@@ -28,20 +28,38 @@ const logs = [
   {
     id: "1",
     date: "2025-02-10",
-    summary: "Moderate Pain Headache",
+    pain_rating: 5,
     text: "My head has had a constant low ache in the front, and sometimes I get a throbbing pain as well.",
   },
   {
     id: "2",
     date: "2025-02-14",
-    summary: "Mild Fever",
+    pain_rating: 3,
     text: "I woke up with a cold and my temperature is a little high at 100 degrees.",
   },
   {
+    id: "6",
+    date: "2025-02-15",
+    pain_rating: 2,
+    text: "My fever is gone but I still have a sniffly/stuffy nose, and my throat is a little itchy.",
+  },
+  {
     id: "3",
+    date: "2025-02-16",
+    pain_rating: 0,
+    text: "My fever is finally gone, I feel much better now.",
+  },
+  {
+    id: "4",
     date: "2025-02-17",
-    summary: "Severe Back Pain",
+    pain_rating: 7,
     text: "My lower back hurts after sitting at the office the whole day, even when I'm laying down.",
+  },
+  {
+    id: "5",
+    date: "2025-02-01",
+    pain_rating: 9,
+    text: "I fell off my skateboard and hit my right hip. It's throbbing and it spikes every time I walk or put weight on my right leg.",
   },
 ];
 
@@ -56,8 +74,44 @@ export default function Export() {
 
   const selectedLog = logs.find((log) => log.date === selectedDate);
 
+  const getPainLevel = (pain_rating) => {
+    if (pain_rating === 0) return "No Pain";
+    if (pain_rating >= 1 && pain_rating <= 3) return "Mild Pain";
+    if (pain_rating >= 4 && pain_rating <= 6) return "Moderate Pain";
+    if (pain_rating >= 7 && pain_rating <= 9) return "Severe Pain";
+    if (pain_rating === 10) return "Extreme Pain";
+    return "Unknown Pain Level";
+  };
+
+  const getPainColor = (pain_rating) => {
+    if (pain_rating === 0) return "rgba(0, 255, 0, 0.5)";
+    if (pain_rating >= 1 && pain_rating <= 2) return "rgba(173, 255, 47, 0.7)";
+    if (pain_rating >= 3 && pain_rating <= 4) return "rgba(255, 255, 0, 0.7)";
+    if (pain_rating >= 5 && pain_rating <= 6) return "rgba(255, 165, 0, 0.8)";
+    if (pain_rating >= 7 && pain_rating <= 8) return "rgba(255, 69, 0, 0.8)";
+    if (pain_rating >= 9) return "rgba(255, 0, 0, 0.7)";
+  };
+
   const markedDates = logs.reduce((acc, log) => {
-    acc[log.date] = { marked: true, dotColor: "white" };
+    const painColor = getPainColor(log.pain_rating);
+
+    acc[log.date] = {
+      selected: true,
+      selectedColor: painColor,
+      customStyles: {
+        container: {
+          backgroundColor: painColor,
+          borderRadius: 8,
+          width: 35,
+          height: 35,
+        },
+        text: {
+          color: "white", // Ensures text is visible on colored background
+          fontWeight: "bold",
+        },
+      },
+    };
+
     return acc;
   }, {});
 
@@ -84,6 +138,7 @@ export default function Export() {
                   [selectedDate]: { selected: true, selectedColor: "#17336b" },
                 }),
               }}
+              markingType="custom"
               style={styles.calendar}
               theme={{
                 arrowColor: "white",
@@ -126,7 +181,9 @@ export default function Export() {
 
             {selectedLog ? (
               <View style={styles.logContent}>
-                <Text style={styles.logDate}>{selectedLog.summary}</Text>
+                <Text style={styles.logDate}>
+                  {getPainLevel(selectedLog.pain_rating)}
+                </Text>
                 <Text style={styles.logText}>{selectedLog.text}</Text>
               </View>
             ) : (
