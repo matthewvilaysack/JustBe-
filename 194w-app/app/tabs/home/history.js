@@ -19,7 +19,7 @@ import Theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
-import Button from "@/src/components/ui/BackButton";
+import BackButton from "@/src/components/ui/BackButton";
 
 const { width } = Dimensions.get("window");
 
@@ -121,8 +121,8 @@ export default function Export() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.footer}>
-        <Button
+      <View style={styles.buttonContainer}>
+        <BackButton
           onPress={() => {
             router.back();
           }}
@@ -303,11 +303,12 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
     borderRadius: 10,
   },
-  footer: {
+  buttonContainer: {
     position: "absolute",
     top: "7%",
     left: "5%",
     opacity: 0.9,
+    zIndex: 10,
   },
 });
 
