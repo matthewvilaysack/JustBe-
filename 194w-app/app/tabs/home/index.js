@@ -57,5 +57,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginVertical: 10,
     flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
   },
 });

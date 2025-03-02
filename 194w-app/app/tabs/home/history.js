@@ -19,7 +19,7 @@ import Theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
-import Button from "@/src/components/ui/BackButton";
+import BackButton from "@/src/components/ui/BackButton";
 
 const { width } = Dimensions.get("window");
 
@@ -28,20 +28,38 @@ const logs = [
   {
     id: "1",
     date: "2025-02-10",
-    summary: "Moderate Pain Headache",
+    pain_rating: 5,
     text: "My head has had a constant low ache in the front, and sometimes I get a throbbing pain as well.",
   },
   {
     id: "2",
     date: "2025-02-14",
-    summary: "Mild Fever",
+    pain_rating: 3,
     text: "I woke up with a cold and my temperature is a little high at 100 degrees.",
   },
   {
+    id: "6",
+    date: "2025-02-15",
+    pain_rating: 2,
+    text: "My fever is gone but I still have a sniffly/stuffy nose, and my throat is a little itchy.",
+  },
+  {
     id: "3",
+    date: "2025-02-16",
+    pain_rating: 0,
+    text: "My fever is finally gone, I feel much better now.",
+  },
+  {
+    id: "4",
     date: "2025-02-17",
-    summary: "Severe Back Pain",
+    pain_rating: 7,
     text: "My lower back hurts after sitting at the office the whole day, even when I'm laying down.",
+  },
+  {
+    id: "5",
+    date: "2025-02-01",
+    pain_rating: 9,
+    text: "I fell off my skateboard and hit my right hip. It's throbbing and it spikes every time I walk or put weight on my right leg.",
   },
 ];
 
@@ -56,8 +74,44 @@ export default function Export() {
 
   const selectedLog = logs.find((log) => log.date === selectedDate);
 
+  const getPainLevel = (pain_rating) => {
+    if (pain_rating === 0) return "No Pain";
+    if (pain_rating >= 1 && pain_rating <= 3) return "Mild Pain";
+    if (pain_rating >= 4 && pain_rating <= 6) return "Moderate Pain";
+    if (pain_rating >= 7 && pain_rating <= 9) return "Severe Pain";
+    if (pain_rating === 10) return "Extreme Pain";
+    return "Unknown Pain Level";
+  };
+
+  const getPainColor = (pain_rating) => {
+    if (pain_rating === 0) return "rgba(0, 255, 0, 0.5)";
+    if (pain_rating >= 1 && pain_rating <= 2) return "rgba(173, 255, 47, 0.7)";
+    if (pain_rating >= 3 && pain_rating <= 4) return "rgba(255, 255, 0, 0.7)";
+    if (pain_rating >= 5 && pain_rating <= 6) return "rgba(255, 165, 0, 0.8)";
+    if (pain_rating >= 7 && pain_rating <= 8) return "rgba(255, 69, 0, 0.8)";
+    if (pain_rating >= 9) return "rgba(255, 0, 0, 0.7)";
+  };
+
   const markedDates = logs.reduce((acc, log) => {
-    acc[log.date] = { marked: true, dotColor: "white" };
+    const painColor = getPainColor(log.pain_rating);
+
+    acc[log.date] = {
+      selected: true,
+      selectedColor: painColor,
+      customStyles: {
+        container: {
+          backgroundColor: painColor,
+          borderRadius: 8,
+          width: 35,
+          height: 35,
+        },
+        text: {
+          color: "white",
+          fontWeight: "bold",
+        },
+      },
+    };
+
     return acc;
   }, {});
 
@@ -67,7 +121,15 @@ export default function Export() {
       resizeMode="cover"
       style={styles.background}
     >
-      <ScrollView>
+      <View style={styles.buttonContainer}>
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+      </View>
+      <ScrollView style={styles.scrollcontainer}>
         <View style={styles.calendarContainer}>
           <LinearGradient
             colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
@@ -84,6 +146,7 @@ export default function Export() {
                   [selectedDate]: { selected: true, selectedColor: "#17336b" },
                 }),
               }}
+              markingType="custom"
               style={styles.calendar}
               theme={{
                 arrowColor: "white",
@@ -126,7 +189,9 @@ export default function Export() {
 
             {selectedLog ? (
               <View style={styles.logContent}>
-                <Text style={styles.logDate}>{selectedLog.summary}</Text>
+                <Text style={styles.logDate}>
+                  {getPainLevel(selectedLog.pain_rating)}
+                </Text>
                 <Text style={styles.logText}>{selectedLog.text}</Text>
               </View>
             ) : (
@@ -139,14 +204,6 @@ export default function Export() {
           </LinearGradient>
         </View>
       </ScrollView>
-      <View style={styles.footer}>
-        <Button
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
     </ImageBackground>
   );
 }
@@ -157,6 +214,9 @@ const styles = StyleSheet.create({
   },
   gradient: {
     borderRadius: theme.radius.lg,
+  },
+  scrollcontainer: {
+    marginTop: "15%",
   },
   card: {
     padding: theme.spacing.lg,
@@ -243,11 +303,12 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
     borderRadius: 10,
   },
-  footer: {
-    flexDirection: "row",
-    //justifyContent: "flex-start",
-    marginBottom: "5%",
-    marginLeft: "5%",
+  buttonContainer: {
+    position: "absolute",
+    top: "7%",
+    left: "5%",
+    opacity: 0.9,
+    zIndex: 10,
   },
 });
 
