@@ -24,7 +24,7 @@ async function incrementValues(updates) {
     for (const column in updates) {
         console.log("column ", column, " key ", updates[column]);
         const keys = updates[column];
-        if (keys == null || column == "entry_text" || column == "what-happened") continue;        
+        if (keys === null || column == "entry_text" || column == "what-happened") continue;        
         // parse comma separated string key into array. e.g 'leg pain, headache' -> [leg pain, headache]
         
         let jsonData = data[column] || {}; 
@@ -62,14 +62,9 @@ async function incrementValues(updates) {
 // updates detailed_entries
 
 export const addNewDetailedEntry = async (detailed_entry) => {
-  let response;
-  const insertData = async () => {
-    
-    response = await addRowToSupabase("detailed_entries", detailed_entry);
-    console.log("add new detailed entry response: " , response);
-  };
-  insertData();
+  const response = await supabase.from("detailed_entries").insert([detailed_entry]).select();
   incrementValues(detailed_entry);
+  // console.log(response);
   return response;
 };
 
