@@ -85,10 +85,16 @@ export default function Page() {
     console.log("🔹 Attempting to update Supabase...");
     while (retryCount > 0) {
       try {
+
+        // get json from LLM output, add entry_text and pain_rating
+        let updateData = { duration: "few hours" }; 
+        updateData.entry_text = text;
+        updateData.pain_rating = painLevel;
+
         const { data, error } = await supabase
           .from("detailed_entries")
           .insert([
-            { entry_text: text, pain_rating: painLevel, duration: "few hours" },
+            updateData,
           ])
           .select();
 
