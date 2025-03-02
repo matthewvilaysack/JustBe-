@@ -1,5 +1,9 @@
 import { supabase } from '../../src/lib/api/supabase';
 
+/**
+ * Fetches the user id for current user
+ * @returns {user id} from Supabase
+ */
 async function getUserID() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
       
@@ -9,9 +13,12 @@ async function getUserID() {
   return user.id;
 }
 
-// Called everytime a new entry is made
-// Function to increment the counts of keys (ex nausea) in multiple JSON columns (ex symptoms)
-// Takes in Updates, a JSON object, ex {duration: "sdjak", sensation: "a,b,c", etc}
+/**
+ * Called everytime a new entry is made
+ * Increment the counts of keys (ex nausea) in multiple JSON columns (ex symptoms)
+ * @param {Object} updates - JSON data to update table with. ex {duration: "sdjak", sensation: "a,b,c", etc}
+ * @param {Object} entry - The JSON data to insert
+ */
 async function incrementValues(updates) {
     // Fetch data for the user
     const { data, error } = await supabase
@@ -28,7 +35,7 @@ async function incrementValues(updates) {
     for (const column in updates) {
         const keys = String(updates[column]);
 
-        if (keys === null || column == "entry_text" || column == "what-happened") continue;   
+        if (keys === null || keys === "null" || column == "entry_text" || column == "what-happened") continue;   
 
         // console.log("Column: ", column, " Keys: ", keys);
         const jsonData = data[column] || {};  
@@ -55,6 +62,10 @@ async function incrementValues(updates) {
     }
 }
 
+/**
+* Adds new detailed entry to Supabase
+* @param {Object} detailed_entry - JSON data to insert
+*/
 export const addNewDetailedEntry = async (detailed_entry) => {
   const response = await supabase.from("detailed_entries").insert([detailed_entry]).select();
   await incrementValues(detailed_entry);
@@ -79,6 +90,10 @@ export const addNewDetailedEntry = async (detailed_entry) => {
 //   }
 // };
 
+/**
+* Fetches data of highest pain rating per day
+* @returns {Promise<Object>} JSON table data
+*/
 export async function getHighestPainRatingPerDay() {
   const userId = await getUserID();
   const { data, error } = await supabase
@@ -91,4 +106,21 @@ export async function getHighestPainRatingPerDay() {
 
   console.log("get_highest_pain_rating_per_day data: ", data);
   return data;
+}
+
+/**
+* Fetches countData 
+* @returns {Promise<Object>} JSON table data
+*/
+export async function fetchCountData(){
+  // Fetch data for the user
+  const { data, error } = await supabase
+    .from('count_data').select('*').single();  // Get single user record
+  if (error) {
+    console.error("Error fetching data from count_data:", error);
+    return error;
+  }
+
+  // otherwise split up the data
+  console.log("fetch count data: ", data);
 }

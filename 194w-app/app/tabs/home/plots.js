@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { getHighestPainRatingPerDay } from "../../utils/supabase-helpers";
+import { fetchCountData, getHighestPainRatingPerDay } from "../../utils/supabase-helpers";
 import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme } from "victory-native";
 
 // Pain Chart Component
@@ -41,6 +41,8 @@ const PainTracker = () => {
             const response = await getHighestPainRatingPerDay();
             setData(response);
             console.log("HighestPainRatingPerDay: ", response);
+
+            await fetchCountData();
         } catch (error) {
             console.error("Error fetching data getHighestPainRatingPerDay:", error);
         }
