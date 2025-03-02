@@ -106,7 +106,7 @@ export default function Export() {
           height: 35,
         },
         text: {
-          color: "white", // Ensures text is visible on colored background
+          color: "white",
           fontWeight: "bold",
         },
       },
@@ -121,7 +121,15 @@ export default function Export() {
       resizeMode="cover"
       style={styles.background}
     >
-      <ScrollView>
+      <View style={styles.footer}>
+        <Button
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+      </View>
+      <ScrollView style={styles.scrollcontainer}>
         <View style={styles.calendarContainer}>
           <LinearGradient
             colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
@@ -196,14 +204,6 @@ export default function Export() {
           </LinearGradient>
         </View>
       </ScrollView>
-      <View style={styles.footer}>
-        <Button
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
     </ImageBackground>
   );
 }
@@ -214,6 +214,9 @@ const styles = StyleSheet.create({
   },
   gradient: {
     borderRadius: theme.radius.lg,
+  },
+  scrollcontainer: {
+    marginTop: "15%",
   },
   card: {
     padding: theme.spacing.lg,
@@ -301,10 +304,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   footer: {
-    flexDirection: "row",
-    //justifyContent: "flex-start",
-    marginBottom: "5%",
-    marginLeft: "5%",
+    position: "absolute",
+    top: "7%",
+    left: "5%",
+    opacity: 0.9,
   },
 });
 
