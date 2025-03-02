@@ -23,6 +23,7 @@ import { extractKeywords } from "@/src/lib/api/togetherai";
 import { supabase } from "../../../src/lib/api/supabase";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
+import { addNewDetailedEntry } from "../../utils/supabase-helpers";
 
 export default function Page() {
   const [text, setText] = useState("");
@@ -91,12 +92,7 @@ export default function Page() {
         updateData.entry_text = text;
         updateData.pain_rating = painLevel;
 
-        const { data, error } = await supabase
-          .from("detailed_entries")
-          .insert([
-            updateData,
-          ])
-          .select();
+        const { data, error } = await addNewDetailedEntry(updateData);
 
         if (error) {
           console.error(`❌ Supabase Error (Attempts left: ${retryCount - 1}):`, error);
