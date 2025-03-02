@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet } from "react-native";
 import { fetchCountData, getHighestPainRatingPerDay } from "../../utils/supabase-helpers";
 import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme, VictoryPie } from "victory-native";
 
 // Pain Chart Component
 const PainChart = ({ data }) => {
     if (!data || data.length === 0) {
-        return <Text>Loading data...</Text>;
+        return; // <Text>Loading data...</Text>;
     }
 
     // Format data for VictoryChart
@@ -34,7 +34,7 @@ const PainChart = ({ data }) => {
 // Pie chart component
 const PieChart = ({ data }) => {
   if (!data || Object.keys(data).length === 0) {
-      return <Text>Loading data...</Text>;
+      return; // <Text>Loading data...</Text>;
   }
 
   // Convert JSON object into an array format that VictoryPie understands
@@ -43,7 +43,7 @@ const PieChart = ({ data }) => {
       y: value // JSON value as y (numeric data)
   }));
   
-  console.log("Pie chart formatted data: ", formattedData);
+  // console.log("Pie chart formatted data: ", formattedData);
   return (
     <View style={styles.container}>
         <VictoryPie 
@@ -62,7 +62,7 @@ const PieChart = ({ data }) => {
 // Parent Component: Fetch Data and Pass to PainChart
 const PainTracker = () => {
     const [pain_data, setPainData] = useState([]);
-    const [duration_data, setDurationData] = useState([]);
+    const [count_data, setCountData] = useState([]); 
 
     // Async function to fetch data
     async function fetchPainData() {
@@ -74,29 +74,40 @@ const PainTracker = () => {
             console.error("Error fetching pain data:", error);
         }
     }
-    async function fetchDurationData() {
+    async function getCountData() {
       try {
           const response = await fetchCountData();
-          setDurationData(response.duration);
-          console.log("fetch duration data: ", response.duration);
+          setCountData(response);
+          console.log("fetch count data: ", response);
       } catch (error) {
-          console.error("Error fetching duration data:", error);
+          console.error("Error fetching count data:", error);
       }
-  }
+    }
 
     // Fetch data on component mount
     useEffect(() => {
         fetchPainData();
-        fetchDurationData();
+        getCountData();
     }, []);
     return (
-      <View style={styles.container}>
-          <Text style={styles.title}>Highest Pain Severity Over Time</Text>
-          <PainChart data={pain_data} />
-          
-          <Text style={styles.title}>Most Common Duration Pie Chart</Text>
-          <PieChart data={duration_data} />
-      </View>
+      <ScrollView >
+        <View style={styles.container}>
+            <Text style={styles.title}>Highest Pain Severity Over Time</Text>
+            <PainChart data={pain_data} />
+            
+            <Text style={styles.title}>Most Common Duration Pie Chart</Text>
+            <PieChart data={count_data.duration} />
+
+            <Text style={styles.title}>Most Common Timing of Pain Pie Chart</Text>
+            <PieChart data={count_data["when-does-it-hurt"]} />
+
+            <Text style={styles.title}>Most Common Concerns</Text>
+            <PieChart data={count_data.concerns} />
+
+            <Text style={styles.title}>Most Common Causes</Text>
+            <PieChart data={count_data.causes} />
+        </View>
+      </ScrollView>
     );
 };
 
