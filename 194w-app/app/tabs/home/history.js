@@ -74,6 +74,7 @@ export default function Export() {
 
   const selectedLog = logs.find((log) => log.date === selectedDate);
 
+  // get pain level for log
   const getPainLevel = (pain_rating) => {
     if (pain_rating === 0) return "No Pain";
     if (pain_rating >= 1 && pain_rating <= 3) return "Mild Pain";
@@ -82,7 +83,7 @@ export default function Export() {
     if (pain_rating === 10) return "Extreme Pain";
     return "Unknown Pain Level";
   };
-
+  // get pain color for calendar, displaying severity back to user
   const getPainColor = (pain_rating) => {
     if (pain_rating === 0) return "rgba(0, 255, 0, 0.5)";
     if (pain_rating >= 1 && pain_rating <= 2) return "rgba(173, 255, 47, 0.7)";
@@ -91,7 +92,7 @@ export default function Export() {
     if (pain_rating >= 7 && pain_rating <= 8) return "rgba(255, 69, 0, 0.8)";
     if (pain_rating >= 9) return "rgba(255, 0, 0, 0.7)";
   };
-
+  // mark dates that have logs on them in the calendar according to color (helper functions above)
   const markedDates = logs.reduce((acc, log) => {
     const painColor = getPainColor(log.pain_rating);
 
@@ -150,7 +151,7 @@ export default function Export() {
               style={styles.calendar}
               theme={{
                 arrowColor: "white",
-                calendarBackground: "transparent", //theme.colors.border.default,
+                calendarBackground: "transparent",
                 selectedDayBackgroundColor: "#20348a",
                 selectedDayTextColor: "white",
                 dayTextColor: "white",
@@ -276,7 +277,6 @@ const styles = StyleSheet.create({
   calendar: {
     backgroundColor: "transparent",
     elevation: 5,
-    // is this shadow actually doing anything...
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
@@ -293,13 +293,9 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.sizes.md,
     color: "white",
     marginLeft: theme.spacing.sm,
-    //marginTop: theme.spacing.sm,
     fontFamily: theme.typography.fonts.regular,
-    //alignSelf: "center",
   },
   logContent: {
-    //padding: 15,
-    //backgroundColor: "rgba(255,255,255,0.2)",
     marginBottom: theme.spacing.sm,
     borderRadius: 10,
   },
