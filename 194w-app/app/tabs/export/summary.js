@@ -3,6 +3,7 @@ import { View, ActivityIndicator, Alert, StyleSheet } from "react-native";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import theme from "@/src/theme/theme";
+import { fetchDetailedEntriesForUser, formatEntriesForAI } from "../../utils/supabase-helpers";
 import { extractExport } from "@/src/lib/api/togetherai";
 import { format } from "date-fns";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
@@ -29,7 +30,16 @@ const GeneratePDF = () => {
     setLoading(true);
 
     try {
-      const output = await extractExport(JOURNAL_ENTRY);
+      const entries = await fetchDetailedEntriesForUser();
+      if (!entries) {
+        Alert.alert("No Entries", "No journal entries found for your account.");
+        router.push("/tabs/home");  // Redirect to a safer page if no entry found
+        return;
+      }
+
+      const combinedJournalText = formatEntriesForAI(entries);
+      const output = await extractExport(combinedJournalText);
+      //const output = await extractExport(JOURNAL_ENTRY);
 
       if (!output.length) {
         Alert.alert(
