@@ -23,45 +23,6 @@ import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
 const { width } = Dimensions.get("window");
 
-// TEMPORARY HARDCODED LOGS need to link to backend later
-const logs = [
-  {
-    id: "1",
-    date: "2025-02-10",
-    pain_rating: 5,
-    text: "My head has had a constant low ache in the front, and sometimes I get a throbbing pain as well.",
-  },
-  {
-    id: "2",
-    date: "2025-02-14",
-    pain_rating: 3,
-    text: "I woke up with a cold and my temperature is a little high at 100 degrees.",
-  },
-  {
-    id: "6",
-    date: "2025-02-15",
-    pain_rating: 2,
-    text: "My fever is gone but I still have a sniffly/stuffy nose, and my throat is a little itchy.",
-  },
-  {
-    id: "3",
-    date: "2025-02-16",
-    pain_rating: 0,
-    text: "My fever is finally gone, I feel much better now.",
-  },
-  {
-    id: "4",
-    date: "2025-02-17",
-    pain_rating: 7,
-    text: "My lower back hurts after sitting at the office the whole day, even when I'm laying down.",
-  },
-  {
-    id: "5",
-    date: "2025-02-01",
-    pain_rating: 9,
-    text: "I fell off my skateboard and hit my right hip. It's throbbing and it spikes every time I walk or put weight on my right leg.",
-  },
-];
 
 export default function Export() {
   const router = useRouter();
@@ -79,6 +40,7 @@ export default function Export() {
 
   // Get logs for the selected date
   const selectedLog = selectedDate ? getLogsByDate(selectedDate)[0] : null;
+  console.log("selectedLog", selectedLog) // Temp 
 
   const getPainLevel = (pain_rating) => {
     if (pain_rating === 0) return "No Pain";

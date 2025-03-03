@@ -4,8 +4,9 @@
 // it caches them in the user's device cache (localStorage)
 // code by @matthewvilaysack
 import { create } from 'zustand';
-import { persist, PersistOptions } from 'zustand/middleware';
+import { createJSONStorage, persist, PersistOptions } from 'zustand/middleware';
 import { supabase } from '../lib/api/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface JournalLog {
   id: number;
@@ -36,8 +37,37 @@ type JournalStorePersist = {
   isLoading: boolean;
 };
 
+// Custom async storage using Zustand
+const customStorage = {
+  getItem: async (name: string) => {
+    try {
+      const value = await AsyncStorage.getItem(name);
+      return value;
+    } catch (error: any) {
+      console.warn(`Error reading from storage: ${error.message}`);
+      return null;
+    }
+  },
+  setItem: async (name: string, value: string) => {
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch (error: any) {
+      console.warn(`Error writing to storage: ${error.message}`);
+    }
+  },
+  removeItem: async (name: string) => {
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch (error: any) {
+      console.warn(`Error removing from storage: ${error.message}`);
+    }
+  },
+};
+
+
 const persistConfig: PersistOptions<JournalState, JournalStorePersist> = {
   name: 'journal-storage',
+  storage: createJSONStorage(() => customStorage),
   partialize: (state) => ({
     journalLogs: state.journalLogs,
     isLoading: state.isLoading
