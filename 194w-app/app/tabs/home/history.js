@@ -139,7 +139,7 @@ export default function Export() {
             style={styles.calendarGradient}
           >
             <Calendar
-              onDayPress={(day) => setSelectedDate(day.dateString)}
+              onDayPress={(day) => setSelectedDate(day.dateString + "T00:00:00")}
               markedDates={{
                 ...markedDates,
                 ...(selectedDate && {
@@ -175,14 +175,10 @@ export default function Export() {
             style={[styles.gradient, { padding: theme.spacing.md }]}
           >
             <Text style={styles.sectionTitle}>Log History</Text>
-
             <Text style={styles.logDate}>
-              {new Date(selectedDate).toLocaleDateString("en-US", {
+              {new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
-              })}
-              ,{" "}
-              {new Date(selectedDate).toLocaleDateString("en-US", {
                 weekday: "long",
               })}
             </Text>
