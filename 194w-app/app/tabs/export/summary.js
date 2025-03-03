@@ -19,43 +19,11 @@ const GeneratePDF = () => {
   const [dateTime, setDateTime] = useState(
     format(new Date(), "EEEE, MMMM dd, yyyy HH:mm")
   );
-  const { setSuggestions, suggestions } = useSuggestionStore();
+  const { setSuggestions } = useSuggestionStore();
 
   useEffect(() => {
-    if (suggestions.length > 0) generatePDF(suggestions);
+    handleGeneratePDF();
   }, []);
-
-  const generatePDF = async (data) => {
-    setLoading(true);
-    setDateTime(format(new Date(), "EEEE, MMMM dd, yyyy HH:mm"));
-
-    const htmlContent = `
-      <html>
-        <body>
-          <h1>Comprehensive Summary</h1>
-          <p>Generated on ${dateTime}</p>
-          <h2>What you can bring up during your next appointment</h1>
-          <ol>
-            <li>${data.map((keyword) => `<li>${keyword}</li>`).join("")}</li>
-          </ol>
-          <h2>Reminder of relevant diagnoses</h1>
-          <ul>${DIAGNOSES.map((diagnosis) => `<li>${diagnosis}</li>`).join(
-            ""
-          )}</ul>
-        </body>
-      </html>
-    `;
-
-    try {
-      const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      setPdfUri(uri);
-      Alert.alert("Success", "PDF generated successfully!");
-    } catch (error) {
-      console.error("❌ Error:", error);
-      Alert.alert("Error", "Failed to generate PDF.");
-    }
-    setLoading(false);
-  };
 
   const handleGeneratePDF = async () => {
     setLoading(true);
@@ -63,7 +31,6 @@ const GeneratePDF = () => {
     try {
       const output = await extractExport(JOURNAL_ENTRY);
 
-      setSuggestions(output);
       if (!output.length) {
         Alert.alert(
           "No keywords found",
@@ -72,13 +39,34 @@ const GeneratePDF = () => {
         return;
       }
 
-      generatePDF(output);
+      setSuggestions(output);
+
+      const currentDateTime = format(new Date(), "EEEE, MMMM dd, yyyy HH:mm");
+
+      const htmlContent = `
+        <html>
+          <body>
+            <h1>Comprehensive Summary</h1>
+            <p>Generated on ${currentDateTime}</p>
+            <h2>What you can bring up during your next appointment</h2>
+            <ol>${output.map((keyword) => `<li>${keyword}</li>`).join("")}</ol>
+            <h2>Reminder of relevant diagnoses</h2>
+            <ul>${DIAGNOSES.map((diagnosis) => `<li>${diagnosis}</li>`).join(
+              ""
+            )}</ul>
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      setPdfUri(uri);
+      Alert.alert("Success", "PDF generated successfully!");
     } catch (error) {
       console.error("❌ Error:", error);
       Alert.alert("Error", "Failed to generate PDF.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleSharePDF = async () => {
