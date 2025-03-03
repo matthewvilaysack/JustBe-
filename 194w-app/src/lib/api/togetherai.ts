@@ -22,7 +22,7 @@ const axiosInstance = axios.create({
 
 /**
  * extracts a JSON object from a journal entry using llm.
- * JSON Format {"symptoms": string, "duration": string, "sensation": string, "causes": string, 
+ * JSON Format {"symptoms": string, "duration": string, "sensation": string, "causes": string,
  *              "what-happened": string, "concerns": string, "when-does-it-hurt": string}
  * @param {string} journalText user's journal entry
  * @returns extracted JSON
@@ -46,12 +46,11 @@ export const extractDetailedEntryJSON = async (
   while (retryCount > 0) {
     try {
       const response = await axiosInstance.post("", {
-          model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-          messages: [
-            {
-              role: "system",
-              content:
-              `You are a medical symptom extraction assistant. 
+        model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+        messages: [
+          {
+            role: "system",
+            content: `You are a medical symptom extraction assistant. 
               
               Your task is to extract structured medical information from a user-provided journal entry and return it **strictly as a JSON object** with the following fields:
 
@@ -84,16 +83,15 @@ export const extractDetailedEntryJSON = async (
                   "when-does-it-hurt": "movement"
               }
 
-              Remember: Output only valid JSON, no extra text.`
-            },
-            {
-              role: "user",
-              content: 
-              `Journal Entry: ${journalText}`
-            },
-          ],
-          temperature: 0,
-      });      
+              Remember: Output only valid JSON, no extra text.`,
+          },
+          {
+            role: "user",
+            content: `Journal Entry: ${journalText}`,
+          },
+        ],
+        temperature: 0,
+      });
 
       const data = await response.data;
       console.log("✅ Response from AI:", data);
@@ -107,9 +105,9 @@ export const extractDetailedEntryJSON = async (
       }
 
       const cleanedJson = jsonMatch[0]; // this should be only the JSON part
-      console.log("Cleaned JSON:", cleanedJson); 
-    
-      const parsedData = JSON.parse(cleanedJson); 
+      console.log("Cleaned JSON:", cleanedJson);
+
+      const parsedData = JSON.parse(cleanedJson);
       // fallback defaults to guarantee all fields exist
       const defaultFields = {
         symptoms: null,
@@ -126,7 +124,10 @@ export const extractDetailedEntryJSON = async (
       console.log("✅ Final Parsed Data:", finalData);
       return finalData;
     } catch (error) {
-      console.error(`❌ Error extracting info (Attempts left: ${retryCount - 1}):`, error);
+      console.error(
+        `❌ Error extracting info (Attempts left: ${retryCount - 1}):`,
+        error
+      );
       retryCount--;
 
       if (retryCount === 0) {
@@ -224,42 +225,34 @@ export const extractExport = async (
   journalText: string,
   retryCount = 3, // Retry logic
   delay = 2000 // Delay between retries
-  ): Promise<string[]> => {
+): Promise<string[]> => {
   if (!journalText.trim()) return [];
 
   console.log("🔹 Sending request to Together AI...");
   while (retryCount > 0) {
-
-
     try {
-      const response = await axiosInstance.post("",
-        {
-          model: "mistralai/Mistral-7B-Instruct-v0.1",
-          messages: [
-            {
-              role: "system",
-              content: `You are a helpful assistant that extracts key symptoms from journal entries and reformats them into clear, structured statements for a doctor. Provide three concise summaries with:
+      const response = await axiosInstance.post("", {
+        model: "mistralai/Mistral-7B-Instruct-v0.1",
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful assistant that extracts key symptoms from journal entries and reformats them into clear, structured statements for a doctor. Provide three concise summaries with:
               - When the symptom started (e.g., "three days ago," "since this morning").
               - How it has changed over time (e.g., worsening, stable, intermittent).
               - How severe it is and how it affects daily life (e.g., "severe fatigue, making it hard to focus").
             
-              **Output Example:**
-                "I started feeling a sore throat three days ago, and now it’s painful to swallow."
-                "My fever spiked to 100.2°F last night and hasn’t gone down."
-                "I’ve been feeling exhausted since this morning, making it hard to focus on work."
-
             **Rules:**
               - Do **not** include numbered list, bullet points, or formatting symbols.
               - Keep the language **natural and easy to understand**.
               - Return only the three formatted symptom statements, **nothing else**.
               - Do not use bold formatting (**) in your response.`,
-            },
-            {
-              role: "user",
-              content: `Extract and structure the symptoms from this journal entry: \n\n"${journalText}"`,
-            },
-          ],
-        });
+          },
+          {
+            role: "user",
+            content: `Extract and structure the symptoms from this journal entry: \n\n"${journalText}"`,
+          },
+        ],
+      });
 
       console.log("✅ Response from AI:", response.data);
 
@@ -272,7 +265,7 @@ export const extractExport = async (
           line
             .trim()
             .replace(/^\d+\.\s*/, "") // remove "1. ", "2. ", etc.
-            .replace(/^[-•]\s*/, "")  // remove bullet points like "-" or "•"
+            .replace(/^[-•]\s*/, "") // remove bullet points like "-" or "•"
             .trim()
         )
         .filter(Boolean); // remove empty lines
@@ -281,7 +274,12 @@ export const extractExport = async (
 
       return cleanedSummaries;
     } catch (error: any) {
-      console.error(`❌ Error extracting structured summaries (Attempts left: ${retryCount - 1}):`, error.response?.data || error.message);
+      console.error(
+        `❌ Error extracting structured summaries (Attempts left: ${
+          retryCount - 1
+        }):`,
+        error.response?.data || error.message
+      );
       retryCount--;
 
       if (retryCount === 0) {

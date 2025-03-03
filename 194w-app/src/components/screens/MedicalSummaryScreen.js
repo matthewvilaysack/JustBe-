@@ -1,4 +1,4 @@
-import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import theme from "@/src/theme/theme";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
 import MedicalSummaryHeader from "@/src/components/ui/MedicalSummaryHeader";
@@ -20,14 +20,16 @@ const MedicalSummaryScreen = ({
         handleSharePDF={handleSharePDF}
       />
       <View style={styles.content}>
-        <Text style={styles.title}>Comprehensive Summary</Text>
-        <Text style={styles.date}>Generated on {dateTime}</Text>
+        <ScrollView>
+          <Text style={styles.title}>Comprehensive Summary</Text>
+          <Text style={styles.date}>Generated on {dateTime}</Text>
 
-        <Section
-          title="What you can bring up during your next appointment"
-          items={suggestions}
-        />
-        <Section title="Reminder of relevant diagnoses" items={DIAGNOSES} />
+          <Section
+            title="What you can bring up during your next appointment"
+            items={suggestions}
+          />
+          <Section title="Reminder of relevant diagnoses" items={DIAGNOSES} />
+        </ScrollView>
       </View>
       <View style={styles.footer}>
         <Text style={styles.pageNumber}>Page 1/1</Text>
