@@ -4,6 +4,7 @@ import Theme from "@/src/theme/theme";
 import { useRouter } from "expo-router";
 import LoadingThinkingBlob from "@/src/animations/LoadingThinkingBlob";
 import { extractExport } from "@/src/lib/api/togetherai";
+import { fetchDetailedEntriesForUser, formatEntriesForAI } from "../../utils/supabase-helpers";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
 
 export default function GeneratingPage() {
@@ -13,10 +14,16 @@ export default function GeneratingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO: Replace this journal entry with your actual data
-        const journalEntry =
-          "I started feeling extremely fatigued three days ago. At first, it was mild, but by the second day, I felt so exhausted that even small tasks like walking to the kitchen felt draining. I also started experiencing dizziness, especially when standing up quickly. Yesterday, I noticed nausea that made it difficult to eat, and this morning, I nearly vomited after trying to have breakfast. The symptoms seem to be getting worse each day.";
-        const output = await extractExport(journalEntry);
+
+        const entries = await fetchDetailedEntriesForUser();
+        if (!entries) {
+          Alert.alert("No Entries", "No journal entries found for your account.");
+          router.push("/tabs/home");  // Redirect to a safer page if no entry found
+          return;
+        }
+
+        const combinedJournalText = formatEntriesForAI(entries);
+        const output = await extractExport(combinedJournalText);
         setSuggestions(output);
         router.push("/tabs/export/summary");
       } catch (error) {

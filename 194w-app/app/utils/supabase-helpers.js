@@ -73,6 +73,53 @@ export const addNewDetailedEntry = async (detailed_entry) => {
 };
 
 /**
+ * Fetches all detailed entries for the current logged-in user
+ * @returns {Promise<Array>} Array of detailed entries
+ */
+export async function fetchDetailedEntriesForUser() {
+  const userId = await getUserID();
+
+  if (!userId) {
+      console.error("No user ID found. Cannot fetch detailed entries.");
+      return [];
+  }
+
+  const { data, error } = await supabase
+      .from('detailed_entries')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+  if (error) {
+      console.error("Error fetching detailed entries:", error);
+      return [];
+  }
+
+  return data;
+}
+
+/**
+ * Will format entries of a user for ai prompting
+ * @param {string} entries - all entries for a user
+ * @returns The ai prompt from Supabase
+ */
+export function formatEntriesForAI(entries) {
+  return entries.map((entry) => {
+      const parts = [
+          entry.symptoms ? `Symptoms: ${entry.symptoms}` : null,
+          entry.duration ? `Duration: ${entry.duration}` : null,
+          entry.sensation ? `Sensation: ${entry.sensation}` : null,
+          entry.causes ? `Causes: ${entry.causes}` : null,
+          entry["what-happened"] ? `What happened: ${entry["what-happened"]}` : null,
+          entry.concerns ? `Concerns: ${entry.concerns}` : null,
+          entry["when-does-it-hurt"] ? `When does it hurt: ${entry["when-does-it-hurt"]}` : null,
+      ];
+
+      return parts.filter(Boolean).join("\n");
+  }).join("\n\n---\n\n");
+}
+
+/**
  * Adds a row to a Supabase table
  * @param {string} tableName - The name of the table
  * @param {Object} entry - The JSON data to insert
