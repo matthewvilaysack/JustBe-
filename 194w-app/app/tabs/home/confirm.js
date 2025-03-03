@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  View,
-  ImageBackground,
-  Image,
-  Text,
-  Dimensions,
-  TextInput,
-} from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+import { StyleSheet, View, ImageBackground, Text } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import Button from "@/src/components/ui/NextButton";
 
 export default function Page() {
   const router = useRouter();

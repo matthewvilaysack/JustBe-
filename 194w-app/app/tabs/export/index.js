@@ -43,7 +43,7 @@ export default function Export() {
     >
       <TouchableOpacity
         style={styles.summaryWrapper}
-        onPress={() => router.push("/tabs/export/summary")}
+        onPress={() => router.push("/tabs/export/generating")}
       >
         <LinearGradient
           colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
@@ -54,7 +54,7 @@ export default function Export() {
         >
           <View style={styles.summaryContainer}>
             <View style={styles.summaryContent}>
-              <Text style={styles.cardTitle}>Generate summary</Text>
+              <Text style={styles.cardTitle}>Generate Suggestions</Text>
               <Text style={styles.cardSubtitle}>
                 Prepare for your medical appointment by generating a complete
                 and formal summary of your logs.
