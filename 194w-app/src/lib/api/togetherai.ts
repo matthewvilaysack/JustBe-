@@ -48,22 +48,48 @@ export const extractDetailedEntryJSON = async (
       const response = await axiosInstance.post("", {
           model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
           messages: [
-            // {
-            //   role: "system",
-            //   content:
-            //     "Fill out a JSON string using a journal entry, make sure to capture key medical information. Put null when information is not mentioned in the journal entry",
-            // },
+            {
+              role: "system",
+              content:
+              `You are a medical symptom extraction assistant. 
+              
+              Your task is to extract structured medical information from a user-provided journal entry and return it **strictly as a JSON object** with the following fields:
+
+              {
+                "symptoms": string, // Comma-separated list of symptoms (e.g., "headache, nausea"). Set to null if no symptoms found.
+                "duration": string, // One of: "<1min", "few minutes", "<30 minutes", "1 hour", "few hours", "a day", "few days", "a week", ">a week", or null if not mentioned.
+                "sensation": string, // Comma-separated list describing the sensations (e.g., "sharp, throbbing"). Set to null if not specified.
+                "causes": string, // Short description of suspected causes if mentioned, otherwise null.
+                "what-happened": string, // Brief summary of the situation leading to symptoms if available, otherwise null.
+                "concerns": string, // User's explicit concerns (e.g., "I'm worried it's my heart") if mentioned, otherwise null.
+                "when-does-it-hurt": string // One of: "constant", "occasional", "once", "movement", "other triggers", or null if not mentioned.
+              }
+
+              ### Rules
+              - Fill every field based only on the journal entry.
+              - If the journal entry does not mention a field, set it to null.
+              - Return **only the JSON object**, with no commentary, explanations, disclaimers, or formatting.
+
+              ### Example Journal Entry
+              "My right knee hurts whenever I climb stairs."
+
+              ### Example JSON Output
+              {
+                  "symptoms": "knee pain",
+                  "duration": null,
+                  "sensation": null,
+                  "causes": null,
+                  "what-happened": "right knee pain when climbing stairs",
+                  "concerns": null,
+                  "when-does-it-hurt": "movement"
+              }
+
+              Remember: Output only valid JSON, no extra text.`
+            },
             {
               role: "user",
               content: 
-              `Fill out and return this JSON string {"symptoms": string, "duration": string, "sensation": string, "causes": string, "what-happened": string, "concerns": string, "when-does-it-hurt": string} \
-              using only key medical information from a journal entry. Set values to null if not specified in journal entry: \
-              Duration should be one of the following values (<1min, few minutes, <30 minutes, 1 hour, few hours, a day, few days, a week, > a week). 
-              When-does-it-hurt should be one of the following values: (constant, occasional, once, movement, other triggers). \
-              For example, "my shoulder hurts everytime I move" should be filled out as "movement" and "my head hurts when I smell perfume" should be filled as "other triggers".\
-              Sensations should be a comma separated list, like "sharp, shooting, sore". Symptoms should be a comma separated list. \
-              Concerns should be filled only when the text expresses some concern such as fear for a potential spinal injury. \
-              Remember to return a JSON {symptoms, duration, sensation, causes, what-happened, concerns, when-does-it-hurt} and set values to null if their information is not specified in this journal entry:  ${journalText}`,
+              `Journal Entry: ${journalText}`
             },
           ],
           temperature: 0,
@@ -74,9 +100,31 @@ export const extractDetailedEntryJSON = async (
 
       let rawText: string = response.data.choices?.[0]?.message?.content || "";
       console.log("raw text: ", rawText);
+
+      const jsonMatch = rawText.match(/\{[\s\S]*\}/); // remove additional assumptions
+      if (!jsonMatch) {
+        throw new Error("No JSON object found in AI response.");
+      }
+
+      const cleanedJson = jsonMatch[0]; // this should be only the JSON part
+      console.log("Cleaned JSON:", cleanedJson); 
     
-      const obj = JSON.parse(rawText); 
-      return obj;
+      const parsedData = JSON.parse(cleanedJson); 
+      // fallback defaults to guarantee all fields exist
+      const defaultFields = {
+        symptoms: null,
+        duration: null,
+        sensation: null,
+        causes: null,
+        "what-happened": null,
+        concerns: null,
+        "when-does-it-hurt": null,
+      };
+
+      const finalData = { ...defaultFields, ...parsedData };
+
+      console.log("✅ Final Parsed Data:", finalData);
+      return finalData;
     } catch (error) {
       console.error(`❌ Error extracting info (Attempts left: ${retryCount - 1}):`, error);
       retryCount--;
