@@ -28,6 +28,8 @@ import { addNewDetailedEntry } from "../../utils/supabase-helpers";
 
 export default function Page() {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);  
+
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
@@ -35,10 +37,9 @@ export default function Page() {
   // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
 
-  const { isLoading, isError, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["keywords", text],
     queryFn: async () => {
-      // const fetchedKeywords = await extractKeywords(text);      
       const fetchedJSON = await extractDetailedEntryJSON(text);
       let fetchedKeywords = [];
       for (const key in fetchedJSON) {
@@ -46,11 +47,10 @@ export default function Page() {
           fetchedKeywords.push(fetchedJSON[key]);
         }
       }
-      console.log("Extracted Keywords ", fetchedKeywords);
+      console.log("Extracted Keywords:", fetchedKeywords);
       setKeywords(fetchedKeywords);
       setJSONData(fetchedJSON);
-      // console.log(fetchedJSON);
-      return fetchedKeywords;
+      return { keywords: fetchedKeywords, jsonData: fetchedJSON };
     },
     enabled: false,
   });
@@ -63,15 +63,19 @@ export default function Page() {
     console.log("🔹 Fetching latest keywords...");
     try {
       const refetchResult = await refetch();  
-      const keywords = refetchResult.data || []; 
+      const fetchedJSON = refetchResult.data?.jsonData || {};
+      const symptoms = fetchedJSON.symptoms ? fetchedJSON.symptoms.split(",").map(s => s.trim()) : [];
 
-      if (!keywords.length) {
+      console.log("✅ Extracted Symptoms:", symptoms);
+
+      if (!symptoms.length) {
         console.warn("⚠️ No keywords extracted.");
-        return null;
+        return { keywords: null, jsonData: null };
       }
 
-      console.log("✅ Extracted Keywords:", keywords);
-      return keywords;
+      setKeywords(symptoms); // only symptoms now
+      setJSONData(fetchedJSON);
+      return { keywords: keywords, jsonData:fetchedJSON };
 
     } catch (error) {
       console.error(`❌ Error extracting keywords:`, error);
@@ -85,10 +89,10 @@ export default function Page() {
             { text: "Retry", onPress: () => fetchKeywords(text) },
           ]
         );
-        return null;
+        return { keywords: null, jsonData: null };
       }
     }
-    return null;
+    return { keywords: null, jsonData: null };
   };
 
   /* update supabase backend with fetched JSON/symptoms 
@@ -136,20 +140,24 @@ export default function Page() {
 
   /* display keywords screen */
   const displayKeywords = async (text, router) => {
-    setJSONData(null);
-    
-    console.log("json data should be null", jsonData);
-    const keywords = await fetchedKeywords(text);
-    if (!keywords) return; // stop if keyword extraction fails
+    setLoading(true); // Show spinner at start
+    const { keywords, jsonData } = await fetchedKeywords(text);
+    if (!keywords || !jsonData){
+      setLoading(false); // Hide spinner if Together AI fails
+      return;
+    }
     console.log("Entry Text: ", text);
+    console.log("Extracted JSON data", jsonData);
     
     // get json from LLM output, add entry_text and pain_rating
-    console.log("json data", jsonData);
-    let updateData = jsonData; 
-    updateData.entry_text = text;
-    updateData.pain_rating = painLevel;
+    const updateData = {
+      ...jsonData,
+      entry_text: text,
+      pain_rating: painLevel,
+    };
 
     const success = await saveToSupabase(updateData);
+    setLoading(false); // Hide spinner after Supabase update completes
     if (!success) return; // stop if Supabase update fails
 
     router.push("/tabs/home/summary");
@@ -186,7 +194,7 @@ export default function Page() {
           </View>
         </View>
 
-        {isLoading && (
+        {loading && (
           <ActivityIndicator
             size="large"
             color="white"
