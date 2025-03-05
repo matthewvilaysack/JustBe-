@@ -16,23 +16,26 @@ const PainChart = ({ data }) => {
     }));
     // console.log("formatted data: ", formattedData);
     return (
-      <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
-          <VictoryAxis 
-              tickFormat={(t) => 
-                  new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-              } 
-          />
-          <VictoryAxis dependentAxis />
-          <VictoryLine 
-              data={formattedData} 
-              style={{ data: { stroke: "#c43a31" } }} 
-          />
-      </VictoryChart>
+      <View style={styles.container}>
+        <Text style={styles.title}>Highest Pain Severity Over Time</Text>
+        <VictoryChart theme={VictoryTheme.material} scale={{ x: "time" }}>
+            <VictoryAxis 
+                tickFormat={(t) => 
+                    new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                } 
+            />
+            <VictoryAxis dependentAxis />
+            <VictoryLine 
+                data={formattedData} 
+                style={{ data: { stroke: "#c43a31" } }} 
+            />
+        </VictoryChart>
+      </View>
   );
 };
 
 // Pie chart component
-const PieChart = ({ data }) => {
+const PieChart = ({ data, title }) => {
   if (!data || Object.keys(data).length === 0) {
       return; // <Text>Loading data...</Text>;
   }
@@ -46,6 +49,7 @@ const PieChart = ({ data }) => {
   // console.log("Pie chart formatted data: ", formattedData);
   return (
     <View style={styles.container}>
+        <Text style={styles.title}> `Most Common ${title}`</Text>
         <VictoryPie 
             data={formattedData}
             colorScale={["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"]}
@@ -92,20 +96,15 @@ const PainTracker = () => {
     return (
       <ScrollView >
         <View style={styles.container}>
-            <Text style={styles.title}>Highest Pain Severity Over Time</Text>
             <PainChart data={pain_data} />
-            
-            <Text style={styles.title}>Most Common Duration Pie Chart</Text>
-            <PieChart data={count_data.duration} />
 
-            <Text style={styles.title}>Most Common Timing of Pain Pie Chart</Text>
-            <PieChart data={count_data["when-does-it-hurt"]} />
+            <PieChart data={count_data.duration} title="Durations"/>
 
-            <Text style={styles.title}>Most Common Concerns</Text>
-            <PieChart data={count_data.concerns} />
+            <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
 
-            <Text style={styles.title}>Most Common Causes</Text>
-            <PieChart data={count_data.causes} />
+            <PieChart data={count_data.concerns} title="Concerns"/>
+
+            <PieChart data={count_data.causes} title="Causes"/>
         </View>
       </ScrollView>
     );
