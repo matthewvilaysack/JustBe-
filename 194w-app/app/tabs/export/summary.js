@@ -10,10 +10,13 @@ import {
 import { extractExport } from "@/src/lib/api/togetherai";
 import { format } from "date-fns";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
+import { useUserPainStore } from "@/src/store/userPainStore";
 import MedicalSummaryScreen from "@/src/components/screens/MedicalSummaryScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 // TODO: fetch diagnoses from supabase
-const DIAGNOSES = ["Anemia", "Gastroenteritis"];
+//const DIAGNOSES = ["Anemia", "Gastroenteritis"];
 
 const GeneratePDF = () => {
   const [loading, setLoading] = useState(false);
@@ -22,6 +25,7 @@ const GeneratePDF = () => {
     format(new Date(), "EEEE, MMMM dd, yyyy HH:mm")
   );
   const { suggestions, setSuggestions } = useSuggestionStore();
+  const { painType, painDuration, setPainType, setPainDuration } = useUserPainStore();
 
   useEffect(() => {
     if (suggestions.length > 0) generatePDF(suggestions);
@@ -37,10 +41,8 @@ const GeneratePDF = () => {
           <p>Generated on ${dateTime}</p>
           <h2>What you can bring up during your next appointment</h2>
           <ol>${data.map((keyword) => `<li>${keyword}</li>`).join("")}</ol>
-          <h2>Reminder of relevant diagnoses</h2>
-          <ul>${DIAGNOSES.map((diagnosis) => `<li>${diagnosis}</li>`).join(
-            ""
-          )}</ul>
+          <h2>Pain History</h2>
+          <ol>You have reported experiencing ${painType} for ${painDuration}.</ol>
         </body>
       </html>
     `;
@@ -55,10 +57,19 @@ const GeneratePDF = () => {
     setLoading(false);
   };
 
+  const loadPainData = async () => {
+    const storedType = await AsyncStorage.getItem("painType") || "Unknown";
+    const storedDuration = await AsyncStorage.getItem("painDuration") || "Unknown";
+    setPainType(storedType);
+    setPainDuration(storedDuration);
+  };
+
   const handleGeneratePDF = async () => {
     setLoading(true);
 
     try {
+      await loadPainData(); 
+
       const entries = await fetchDetailedEntriesForUser();
       if (!entries) {
         Alert.alert("No Entries", "No journal entries found for your account.");
@@ -67,6 +78,7 @@ const GeneratePDF = () => {
       }
 
       const combinedJournalText = formatEntriesForAI(entries);
+      console.log("raw combined text:", combinedJournalText);
       const output = await extractExport(combinedJournalText);
 
       if (!output.length) {
@@ -102,6 +114,8 @@ const GeneratePDF = () => {
       {loading && <ActivityIndicator size="large" color="blue" />}
       <MedicalSummaryScreen
         dateTime={dateTime}
+        painType={painType}
+        painDuration={painDuration}
         handleGeneratePDF={handleGeneratePDF}
         handleSharePDF={handleSharePDF}
       />

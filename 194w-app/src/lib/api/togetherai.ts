@@ -222,11 +222,11 @@ export const extractKeywords = async (
 };
 
 export const extractExport = async (
-  journalText: string,
+  formattedInput: string,
   retryCount = 3, // Retry logic
   delay = 2000 // Delay between retries
 ): Promise<string[]> => {
-  if (!journalText.trim()) return [];
+  if (!formattedInput.trim()) return [];
 
   console.log("🔹 Sending request to Together AI...");
   while (retryCount > 0) {
@@ -236,22 +236,31 @@ export const extractExport = async (
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant that extracts key symptoms from journal entries and reformats them into clear, structured statements for a doctor. Provide three concise summaries with:
+            content: `You are a helpful assistant that extracts key symptoms  **strictly based on the provided structured medical data** and reformats them into clear, structured statements for a doctor. Provide three concise summaries with:
               - When the symptom started (e.g., "three days ago," "since this morning").
               - How it has changed over time (e.g., worsening, stable, intermittent).
               - How severe it is and how it affects daily life (e.g., "severe fatigue, making it hard to focus").
+
+            **Output Example:**
+                "I started feeling a sore throat three days ago, and now it’s painful to swallow."
+                "My fever spiked to 100.2°F last night and hasn’t gone down."
+                "I’ve been feeling exhausted since this morning, making it hard to focus on work."
             
             **Rules:**
               - Do **not** include numbered list, bullet points, or formatting symbols.
+              - Only use data from the structured input.
+              - Do not add any symptoms, durations, or causes not present.
+              - Do not add placeholders or generic text if no symptom exists.
               - Keep the language **natural and easy to understand**.
-              - Return only the three formatted symptom statements, **nothing else**.
+              - Return only the formatted symptom statements, **nothing else**.
               - Do not use bold formatting (**) in your response.`,
           },
           {
             role: "user",
-            content: `Extract and structure the symptoms from this journal entry: \n\n"${journalText}"`,
+            content: `Extract and structure the symptoms from this structured symptom data: \n\n"${formattedInput}"`,
           },
         ],
+        temperature: 0,
       });
 
       console.log("✅ Response from AI:", response.data);
