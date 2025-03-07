@@ -18,6 +18,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useUserPainStore } from "@/src/store/userPainStore";
 import theme from "@/src/theme/theme";
 import Button from "../ui/NextButton";
 import LoadingBlob from "@/src/animations/LoadingBlob";
@@ -38,6 +39,7 @@ interface Slide {
 
 export default function Onboarding() {
   const router = useRouter();
+  const { setPainType, setPainDuration } = useUserPainStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedPainType, setSelectedPainType] = useState("");
   const [selectedDuration, setSelectedDuration] = useState("");
@@ -224,6 +226,8 @@ export default function Onboarding() {
   const completeOnboarding = async () => {
     try {
       const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
+      setPainType(painType);
+      setPainDuration(selectedDuration);
       console.log('Saving to AsyncStorage:', { painType, selectedDuration });
       
       await AsyncStorage.setItem("painType", painType);

@@ -14,6 +14,32 @@ async function getUserID() {
 }
 
 /**
+ * Fetches the current user's profile, including pain_type.
+ * @returns {Promise<Object|null>} User profile or null if error
+ */
+export async function fetchUserProfile() {
+  const userId = await getUserID();
+  if (!userId) {
+      console.error("No user ID found. Cannot fetch user profile.");
+      return null;
+  }
+
+  const { data, error } = await supabase
+      .from('profiles')
+      .select("pain_type, pain_duration")
+      .eq('id', userId)
+      .single();  // Assuming there's only one profile per user
+
+  if (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+  }
+
+  return data;
+}
+
+
+/**
  * Called everytime a new entry is made
  * Increment the counts of keys (ex nausea) in multiple JSON columns (ex symptoms)
  * @param {Object} updates - JSON data to update table with. ex {duration: "sdjak", sensation: "a,b,c", etc}
@@ -104,20 +130,30 @@ export async function fetchDetailedEntriesForUser() {
  * @returns The ai prompt from Supabase
  */
 export function formatEntriesForAI(entries) {
-  return entries.map((entry) => {
-      const parts = [
-          entry.symptoms ? `Symptoms: ${entry.symptoms}` : null,
-          entry.duration ? `Duration: ${entry.duration}` : null,
-          entry.sensation ? `Sensation: ${entry.sensation}` : null,
-          entry.causes ? `Causes: ${entry.causes}` : null,
-          entry["what-happened"] ? `What happened: ${entry["what-happened"]}` : null,
-          entry.concerns ? `Concerns: ${entry.concerns}` : null,
-          entry["when-does-it-hurt"] ? `When does it hurt: ${entry["when-does-it-hurt"]}` : null,
-      ];
+  const combinedText = entries.map((entry) => {
+    const parts = [
+        entry.symptoms ? `Symptoms: ${entry.symptoms}` : null,
+        entry.duration ? `Duration: ${entry.duration}` : null,
+        entry.sensation ? `Sensation: ${entry.sensation}` : null,
+        entry.causes ? `Causes: ${entry.causes}` : null,
+        entry["what-happened"] ? `What happened: ${entry["what-happened"]}` : null,
+        entry.concerns ? `Concerns: ${entry.concerns}` : null,
+        entry["when-does-it-hurt"] ? `When does it hurt: ${entry["when-does-it-hurt"]}` : null,
+    ];
 
-      return parts.filter(Boolean).join("\n");
+    // Join parts of a single entry and remove empty/null lines
+    return parts.filter(Boolean).join("\n");
   }).join("\n\n---\n\n");
+
+  // Clean up excess whitespace and multiple dividers
+  return combinedText
+    .replace(/[\t ]+/g, ' ')                    // Collapse multiple spaces
+    .replace(/\n{3,}/g, '\n\n')                  // Collapse 3+ newlines into 2
+    .replace(/(\n---\n){2,}/g, '\n---\n')        // Collapse repeated dividers into 1
+    .replace(/(^---\n|\n---$)/g, '')             // Remove leading or trailing dividers
+    .trim();                                     // Trim final leading/trailing whitespace
 }
+
 
 /**
  * Adds a row to a Supabase table

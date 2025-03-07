@@ -1,13 +1,16 @@
 import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import theme from "@/src/theme/theme";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
+import { useUserPainStore } from "@/src/store/userPainStore";
 import MedicalSummaryHeader from "@/src/components/ui/MedicalSummaryHeader";
 
 // TODO: fetch data from supabase
-const DIAGNOSES = ["Anemia", "Gastroenteritis"];
+//const DIAGNOSES = ["Anemia", "Gastroenteritis"];
 
 const MedicalSummaryScreen = ({
   dateTime,
+  painType,
+  painDuration,
   handleGeneratePDF,
   handleSharePDF,
 }) => {
@@ -28,7 +31,12 @@ const MedicalSummaryScreen = ({
             title="What you can bring up during your next appointment"
             items={suggestions}
           />
-          <Section title="Reminder of relevant diagnoses" items={DIAGNOSES} />
+          <Section 
+            title="Pain History"
+            items={[
+              `You have reported experiencing ${painType} for ${painDuration}.`
+            ]}
+          />
         </ScrollView>
       </View>
       <View style={styles.footer}>
