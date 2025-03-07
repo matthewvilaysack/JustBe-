@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter, Link } from "expo-router";
 import { supabase } from "@/src/lib/api/supabase";
+import useJournalStore from "@/src/store/journalStore";
 import Theme from "@/src/theme/theme";
 
 export default function Profile() {
@@ -24,6 +25,7 @@ export default function Profile() {
   }, []);
 
   async function handleSignOut() {
+    useJournalStore.getState().clearLogs();
     const { error } = await supabase.auth.signOut();
     if (error) {
       Alert.alert("Error", error.message);

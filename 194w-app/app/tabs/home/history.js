@@ -20,59 +20,27 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
 import BackButton from "@/src/components/ui/BackButton";
-
+import useJournalStore from "@/src/store/journalStore";
 const { width } = Dimensions.get("window");
 
-// TEMPORARY HARDCODED LOGS need to link to backend later
-const logs = [
-  {
-    id: "1",
-    date: "2025-02-10",
-    pain_rating: 5,
-    text: "My head has had a constant low ache in the front, and sometimes I get a throbbing pain as well.",
-  },
-  {
-    id: "2",
-    date: "2025-02-14",
-    pain_rating: 3,
-    text: "I woke up with a cold and my temperature is a little high at 100 degrees.",
-  },
-  {
-    id: "6",
-    date: "2025-02-15",
-    pain_rating: 2,
-    text: "My fever is gone but I still have a sniffly/stuffy nose, and my throat is a little itchy.",
-  },
-  {
-    id: "3",
-    date: "2025-02-16",
-    pain_rating: 0,
-    text: "My fever is finally gone, I feel much better now.",
-  },
-  {
-    id: "4",
-    date: "2025-02-17",
-    pain_rating: 7,
-    text: "My lower back hurts after sitting at the office the whole day, even when I'm laying down.",
-  },
-  {
-    id: "5",
-    date: "2025-02-01",
-    pain_rating: 9,
-    text: "I fell off my skateboard and hit my right hip. It's throbbing and it spikes every time I walk or put weight on my right leg.",
-  },
-];
 
 export default function Export() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const today = new Date().toISOString().split("T")[0];
+  const { journalLogs, isLoading, getLogsByDate } = useJournalStore();
 
   useEffect(() => {
     setSelectedDate(today);
+    // Fetch logs only if store is empty
+    if (Object.keys(journalLogs).length === 0) {
+      useJournalStore.getState().getJournalLogs();
+    }
   }, []);
 
-  const selectedLog = logs.find((log) => log.date === selectedDate);
+  // Get logs for the selected date
+  const selectedLog = selectedDate ? getLogsByDate(selectedDate)[0] : null;
+  console.log("selectedLog", selectedLog) // Temp 
 
   const getPainLevel = (pain_rating) => {
     if (pain_rating === 0) return "No Pain";
@@ -92,10 +60,11 @@ export default function Export() {
     if (pain_rating >= 9) return "rgba(255, 0, 0, 0.7)";
   };
 
-  const markedDates = logs.reduce((acc, log) => {
-    const painColor = getPainColor(log.pain_rating);
-
-    acc[log.date] = {
+  // Create marked dates object from all journal logs
+  const markedDates = Object.entries(journalLogs).reduce((journalLogs, [date, logs]) => {
+    if (logs.length === 0) return journalLogs;
+    const painColor = getPainColor(logs[0].pain_rating);
+    journalLogs[date] = {
       selected: true,
       selectedColor: painColor,
       customStyles: {
@@ -111,8 +80,7 @@ export default function Export() {
         },
       },
     };
-
-    return acc;
+    return journalLogs;
   }, {});
 
   return (
@@ -140,12 +108,7 @@ export default function Export() {
           >
             <Calendar
               onDayPress={(day) => setSelectedDate(day.dateString)}
-              markedDates={{
-                ...markedDates,
-                ...(selectedDate && {
-                  [selectedDate]: { selected: true, selectedColor: "#17336b" },
-                }),
-              }}
+              markedDates={markedDates}
               markingType="custom"
               style={styles.calendar}
               theme={{
@@ -175,24 +138,25 @@ export default function Export() {
             style={[styles.gradient, { padding: theme.spacing.md }]}
           >
             <Text style={styles.sectionTitle}>Log History</Text>
-
             <Text style={styles.logDate}>
-              {new Date(selectedDate).toLocaleDateString("en-US", {
+              {new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
-              })}
-              ,{" "}
-              {new Date(selectedDate).toLocaleDateString("en-US", {
                 weekday: "long",
               })}
             </Text>
 
             {selectedLog ? (
               <View style={styles.logContent}>
-                <Text style={styles.logDate}>
-                  {getPainLevel(selectedLog.pain_rating)}
-                </Text>
-                <Text style={styles.logText}>{selectedLog.text}</Text>
+                <Text style={[styles.pain, { color: theme.colors.text.primary, fontSize: theme.typography.sizes.xl }]}> {getPainLevel(selectedLog.pain_rating)} </Text>
+                <Text style={styles.logText}>{"What you said: " + selectedLog.entry_text}</Text>
+                <Text style={styles.logText}>{"pain rating: " + (selectedLog.pain_rating !== null ? selectedLog.pain_rating : "N/A")}</Text>
+                <Text style={styles.logText}>{"causes: " + (selectedLog.causes !== null ? selectedLog.causes : "N/A")}</Text>
+                <Text style={styles.logText}>{"concerns: " + (selectedLog.concerns !== null ? selectedLog.concerns : "N/A")}</Text>
+                <Text style={styles.logText}>{"duration: " + (selectedLog.duration !== null ? selectedLog.duration : "N/A")}</Text>
+                <Text style={styles.logText}>{"symptoms: " + (selectedLog.symptoms !== null ? selectedLog.symptoms : "N/A")}</Text>
+                <Text style={styles.logText}>{"what happened: " + (selectedLog["what-happened"] !== null ? selectedLog["what-happened"] : "N/A")}</Text>
+                <Text style={styles.logText}>{"when does it hurt: " + (selectedLog["when-does-it-hurt"] !== null ? selectedLog["when-does-it-hurt"] : "N/A")}</Text>
               </View>
             ) : (
               <Text style={styles.logText}>
@@ -207,7 +171,6 @@ export default function Export() {
     </ImageBackground>
   );
 }
-
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -382,3 +345,4 @@ const styles = StyleSheet.create({
 export default FetchSupabaseData;
 
 */
+
