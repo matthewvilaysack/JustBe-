@@ -15,7 +15,6 @@ import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
-
 import { useKeywordStore } from "@/src/store/summaryStore";
 
 const { width, height } = Dimensions.get("window");
