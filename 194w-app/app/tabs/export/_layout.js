@@ -14,6 +14,18 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="generating"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="summary"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

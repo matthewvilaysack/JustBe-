@@ -19,24 +19,38 @@ import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
 
 import { useQuery } from "@tanstack/react-query";
-import { extractKeywords } from "@/src/lib/api/togetherai";
+import { extractKeywords, extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
 import { supabase } from "../../../src/lib/api/supabase";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
+import { useJSONDataStore } from "@/src/store/jsonDataStore";
+import { addNewDetailedEntry } from "../../utils/supabase-helpers";
 
 export default function Page() {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);  
+
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
+  const { setJSONData, jsonData } = useJSONDataStore();
+  // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
 
-  const { isLoading, isError, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["keywords", text],
     queryFn: async () => {
-      const fetchedKeywords = await extractKeywords(text);
+      const fetchedJSON = await extractDetailedEntryJSON(text);
+      let fetchedKeywords = [];
+      for (const key in fetchedJSON) {
+        if (fetchedJSON[key] != null) {
+          fetchedKeywords.push(fetchedJSON[key]);
+        }
+      }
+      console.log("Extracted Keywords:", fetchedKeywords);
       setKeywords(fetchedKeywords);
-      return fetchedKeywords;
+      setJSONData(fetchedJSON);
+      return { keywords: fetchedKeywords, jsonData: fetchedJSON };
     },
     enabled: false,
   });
@@ -49,15 +63,19 @@ export default function Page() {
     console.log("🔹 Fetching latest keywords...");
     try {
       const refetchResult = await refetch();  
-      const keywords = refetchResult.data || []; 
+      const fetchedJSON = refetchResult.data?.jsonData || {};
+      const symptoms = fetchedJSON.symptoms ? fetchedJSON.symptoms.split(",").map(s => s.trim()) : [];
 
-      if (!keywords.length) {
+      console.log("✅ Extracted Symptoms:", symptoms);
+
+      if (!symptoms.length) {
         console.warn("⚠️ No keywords extracted.");
-        return null;
+        return { keywords: null, jsonData: null };
       }
 
-      console.log("✅ Extracted Keywords:", keywords);
-      return keywords;
+      setKeywords(symptoms); // only symptoms now
+      setJSONData(fetchedJSON);
+      return { keywords: keywords, jsonData:fetchedJSON };
 
     } catch (error) {
       console.error(`❌ Error extracting keywords:`, error);
@@ -71,26 +89,21 @@ export default function Page() {
             { text: "Retry", onPress: () => fetchKeywords(text) },
           ]
         );
-        return null;
+        return { keywords: null, jsonData: null };
       }
     }
-    return null;
+    return { keywords: null, jsonData: null };
   };
 
-  /* update supabase backend with fetched keywords/symptoms 
+  /* update supabase backend with fetched JSON/symptoms 
     - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
   issue w ios, need to research further into issue
   */
-  const saveToSupabase  = async (text, keywords, retryCount = 3) => {
+  const saveToSupabase  = async (updateData, retryCount = 3) => {
     console.log("🔹 Attempting to update Supabase...");
     while (retryCount > 0) {
       try {
-        const { data, error } = await supabase
-          .from("journal_entries")
-          .insert([
-            { entry_text: text, pain_rating: painLevel, summary: keywords },
-          ])
-          .select();
+        const { data, error } = await addNewDetailedEntry(updateData);
 
         if (error) {
           console.error(`❌ Supabase Error (Attempts left: ${retryCount - 1}):`, error);
@@ -113,7 +126,7 @@ export default function Page() {
             "An unexpected issue occurred. Would you like to retry?",
             [
               { text: "Cancel", style: "cancel" },
-              { text: "Retry", onPress: () => saveToSupabase(text, keywords, 3) },
+              { text: "Retry", onPress: () => saveToSupabase(updateData, 3) },
             ]
           );
           return false;
@@ -127,10 +140,24 @@ export default function Page() {
 
   /* display keywords screen */
   const displayKeywords = async (text, router) => {
-    const keywords = await fetchedKeywords(text);
-    if (!keywords) return; // stop if keyword extraction fails
+    setLoading(true); // Show spinner at start
+    const { keywords, jsonData } = await fetchedKeywords(text);
+    if (!keywords || !jsonData){
+      setLoading(false); // Hide spinner if Together AI fails
+      return;
+    }
+    console.log("Entry Text: ", text);
+    console.log("Extracted JSON data", jsonData);
+    
+    // get json from LLM output, add entry_text and pain_rating
+    const updateData = {
+      ...jsonData,
+      entry_text: text,
+      pain_rating: painLevel,
+    };
 
-    const success = await saveToSupabase(text, keywords);
+    const success = await saveToSupabase(updateData);
+    setLoading(false); // Hide spinner after Supabase update completes
     if (!success) return; // stop if Supabase update fails
 
     router.push("/tabs/home/summary");
@@ -167,7 +194,7 @@ export default function Page() {
           </View>
         </View>
 
-        {isLoading && (
+        {loading && (
           <ActivityIndicator
             size="large"
             color="white"
