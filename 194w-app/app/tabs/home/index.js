@@ -28,10 +28,10 @@ export default function Page() {
             title="History"
             onPress={() => router.push("/tabs/home/history")}
           />
-          <Button
+          {/* <Button
             title="Plots"
             onPress={() => router.push("/tabs/home/plots")}
-          />
+          /> */}
         </View>
       </View>
     </ImageBackground>

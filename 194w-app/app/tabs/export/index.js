@@ -21,6 +21,7 @@ import { useRouter, Link } from "expo-router";
 import theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import PlotDisplayer from "./plots"
 
 const { width } = Dimensions.get("window");
 
@@ -79,8 +80,9 @@ export default function Export() {
           end={{ x: 1, y: 1 }}
           style={[styles.gradient, { padding: theme.spacing.md }]}
         >
-          <Text style={styles.sectionTitle}>Log History</Text>
-          <FlatList
+          <Text style={styles.sectionTitle}>Health Plots</Text>
+          <PlotDisplayer></PlotDisplayer>
+          {/* <FlatList
             data={logs}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -94,7 +96,7 @@ export default function Export() {
               </TouchableOpacity>
             )}
             contentContainerStyle={{ paddingBottom: 80 }}
-          />
+          /> */}
         </LinearGradient>
       </View>
     </ImageBackground>
