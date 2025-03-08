@@ -24,6 +24,8 @@ import Button from "../ui/NextButton";
 import LoadingBlob from "@/src/animations/LoadingBlob";
 import SelectionButton from "../ui/SelectionButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
 
@@ -47,6 +49,10 @@ export default function Onboarding() {
   const [isScrolling, setIsScrolling] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const flatListRef = useRef<FlatList<any>>(null);
+  const [fontsLoaded] = useFonts({
+    LexendDecaBold: require("@/assets/fonts/LexendDeca-Bold.ttf"),
+    LexendDecaRegular: require("@/assets/fonts/LexendDeca-Regular.ttf"),
+  });
 
   const slides: Slide[] = [
     {
@@ -65,7 +71,7 @@ export default function Onboarding() {
         ["Sciatic", "OCD"],
         ["Arthritis", "CKD"],
         ["Joint Pain", "Alzheimers"],
-        ["Other"]
+        ["Other"],
       ],
       character: true,
       showNext: true,
@@ -77,7 +83,7 @@ export default function Onboarding() {
       subtitle: "This helps us understand your journey",
       options: [
         ["< 1 year", "1-3 years"],
-        ["3-5 years", "5+ years"]
+        ["3-5 years", "5+ years"],
       ],
       character: true,
       showNext: true,
@@ -87,7 +93,8 @@ export default function Onboarding() {
       type: "welcome",
       title: "Hi, I'm blob!",
       subtitle: () => {
-        const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
+        const painType =
+          selectedPainType === "Other" ? customPainType : selectedPainType;
         return `I will help you manage your ${painType}`;
       },
       character: true,
@@ -107,28 +114,28 @@ export default function Onboarding() {
     }
   }, [currentIndex]);
 
-  const isValidScroll = (targetIndex: number) => {  
+  const isValidScroll = (targetIndex: number) => {
     if (targetIndex <= currentIndex) return true;
-    
+
     if (currentIndex === 1) {
       if (selectedPainType === "Other" && !customPainType.trim()) return false;
       if (!selectedPainType) return false;
     }
-    
+
     if (currentIndex === 2 && !selectedDuration) return false;
-    
+
     return true;
   };
 
   const moveToNextSlide = () => {
     if (isDragging) return;
-    
+
     const nextIndex = currentIndex + 1;
     if (isValidScroll(nextIndex)) {
       setCurrentIndex(nextIndex);
-      flatListRef.current?.scrollToIndex({ 
-        index: nextIndex, 
-        animated: true 
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
       });
     }
   };
@@ -144,22 +151,23 @@ export default function Onboarding() {
             <Text style={styles.title}>{item.title}</Text>
             {item.subtitle && (
               <Text style={styles.subtitle}>
-                {typeof item.subtitle === 'function' 
+                {typeof item.subtitle === "function"
                   ? item.subtitle(selectedPainType)
-                  : item.subtitle
-                }
+                  : item.subtitle}
               </Text>
             )}
-            
+
             {item.options && (
-              <View style={{
-                alignItems: "center",
-                width: "100%",
-                paddingHorizontal: theme.spacing.lg,
-                maxWidth: 350,
-              }}>
+              <View
+                style={{
+                  alignItems: "center",
+                  width: "100%",
+                  paddingHorizontal: theme.spacing.lg,
+                  maxWidth: 350,
+                }}
+              >
                 {item.options.map((row: string[], rowIndex: number) => (
-                  <View 
+                  <View
                     key={rowIndex}
                     style={{
                       flexDirection: "row",
@@ -175,11 +183,11 @@ export default function Onboarding() {
                         title={option}
                         onPress={() => handleOptionSelect(option)}
                         selected={
-                          item.id === "2" 
-                            ? selectedPainType === option 
-                            : item.id === "3" 
-                              ? selectedDuration === option 
-                              : false
+                          item.id === "2"
+                            ? selectedPainType === option
+                            : item.id === "3"
+                            ? selectedDuration === option
+                            : false
                         }
                         isOther={option === "Other"}
                         customValue={customPainType}
@@ -201,7 +209,11 @@ export default function Onboarding() {
                 onPress={completeOnboarding}
                 variant="primary"
                 showArrow={false}
-                style={{ width: 200, marginTop: theme.spacing.xl }}
+                style={{
+                  marginTop: theme.spacing.lg,
+                  paddingHorizontal: theme.spacing.lg,
+                  paddingVertical: theme.spacing.sm,
+                }}
               />
             )}
           </View>
@@ -211,8 +223,8 @@ export default function Onboarding() {
   );
 
   const handleOptionSelect = (option: string) => {
-    console.log('Option selected:', option, 'on slide:', currentIndex);
-    
+    console.log("Option selected:", option, "on slide:", currentIndex);
+
     if (currentIndex === 1) {
       setSelectedPainType(option);
       if (option !== "Other") {
@@ -223,17 +235,26 @@ export default function Onboarding() {
     }
   };
 
+  useEffect(() => {
+    if (currentIndex === 1 && selectedPainType) {
+      moveToNextSlide();
+    } else if (currentIndex === 2 && selectedDuration) {
+      moveToNextSlide();
+    }
+  }, [selectedPainType, selectedDuration]);
+
   const completeOnboarding = async () => {
     try {
-      const painType = selectedPainType === "Other" ? customPainType : selectedPainType;
+      const painType =
+        selectedPainType === "Other" ? customPainType : selectedPainType;
       setPainType(painType);
       setPainDuration(selectedDuration);
-      console.log('Saving to AsyncStorage:', { painType, selectedDuration });
-      
+      console.log("Saving to AsyncStorage:", { painType, selectedDuration });
+
       await AsyncStorage.setItem("painType", painType);
       await AsyncStorage.setItem("painDuration", selectedDuration);
       await AsyncStorage.setItem("hasCompletedOnboarding", "true");
-      
+
       router.replace("/");
     } catch (error) {
       router.replace("/");
@@ -242,6 +263,7 @@ export default function Onboarding() {
 
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar style="light" />
       <ImageBackground
         source={require("@/assets/background.png")}
         resizeMode="cover"
@@ -274,14 +296,16 @@ export default function Onboarding() {
               decelerationRate="fast"
               onScrollBeginDrag={() => setIsDragging(true)}
               onMomentumScrollEnd={(e) => {
-                const newIndex = Math.round(e.nativeEvent.contentOffset.x / width);
-                
+                const newIndex = Math.round(
+                  e.nativeEvent.contentOffset.x / width
+                );
+
                 if (newIndex < currentIndex || isValidScroll(newIndex)) {
                   setCurrentIndex(newIndex);
                 } else {
-                  flatListRef.current?.scrollToIndex({ 
-                    index: currentIndex, 
-                    animated: true 
+                  flatListRef.current?.scrollToIndex({
+                    index: currentIndex,
+                    animated: true,
                   });
                 }
                 setIsDragging(false);
@@ -315,22 +339,23 @@ export default function Onboarding() {
           </View>
         </SafeAreaView>
         {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
-          <View style={{
-            paddingHorizontal: theme.spacing.lg,
-            alignItems: 'flex-end',
-          }}>
-            <Button
+          <View
+            style={{
+              paddingHorizontal: theme.spacing.lg,
+              alignItems: "flex-end",
+            }}
+          >
+            {/* <Button
               title="Next"
               onPress={() => moveToNextSlide()}
               variant="primary"
               showArrow={true}
               style={{
                 position: "absolute",
-                bottom: 50,
+                bottom: 40,
                 right: 25,
-                width: 120,
               }}
-            />
+            /> */}
           </View>
         )}
       </ImageBackground>
@@ -352,7 +377,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: theme.typography.sizes.xl,
     color: theme.colors.white,
-    fontFamily: theme.typography.fonts.bold,
+    fontFamily: theme.typography.fonts.regular,
     marginBottom: theme.spacing.sm,
     textAlign: "center",
   },
@@ -362,7 +387,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     marginBottom: theme.spacing.lg,
     fontSize: theme.typography.sizes.lg,
-    fontFamily: theme.typography.fonts.bold,
+    fontFamily: theme.typography.fonts.regular,
   },
   optionsContainer: {
     width: "100%",

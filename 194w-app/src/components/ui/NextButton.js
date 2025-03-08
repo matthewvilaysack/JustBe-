@@ -1,6 +1,16 @@
-import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+} from "react-native";
 import Theme from "@/src/theme/theme";
 import ArrowRight from "./ArrowRight";
+
+const { width, height } = Dimensions.get("window");
+const BUTTON_WIDTH = width * 0.25;
+const BUTTON_HEIGHT = height * 0.025;
 
 export default function Button({
   title,
@@ -41,8 +51,8 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: BUTTON_WIDTH * 0.2,
+    paddingVertical: BUTTON_HEIGHT * 0.2,
     backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
     alignItems: "center",
