@@ -38,8 +38,18 @@ export default function Export() {
   }, []);
 
   // Get logs for the selected date
-  const selectedLog = selectedDate ? getLogsByDate(selectedDate)[0] : null;
+  const selectedLog = selectedDate ? getLogsByDate(selectedDate) : [];
   console.log("selectedLog", selectedLog); // Temp
+
+  // Get the time that a log was created (helper fn)
+  const formatLogTime = (timestamp) => {
+    if (!timestamp) return "Unknown Time";
+    return new Date(timestamp).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
   // get pain level for log
   const getPainLevel = (pain_rating) => {
@@ -64,7 +74,15 @@ export default function Export() {
   const markedDates = Object.entries(journalLogs).reduce(
     (journalLogs, [date, logs]) => {
       if (logs.length === 0) return journalLogs;
-      const painColor = getPainColor(logs[0].pain_rating);
+
+      // Find log with the highest pain rating
+      const maxPainLog = logs.reduce((maxLog, currentLog) =>
+        currentLog.pain_rating > maxLog.pain_rating ? currentLog : maxLog
+      );
+
+      // Date is marked the color of the highest-severity pain
+      const painColor = getPainColor(maxPainLog.pain_rating);
+
       journalLogs[date] = {
         selected: true,
         selectedColor: painColor,
@@ -152,64 +170,24 @@ export default function Export() {
               )}
             </Text>
 
-            {selectedLog ? (
-              <View style={styles.logContent}>
-                <Text
-                  style={[
-                    styles.pain,
-                    {
-                      color: theme.colors.text.primary,
-                      fontSize: theme.typography.sizes.xl,
-                    },
-                  ]}
-                >
-                  {" "}
-                  {getPainLevel(selectedLog.pain_rating)}{" "}
-                </Text>
-                <Text style={styles.logText}>
-                  {"What you said: " + selectedLog.entry_text}
-                </Text>
-                <Text style={styles.logText}>
-                  {"pain rating: " +
-                    (selectedLog.pain_rating !== null
-                      ? selectedLog.pain_rating
-                      : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"causes: " +
-                    (selectedLog.causes !== null ? selectedLog.causes : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"concerns: " +
-                    (selectedLog.concerns !== null
-                      ? selectedLog.concerns
-                      : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"duration: " +
-                    (selectedLog.duration !== null
-                      ? selectedLog.duration
-                      : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"symptoms: " +
-                    (selectedLog.symptoms !== null
-                      ? selectedLog.symptoms
-                      : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"what happened: " +
-                    (selectedLog["what-happened"] !== null
-                      ? selectedLog["what-happened"]
-                      : "N/A")}
-                </Text>
-                <Text style={styles.logText}>
-                  {"when does it hurt: " +
-                    (selectedLog["when-does-it-hurt"] !== null
-                      ? selectedLog["when-does-it-hurt"]
-                      : "N/A")}
-                </Text>
-              </View>
+            {selectedLog && selectedLog.length > 0 ? (
+              selectedLog
+                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                .map((log, index) => (
+                  <View key={index} style={styles.logContent}>
+                    <Text style={styles.logPain}>
+                      {formatLogTime(log.created_at)} -{" "}
+                      {getPainLevel(log.pain_rating)}
+                    </Text>
+                    <Text style={styles.logText}>
+                      {"Pain rating: " +
+                        (log.pain_rating !== null ? log.pain_rating : "N/A")}
+                    </Text>
+                    <Text style={styles.logText}>
+                      {"What you said: " + log.entry_text}
+                    </Text>
+                  </View>
+                ))
             ) : (
               <Text style={styles.logText}>
                 {selectedDate === today
@@ -297,10 +275,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   logDate: {
+    fontSize: theme.typography.sizes.lg,
+    color: "white",
+    fontFamily: theme.typography.fonts.bold,
+    marginBottom: theme.spacing.md,
+  },
+  logPain: {
     fontSize: theme.typography.sizes.md,
     color: "white",
     fontFamily: theme.typography.fonts.bold,
     marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.md,
   },
   logText: {
     flex: 1,
@@ -321,74 +306,3 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
 });
-
-/*
-*--------------------------------------------------------------------------------------
-* CODE BELOW fetches logs from supabase - save for later to incorporate into front end
-*
-
-const FetchSupabaseData = () => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(true);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-        
-    const fetchData = async () => {
-      const { data: journal_entries, err } = await supabase.from('journal_entries').select('*')
-      if (err) {
-        text = "err";
-        setData(null);
-        console.log("error") 
-        console.error('Error fetching data:', err);
-      } else {
-        console.log("getting data");
-        setData(journal_entries);
-        setError(null);
-      }
-      setLoading(false);
-    };        
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <ActivityIndicator size="large" style={styles.loader} />;
-  }
-
-  return (
-    <View style={styles.container}>
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.item}>
-          <Text>{JSON.stringify(item)}</Text>
-        </View>
-      )}
-      />
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
-export default FetchSupabaseData;
-
-*/
