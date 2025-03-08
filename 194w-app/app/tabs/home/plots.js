@@ -49,7 +49,7 @@ const PieChart = ({ data, title }) => {
   // console.log("Pie chart formatted data: ", formattedData);
   return (
     <View style={styles.container}>
-        <Text style={styles.title}> `Most Common ${title}`</Text>
+        <Text style={styles.title}> Most Common {title} </Text>
         <VictoryPie 
             data={formattedData}
             colorScale={["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"]}
@@ -64,7 +64,7 @@ const PieChart = ({ data, title }) => {
 };
 
 // Parent Component: Fetch Data and Pass to PainChart
-const PainTracker = () => {
+const PlotDisplayer = () => {
     const [pain_data, setPainData] = useState([]);
     const [count_data, setCountData] = useState([]); 
 
@@ -110,7 +110,7 @@ const PainTracker = () => {
     );
 };
 
-export default PainTracker;
+export default PlotDisplayer;
 
 const styles = StyleSheet.create({
   container: {
