@@ -2,39 +2,29 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
-  ActivityIndicator,
-  Dimensions,
-  TouchableOpacity,
-  Alert,
   ScrollView,
   ImageBackground,
   StyleSheet,
 } from "react-native";
-import { supabase } from "../../../src/lib/api/supabase";
-import { useRouter, Link } from "expo-router";
+import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
-import Theme from "@/src/theme/theme";
 
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
 import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
-const { width } = Dimensions.get("window");
 
-export default function Export() {
+export default function History() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T");
   const { journalLogs, isLoading, getLogsByDate } = useJournalStore();
 
+  // Load logs only once when component mounts
   useEffect(() => {
     setSelectedDate(today);
-    // Fetch logs only if store is empty
-    if (Object.keys(journalLogs).length === 0) {
-      useJournalStore.getState().getJournalLogs();
-    }
+    // reload the logs once when component mounts
+    useJournalStore.getState().getJournalLogs();
   }, []);
 
   // Get logs for the selected date

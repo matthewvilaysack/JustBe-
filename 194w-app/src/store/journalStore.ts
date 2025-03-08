@@ -30,6 +30,7 @@ interface JournalState {
   getJournalLogs: () => Promise<JournalLog[]>;
   getLogsByDate: (date: string) => JournalLog[];
   clearLogs: () => void;
+  addJournalLog: (log: JournalLog) => void;
 }
 
 type JournalStorePersist = {
@@ -85,6 +86,17 @@ const useJournalStore = create<JournalState>()(
       getLogsByDate: (date: string) => {
         const state = get();
         return state.journalLogs[date] || [];
+      },
+
+      // Add a new log entry 
+      addJournalLog: (log: JournalLog) => {
+        const date = new Date(log.created_at).toISOString().split('T')[0];
+        set((state) => ({
+          journalLogs: {
+            ...state.journalLogs,
+            [date]: [log, ...(state.journalLogs[date] || [])],
+          },
+        }));
       },
 
       // Get all journal logs from supabase
