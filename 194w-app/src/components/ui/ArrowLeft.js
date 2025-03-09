@@ -10,7 +10,7 @@ export default function ArrowLeft() {
     <MaterialCommunityIcons
       size={BUTTON_HEIGHT * 0.5}
       name="arrow-left"
-      color={Theme.colors.button.primary.border}
+      color={Theme.colors.white}
     />
   );
 }

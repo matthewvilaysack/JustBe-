@@ -70,7 +70,7 @@ export default function Onboarding() {
       options: [
         ["Sciatic", "Migraines"],
         ["Arthritis", "IBS"],
-        ["Back Pain", "Endometriosis"],
+        ["Back Pain", "Fibromyalgia"],
         ["Other"],
       ],
       character: true,
