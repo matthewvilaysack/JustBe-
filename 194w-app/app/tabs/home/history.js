@@ -108,86 +108,90 @@ export default function History() {
           showArrow={true}
         />
       </View>
-      <ScrollView style={styles.scrollcontainer}>
-        <View style={styles.calendarContainer}>
-          <LinearGradient
-            colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
-            locations={[0, 0.2, 0.9, 0.5]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.calendarGradient}
-          >
-            <Calendar
-              onDayPress={(day) => setSelectedDate(day.dateString)}
-              markedDates={markedDates}
-              markingType="custom"
-              style={styles.calendar}
-              theme={{
-                arrowColor: "white",
-                calendarBackground: "transparent",
-                selectedDayBackgroundColor: "#20348a",
-                selectedDayTextColor: "white",
-                dayTextColor: "white",
-                textDisabledColor: "#b8c0cc",
-                todayTextColor: "#17336b",
-                textMonthFontSize: 18,
-                monthTextColor: "white",
-                textDayFontFamily: theme.typography.fonts.regular,
-                textMonthFontFamily: theme.typography.fonts.regular,
-                textDayHeaderFontFamily: theme.typography.fonts.regular,
-              }}
-            />
-          </LinearGradient>
-        </View>
+      <View style={styles.scrollcontainer}>
+        <ScrollView>
+          <View style={styles.calendarContainer}>
+            <LinearGradient
+              colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
+              locations={[0, 0.2, 0.9, 0.5]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.calendarGradient}
+            >
+              <Calendar
+                onDayPress={(day) => setSelectedDate(day.dateString)}
+                markedDates={markedDates}
+                markingType="custom"
+                style={styles.calendar}
+                theme={{
+                  arrowColor: "white",
+                  calendarBackground: "transparent",
+                  selectedDayBackgroundColor: "#20348a",
+                  selectedDayTextColor: "white",
+                  dayTextColor: "white",
+                  textDisabledColor: "#b8c0cc",
+                  todayTextColor: "#17336b",
+                  textMonthFontSize: 18,
+                  monthTextColor: "white",
+                  textDayFontFamily: theme.typography.fonts.regular,
+                  textMonthFontFamily: theme.typography.fonts.regular,
+                  textDayHeaderFontFamily: theme.typography.fonts.regular,
+                }}
+              />
+            </LinearGradient>
+          </View>
 
-        <View style={styles.logContainer}>
-          <LinearGradient
-            colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
-            locations={[0, 0.01, 0.7, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.gradient, { padding: theme.spacing.md }]}
-          >
-            <Text style={styles.sectionTitle}>Log History</Text>
-            <Text style={styles.logDate}>
-              {new Date(selectedDate + "T00:00:00").toLocaleDateString(
-                "en-US",
-                {
-                  month: "long",
-                  day: "numeric",
-                  weekday: "long",
-                }
-              )}
-            </Text>
-
-            {selectedLog && selectedLog.length > 0 ? (
-              selectedLog
-                .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-                .map((log, index) => (
-                  <View key={index} style={styles.logContent}>
-                    <Text style={styles.logPain}>
-                      {formatLogTime(log.created_at)} -{" "}
-                      {getPainLevel(log.pain_rating)}
-                    </Text>
-                    <Text style={styles.logText}>
-                      {"Pain rating: " +
-                        (log.pain_rating !== null ? log.pain_rating : "N/A")}
-                    </Text>
-                    <Text style={styles.logText}>
-                      {"What you said: " + log.entry_text}
-                    </Text>
-                  </View>
-                ))
-            ) : (
-              <Text style={styles.logText}>
-                {selectedDate === today
-                  ? "You haven't created a log today yet."
-                  : "No log available for this date."}
+          <View style={styles.logContainer}>
+            <LinearGradient
+              colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
+              locations={[0, 0.01, 0.7, 1]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.gradient, { padding: theme.spacing.md }]}
+            >
+              <Text style={styles.sectionTitle}>Log History</Text>
+              <Text style={styles.logDate}>
+                {new Date(selectedDate + "T00:00:00").toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long",
+                  }
+                )}
               </Text>
-            )}
-          </LinearGradient>
-        </View>
-      </ScrollView>
+
+              {selectedLog && selectedLog.length > 0 ? (
+                selectedLog
+                  .sort(
+                    (a, b) => new Date(a.created_at) - new Date(b.created_at)
+                  )
+                  .map((log, index) => (
+                    <View key={index} style={styles.logContent}>
+                      <Text style={styles.logPain}>
+                        {formatLogTime(log.created_at)} -{" "}
+                        {getPainLevel(log.pain_rating)}
+                      </Text>
+                      <Text style={styles.logText}>
+                        {"Pain rating: " +
+                          (log.pain_rating !== null ? log.pain_rating : "N/A")}
+                      </Text>
+                      <Text style={styles.logText}>
+                        {"What you said: " + log.entry_text}
+                      </Text>
+                    </View>
+                  ))
+              ) : (
+                <Text style={styles.logText}>
+                  {selectedDate === today
+                    ? "You haven't created a log today yet."
+                    : "No log available for this date."}
+                </Text>
+              )}
+            </LinearGradient>
+          </View>
+        </ScrollView>
+      </View>
     </ImageBackground>
   );
 }
@@ -199,7 +203,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
   },
   scrollcontainer: {
-    marginTop: "15%",
+    marginTop: "25%",
+    flex: 1,
   },
   card: {
     padding: theme.spacing.lg,
@@ -246,11 +251,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   calendarContainer: {
-    marginTop: theme.spacing.md,
     marginHorizontal: theme.spacing.md,
     borderRadius: 15,
     overflow: "hidden",
-    marginTop: "20%",
   },
   calendarGradient: {
     borderRadius: 15,
@@ -290,7 +293,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    top: "7%",
+    top: "5%",
     left: "5%",
     opacity: 0.9,
     zIndex: 10,
