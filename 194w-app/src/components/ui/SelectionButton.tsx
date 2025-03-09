@@ -74,7 +74,7 @@ export default function SelectionButton({
 
 const styles = StyleSheet.create({
   wrapper: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: theme.spacing.sm,
   },
   buttonContainer: {
@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.3,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: theme.spacing.lg,
   },
   selected: {
     backgroundColor: theme.colors.white,
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontSize: theme.typography.sizes.md,
     fontFamily: theme.typography.fonts.regular,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: theme.spacing.md,
   },
 });
