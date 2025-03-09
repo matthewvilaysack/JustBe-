@@ -177,18 +177,20 @@ const PlotDisplayer = () => {
     return (
         <View style={styles.container}>
             <PainChart data={pain_data}/>
+            
+            <PieChart data={count_data.symptoms} title="Symptoms"/>
+            
+            <PieChart data={count_data.pain_rating} title="Pain Ratings"/>
 
-            <PieChart data={count_data.duration} title="Durations"/>
-
-            <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
+            <PieChart data={count_data.sensation} title="Sensations"/>
             
             <PieChart data={count_data.causes} title="Causes"/>
 
             <PieChart data={count_data.concerns} title="Concerns"/>
 
-            <PieChart data={count_data.pain_rating} title="Pain Ratings"/>
-            
-            <PieChart data={count_data.symptoms} title="Symptoms"/>
+            <PieChart data={count_data.duration} title="Durations"/>
+
+            <PieChart data={count_data["when-does-it-hurt"]} title="Timings" /> 
         </View>
     );
 };
