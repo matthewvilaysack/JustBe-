@@ -1,24 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Alert,
+  Image,
+  ImageBackground,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useRouter, Link } from "expo-router";
-import { supabase } from "@/src/lib/api/supabase";
+import { useRouter } from "expo-router";
+// import { supabase } from "@/src/lib/api/supabase";
 import useJournalStore from "@/src/store/journalStore";
 import Theme from "@/src/theme/theme";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
   const router = useRouter();
   const CURRENT_TAB_DETAILS = "/tabs/profile/details";
 
   useEffect(() => {
     async function fetchUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        Alert.alert("Error fetching user", error.message);
-      } else {
-        setUser(data.user);
-      }
+      // const { data, error } = await supabase.auth.getUser();
+      // if (error) {
+      //   Alert.alert("Error fetching user", error.message);
+      // } else {
+      //   setUser(data.user);
+      // }
     }
 
     fetchUser();
@@ -26,48 +36,109 @@ export default function Profile() {
 
   async function handleSignOut() {
     useJournalStore.getState().clearLogs();
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert("Error", error.message);
-    } else {
-      router.replace("/"); // Redirect to login page after sign out
+    // const { error } = await supabase.auth.signOut();
+    // if (error) {
+    //   Alert.alert("Error", error.message);
+    // } else {
+    //   router.replace("/"); // Redirect to login page after sign out
+    // }
+  }
+
+  async function pickImage() {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Profile</Text>
-      {user ? (
-        <Text style={styles.email}>{user.email}</Text>
-      ) : (
-        <Text>Loading...</Text>
-      )}
-
-      <TouchableOpacity style={styles.button} onPress={handleSignOut}>
-        <Text style={styles.buttonText}>Sign Out</Text>
-      </TouchableOpacity>
-    </View>
+    <ImageBackground
+      source={require("@/assets/background.png")}
+      resizeMode="cover"
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <Text style={styles.heading}>Profile</Text>
+        <View style={styles.profileImageContainer}>
+          {profileImage ? (
+            <Image source={{ uri: profileImage }} style={styles.profileImage} />
+          ) : (
+            <FontAwesome
+              name="user-circle"
+              size={150}
+              color={Theme.colors.darkBlue}
+              style={styles.profileImage}
+            />
+          )}
+          <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+            <FontAwesome
+              name="pencil"
+              size={24}
+              color={Theme.colors.darkBlue}
+            />
+          </TouchableOpacity>
+        </View>
+        {user ? (
+          <Text style={styles.email}>{user.email}</Text>
+        ) : (
+          <Text style={styles.email}>Loading...</Text>
+        )}
+        <TouchableOpacity style={styles.button} onPress={handleSignOut}>
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Theme.colors.background,
-    padding: Theme.spacing.lg,
+  },
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Theme.colors.darkBlue,
+    padding: Theme.spacing.xxl * 2,
+    borderRadius: Theme.radius.xl * 2,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     fontWeight: "bold",
     marginBottom: Theme.spacing.lg,
-    color: Theme.colors.text.primary,
+    color: Theme.colors.primary[50],
+  },
+  profileImageContainer: {
+    position: "relative",
+    marginBottom: Theme.spacing.md,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 200,
+  },
+  uploadButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: Theme.colors.button.secondary.background,
+    padding: Theme.spacing.sm,
+    borderRadius: Theme.radius.lg,
+    alignItems: "center",
+    justifyContent: "center",
   },
   email: {
     fontSize: Theme.typography.sizes.md,
-    color: Theme.colors.text.secondary,
+    color: Theme.colors.primary[50],
     marginBottom: Theme.spacing.md,
+    fontFamily: Theme.typography.fonts.regular,
   },
   button: {
     backgroundColor: Theme.colors.button.primary.background,
@@ -79,7 +150,7 @@ const styles = StyleSheet.create({
     marginTop: Theme.spacing.lg,
   },
   buttonText: {
-    color: Theme.colors.button.primary.text,
+    color: Theme.colors.darkBlue,
     fontSize: Theme.typography.sizes.md,
     fontWeight: "bold",
   },
