@@ -51,6 +51,7 @@ export default function Auth() {
           <View style={[styles.verticallySpaced, styles.mt20]}>
             <Text style={styles.inputLabel}>Email</Text>
             <TextInput
+              label="Email"
               leftIcon={{ type: "font-awesome", name: "envelope" }}
               onChangeText={(text) => setEmail(text)}
               value={email}

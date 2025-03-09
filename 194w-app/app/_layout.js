@@ -51,32 +51,32 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <Stack screenOptions={{ headerShown: false }}>
       {session ? (
-        <Stack>
-          <Stack.Screen 
-            name="tabs" 
-            options={{ 
-              headerShown: false,
-              gestureEnabled: false 
-            }} 
-          />
-        </Stack>
+        <Stack.Screen 
+          name="tabs" 
+          options={{ 
+            headerShown: false,
+            gestureEnabled: false 
+          }} 
+        />
+      ) : !hasCompletedOnboarding ? (
+        <Stack.Screen 
+          name="onboarding" 
+          options={{
+            headerShown: false,
+            gestureEnabled: false
+          }} 
+        />
       ) : (
-        <Stack screenOptions={{ headerShown: false }}>
-          {!hasCompletedOnboarding ? (
-            <Stack.Screen 
-              name="onboarding" 
-              options={{ gestureEnabled: false }} 
-            />
-          ) : (
-            <Stack.Screen 
-              name="index" 
-              options={{ gestureEnabled: false }} 
-            />
-          )}
-        </Stack>
+        <Stack.Screen 
+          name="index" 
+          options={{
+            headerShown: false,
+            gestureEnabled: false
+          }} 
+        />
       )}
-    </>
+    </Stack>
   );
 }

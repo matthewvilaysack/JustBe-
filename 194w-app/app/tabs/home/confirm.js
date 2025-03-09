@@ -20,7 +20,7 @@ export default function Page() {
       style={styles.background}
     >
       <View style={styles.container}>
-        <Text style={styles.heading}>Your symptoms have been logged!</Text>
+        <Text style={styles.heading}>Your entry have been logged!</Text>
       </View>
     </ImageBackground>
   );
