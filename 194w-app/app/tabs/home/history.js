@@ -2,46 +2,46 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
-  ActivityIndicator,
-  Dimensions,
-  TouchableOpacity,
-  Alert,
   ScrollView,
   ImageBackground,
   StyleSheet,
 } from "react-native";
-import { supabase } from "../../../src/lib/api/supabase";
-import { useRouter, Link } from "expo-router";
+import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
-import Theme from "@/src/theme/theme";
 
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Calendar } from "react-native-calendars";
 import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
-const { width } = Dimensions.get("window");
 
-
-export default function Export() {
+export default function History() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T");
   const { journalLogs, isLoading, getLogsByDate } = useJournalStore();
 
+  // Load logs only once when component mounts
   useEffect(() => {
     setSelectedDate(today);
-    // Fetch logs only if store is empty
-    if (Object.keys(journalLogs).length === 0) {
-      useJournalStore.getState().getJournalLogs();
-    }
+    // reload the logs once when component mounts
+    useJournalStore.getState().getJournalLogs();
   }, []);
 
   // Get logs for the selected date
-  const selectedLog = selectedDate ? getLogsByDate(selectedDate)[0] : null;
-  console.log("selectedLog", selectedLog) // Temp 
+  const selectedLog = selectedDate ? getLogsByDate(selectedDate) : [];
+  console.log("selectedLog", selectedLog); // Temp
 
+  // Get the time that a log was created (helper fn)
+  const formatLogTime = (timestamp) => {
+    if (!timestamp) return "Unknown Time";
+    return new Date(timestamp).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  // get pain level for log
   const getPainLevel = (pain_rating) => {
     if (pain_rating === 0) return "No Pain";
     if (pain_rating >= 1 && pain_rating <= 3) return "Mild Pain";
@@ -50,7 +50,7 @@ export default function Export() {
     if (pain_rating === 10) return "Extreme Pain";
     return "Unknown Pain Level";
   };
-
+  // get pain color for calendar, displaying severity back to user
   const getPainColor = (pain_rating) => {
     if (pain_rating === 0) return "rgba(0, 255, 0, 0.5)";
     if (pain_rating >= 1 && pain_rating <= 2) return "rgba(173, 255, 47, 0.7)";
@@ -61,27 +61,38 @@ export default function Export() {
   };
 
   // Create marked dates object from all journal logs
-  const markedDates = Object.entries(journalLogs).reduce((journalLogs, [date, logs]) => {
-    if (logs.length === 0) return journalLogs;
-    const painColor = getPainColor(logs[0].pain_rating);
-    journalLogs[date] = {
-      selected: true,
-      selectedColor: painColor,
-      customStyles: {
-        container: {
-          backgroundColor: painColor,
-          borderRadius: 8,
-          width: 35,
-          height: 35,
+  const markedDates = Object.entries(journalLogs).reduce(
+    (journalLogs, [date, logs]) => {
+      if (logs.length === 0) return journalLogs;
+
+      // Find log with the highest pain rating
+      const maxPainLog = logs.reduce((maxLog, currentLog) =>
+        currentLog.pain_rating > maxLog.pain_rating ? currentLog : maxLog
+      );
+
+      // Date is marked the color of the highest-severity pain
+      const painColor = getPainColor(maxPainLog.pain_rating);
+
+      journalLogs[date] = {
+        selected: true,
+        selectedColor: painColor,
+        customStyles: {
+          container: {
+            backgroundColor: painColor,
+            borderRadius: 8,
+            width: 35,
+            height: 35,
+          },
+          text: {
+            color: "white",
+            fontWeight: "bold",
+          },
         },
-        text: {
-          color: "white",
-          fontWeight: "bold",
-        },
-      },
-    };
-    return journalLogs;
-  }, {});
+      };
+      return journalLogs;
+    },
+    {}
+  );
 
   return (
     <ImageBackground
@@ -97,77 +108,90 @@ export default function Export() {
           showArrow={true}
         />
       </View>
-      <ScrollView style={styles.scrollcontainer}>
-        <View style={styles.calendarContainer}>
-          <LinearGradient
-            colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
-            locations={[0, 0.2, 0.9, 0.5]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.calendarGradient}
-          >
-            <Calendar
-              onDayPress={(day) => setSelectedDate(day.dateString)}
-              markedDates={markedDates}
-              markingType="custom"
-              style={styles.calendar}
-              theme={{
-                arrowColor: "white",
-                calendarBackground: "transparent", //theme.colors.border.default,
-                selectedDayBackgroundColor: "#20348a",
-                selectedDayTextColor: "white",
-                dayTextColor: "white",
-                textDisabledColor: "#b8c0cc",
-                todayTextColor: "#17336b",
-                textMonthFontSize: 18,
-                monthTextColor: "white",
-                textDayFontFamily: theme.typography.fonts.regular,
-                textMonthFontFamily: theme.typography.fonts.regular,
-                textDayHeaderFontFamily: theme.typography.fonts.regular,
-              }}
-            />
-          </LinearGradient>
-        </View>
+      <View style={styles.scrollcontainer}>
+        <ScrollView>
+          <View style={styles.calendarContainer}>
+            <LinearGradient
+              colors={["#69BBDE", "#5CA2C0", "#2B4F8E", "#6580D8"]}
+              locations={[0, 0.2, 0.9, 0.5]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.calendarGradient}
+            >
+              <Calendar
+                onDayPress={(day) => setSelectedDate(day.dateString)}
+                markedDates={markedDates}
+                markingType="custom"
+                style={styles.calendar}
+                theme={{
+                  arrowColor: "white",
+                  calendarBackground: "transparent",
+                  selectedDayBackgroundColor: "#20348a",
+                  selectedDayTextColor: "white",
+                  dayTextColor: "white",
+                  textDisabledColor: "#b8c0cc",
+                  todayTextColor: "#17336b",
+                  textMonthFontSize: 18,
+                  monthTextColor: "white",
+                  textDayFontFamily: theme.typography.fonts.regular,
+                  textMonthFontFamily: theme.typography.fonts.regular,
+                  textDayHeaderFontFamily: theme.typography.fonts.regular,
+                }}
+              />
+            </LinearGradient>
+          </View>
 
-        <View style={styles.logContainer}>
-          <LinearGradient
-            colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
-            locations={[0, 0.01, 0.7, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.gradient, { padding: theme.spacing.md }]}
-          >
-            <Text style={styles.sectionTitle}>Log History</Text>
-            <Text style={styles.logDate}>
-              {new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                weekday: "long",
-              })}
-            </Text>
-
-            {selectedLog ? (
-              <View style={styles.logContent}>
-                <Text style={[styles.pain, { color: theme.colors.text.primary, fontSize: theme.typography.sizes.xl }]}> {getPainLevel(selectedLog.pain_rating)} </Text>
-                <Text style={styles.logText}>{"What you said: " + selectedLog.entry_text}</Text>
-                <Text style={styles.logText}>{"pain rating: " + (selectedLog.pain_rating !== null ? selectedLog.pain_rating : "N/A")}</Text>
-                <Text style={styles.logText}>{"causes: " + (selectedLog.causes !== null ? selectedLog.causes : "N/A")}</Text>
-                <Text style={styles.logText}>{"concerns: " + (selectedLog.concerns !== null ? selectedLog.concerns : "N/A")}</Text>
-                <Text style={styles.logText}>{"duration: " + (selectedLog.duration !== null ? selectedLog.duration : "N/A")}</Text>
-                <Text style={styles.logText}>{"symptoms: " + (selectedLog.symptoms !== null ? selectedLog.symptoms : "N/A")}</Text>
-                <Text style={styles.logText}>{"what happened: " + (selectedLog["what-happened"] !== null ? selectedLog["what-happened"] : "N/A")}</Text>
-                <Text style={styles.logText}>{"when does it hurt: " + (selectedLog["when-does-it-hurt"] !== null ? selectedLog["when-does-it-hurt"] : "N/A")}</Text>
-              </View>
-            ) : (
-              <Text style={styles.logText}>
-                {selectedDate === today
-                  ? "You haven't created a log today yet."
-                  : "No log available for this date."}
+          <View style={styles.logContainer}>
+            <LinearGradient
+              colors={["#69BBDE", "#5CA2C0", "#6580D8", "#8794E3"]}
+              locations={[0, 0.01, 0.7, 1]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.gradient, { padding: theme.spacing.md }]}
+            >
+              <Text style={styles.sectionTitle}>Log History</Text>
+              <Text style={styles.logDate}>
+                {new Date(selectedDate + "T00:00:00").toLocaleDateString(
+                  "en-US",
+                  {
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long",
+                  }
+                )}
               </Text>
-            )}
-          </LinearGradient>
-        </View>
-      </ScrollView>
+
+              {selectedLog && selectedLog.length > 0 ? (
+                selectedLog
+                  .sort(
+                    (a, b) => new Date(a.created_at) - new Date(b.created_at)
+                  )
+                  .map((log, index) => (
+                    <View key={index} style={styles.logContent}>
+                      <Text style={styles.logPain}>
+                        {formatLogTime(log.created_at)} -{" "}
+                        {getPainLevel(log.pain_rating)}
+                      </Text>
+                      <Text style={styles.logText}>
+                        {"Pain rating: " +
+                          (log.pain_rating !== null ? log.pain_rating : "N/A")}
+                      </Text>
+                      <Text style={styles.logText}>
+                        {"What you said: " + log.entry_text}
+                      </Text>
+                    </View>
+                  ))
+              ) : (
+                <Text style={styles.logText}>
+                  {selectedDate === today
+                    ? "You haven't created a log today yet."
+                    : "No log available for this date."}
+                </Text>
+              )}
+            </LinearGradient>
+          </View>
+        </ScrollView>
+      </View>
     </ImageBackground>
   );
 }
@@ -179,7 +203,8 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
   },
   scrollcontainer: {
-    marginTop: "15%",
+    marginTop: "25%",
+    flex: 1,
   },
   card: {
     padding: theme.spacing.lg,
@@ -226,11 +251,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   calendarContainer: {
-    marginTop: theme.spacing.md,
     marginHorizontal: theme.spacing.md,
     borderRadius: 15,
     overflow: "hidden",
-    marginTop: "20%",
   },
   calendarGradient: {
     borderRadius: 15,
@@ -239,110 +262,40 @@ const styles = StyleSheet.create({
   calendar: {
     backgroundColor: "transparent",
     elevation: 5,
-    // is this shadow actually doing anything...
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
   },
   logDate: {
+    fontSize: theme.typography.sizes.lg,
+    color: "white",
+    fontFamily: theme.typography.fonts.bold,
+    marginBottom: theme.spacing.md,
+  },
+  logPain: {
     fontSize: theme.typography.sizes.md,
     color: "white",
     fontFamily: theme.typography.fonts.bold,
     marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.md,
   },
   logText: {
     flex: 1,
     fontSize: theme.typography.sizes.md,
     color: "white",
     marginLeft: theme.spacing.sm,
-    //marginTop: theme.spacing.sm,
     fontFamily: theme.typography.fonts.regular,
-    //alignSelf: "center",
   },
   logContent: {
-    //padding: 15,
-    //backgroundColor: "rgba(255,255,255,0.2)",
     marginBottom: theme.spacing.sm,
     borderRadius: 10,
   },
   buttonContainer: {
     position: "absolute",
-    top: "7%",
+    top: "5%",
     left: "5%",
     opacity: 0.9,
     zIndex: 10,
   },
 });
-
-/*
-*--------------------------------------------------------------------------------------
-* CODE BELOW fetches logs from supabase - save for later to incorporate into front end
-*
-
-const FetchSupabaseData = () => {
-  const [data, setData] = useState([]);
-  const [error, setError] = useState(true);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-        
-    const fetchData = async () => {
-      const { data: journal_entries, err } = await supabase.from('journal_entries').select('*')
-      if (err) {
-        text = "err";
-        setData(null);
-        console.log("error") 
-        console.error('Error fetching data:', err);
-      } else {
-        console.log("getting data");
-        setData(journal_entries);
-        setError(null);
-      }
-      setLoading(false);
-    };        
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <ActivityIndicator size="large" style={styles.loader} />;
-  }
-
-  return (
-    <View style={styles.container}>
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.item}>
-          <Text>{JSON.stringify(item)}</Text>
-        </View>
-      )}
-      />
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
-export default FetchSupabaseData;
-
-*/
-

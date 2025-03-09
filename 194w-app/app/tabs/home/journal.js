@@ -26,6 +26,7 @@ import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 import { useJSONDataStore } from "@/src/store/jsonDataStore";
 import { addNewDetailedEntry } from "../../utils/supabase-helpers";
+import useJournalStore from "@/src/store/journalStore";
 
 export default function Page() {
   const [text, setText] = useState("");
@@ -37,6 +38,7 @@ export default function Page() {
   const { setJSONData, jsonData } = useJSONDataStore();
   // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
+  const { addJournalLog } = useJournalStore();  
 
   const { refetch } = useQuery({
     queryKey: ["keywords", text],
@@ -120,6 +122,9 @@ export default function Page() {
           console.error("❌ Supabase returned null. Insert might have failed.");
           throw new Error("Supabase insert failed - No data returned.");
         }
+        
+        // eagerly add new log to journal store
+        addJournalLog(data[0]);
 
         console.log("✅ Supabase Updated:", data);
         return true;
