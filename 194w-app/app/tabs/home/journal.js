@@ -125,7 +125,7 @@ export default function Page() {
         
         // eagerly add new log to journal store
         addJournalLog(data[0]);
-        
+
         console.log("✅ Supabase Updated:", data);
         return true;
       } catch (err) {

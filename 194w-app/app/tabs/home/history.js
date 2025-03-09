@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,20 +15,17 @@ import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
 
 export default function History() {
-export default function History() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const today = new Date().toISOString().split("T");
-  const today = new Date().toISOString().split("T");
   const { journalLogs, isLoading, getLogsByDate } = useJournalStore();
 
-  // Load logs only once when component mounts
   // Load logs only once when component mounts
   useEffect(() => {
     setSelectedDate(today);
     // reload the logs once when component mounts
     useJournalStore.getState().getJournalLogs();
-  }, [today]);
+  }, []);
 
   // Get logs for the selected date
   const selectedLog = selectedDate ? getLogsByDate(selectedDate) : [];
