@@ -58,7 +58,7 @@ export default function Onboarding() {
     {
       id: "1",
       type: "loading",
-      title: "...",
+      title: "Welcome to JustBe.",
       character: true,
       showNext: false,
     },
@@ -70,7 +70,7 @@ export default function Onboarding() {
       options: [
         ["Sciatic", "Migraines"],
         ["Arthritis", "IBS"],
-        ["Back Pain", "Endometriosis"],
+        ["Back Pain", "Fibromyalgia"],
         ["Other"],
       ],
       character: true,
@@ -143,7 +143,10 @@ export default function Onboarding() {
   const renderSlide = ({ item }: { item: Slide }) => (
     <View style={styles.slideContainer}>
       {item.type === "loading" ? (
-        <LoadingBlob style={{ transform: [{ scale: 1.5 }], marginTop: 100 }} />
+        <View style={[styles.contentContainer, { paddingTop: 100 }]}>
+          <LoadingBlob style={{ transform: [{ scale: 1.5 }] }} />
+          <Text style={[styles.title, { marginTop: 50 }]}>{item.title}</Text>
+        </View>
       ) : (
         <>
           <LoadingBlob />

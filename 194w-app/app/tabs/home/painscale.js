@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -18,7 +18,7 @@ import BackButton from "@/src/components/ui/BackButton";
 import theme from "@/src/theme/theme";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.5;
 const ITEM_MARGIN = 30;
 
@@ -41,7 +41,7 @@ const painLevelDescriptions = {
   2: "Mild pain but doesn't interfere",
   3: "Sometimes distracting pain",
   4: "Distracting pain but no interruptions",
-  5: "Moderate pain that interrupts",
+  5: "Moderate pain that interrupts activities",
   6: "Hard to ignore pain and avoiding activities",
   7: "Severe pain that is focus of attention",
   8: "Very severe pain that is hard to tolerate",
@@ -54,6 +54,10 @@ export default function Page() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { painLevel, setPainLevel } = usePainLevelStore();
   const flatListRef = useRef(null);
+
+  useEffect(() => {
+    setPainLevel(0);
+  }, []);
 
   const mapSliderToIndex = (value) => Math.ceil(value / 2);
   const handleSliderChange = (value) => {
@@ -73,64 +77,66 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.buttonContainer}>
-        <BackButton
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
-      <View style={styles.container}>
-        <Text style={styles.heading}>How would you rate your pain?</Text>
-        <View style={styles.carousel}>
-          <FlatList
-            ref={flatListRef}
-            data={images}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
-            keyExtractor={(_, index) => index.toString()}
-            scrollEnabled={false}
-            contentContainerStyle={{
-              paddingHorizontal: (width - ITEM_WIDTH) / 2,
+      <View style={styles.background}>
+        <View style={styles.buttonContainer}>
+          <BackButton
+            onPress={() => {
+              router.back();
             }}
-            ItemSeparatorComponent={() => (
-              <View style={{ width: ITEM_MARGIN }} />
-            )}
-            renderItem={({ item }) => (
-              <View style={styles.carouselItem}>
-                <Image source={item.src} style={styles.blobImage} />
-              </View>
-            )}
+            showArrow={true}
           />
         </View>
-      </View>
-      <View style={styles.sliderContainer}>
-        <View style={styles.levelContainer}>
-          <Text style={styles.heading}>
-            {painLevel} - {painLevelDescriptions[painLevel]}
-          </Text>
+        <View style={styles.container}>
+          <Text style={styles.heading}>How would you rate your pain?</Text>
+          <View style={styles.carousel}>
+            <FlatList
+              ref={flatListRef}
+              data={images}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
+              keyExtractor={(_, index) => index.toString()}
+              scrollEnabled={false}
+              contentContainerStyle={{
+                paddingHorizontal: (width - ITEM_WIDTH) / 2,
+              }}
+              ItemSeparatorComponent={() => (
+                <View style={{ width: ITEM_MARGIN }} />
+              )}
+              renderItem={({ item }) => (
+                <View style={styles.carouselItem}>
+                  <Image source={item.src} style={styles.blobImage} />
+                </View>
+              )}
+            />
+          </View>
         </View>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={10}
-          step={1}
-          value={selectedIndex * 2}
-          onValueChange={handleSliderChange}
-          minimumTrackTintColor={theme.colors.primary[200]}
-          maximumTrackTintColor={theme.colors.white}
-          thumbTintColor={theme.colors.white}
-        />
-      </View>
+        <View style={styles.sliderContainer}>
+          <View style={styles.levelContainer}>
+            <Text style={styles.description}>
+              {painLevel} - {painLevelDescriptions[painLevel]}
+            </Text>
+          </View>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={10}
+            step={1}
+            value={selectedIndex * 2}
+            onValueChange={handleSliderChange}
+            minimumTrackTintColor={theme.colors.primary[200]}
+            maximumTrackTintColor={theme.colors.white}
+            thumbTintColor={theme.colors.white}
+          />
+        </View>
 
-      <View style={styles.footer}>
-        <NextButton
-          onPress={() => router.push("/tabs/home/journal")}
-          showArrow={true}
-        />
+        <View style={styles.footer}>
+          <NextButton
+            onPress={() => router.push("/tabs/home/journal")}
+            showArrow={true}
+          />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -139,13 +145,14 @@ export default function Page() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    height: height,
+    flexDirection: "column",
+    justifyContent: "center",
   },
   container: {
-    flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    padding: Theme.spacing.xl,
-    marginTop: Theme.spacing.xxl * 3,
+    alignSelf: "center",
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
@@ -153,8 +160,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
   },
+  description: {
+    fontSize: Theme.typography.sizes.lg,
+    color: Theme.colors.white,
+    textAlign: "center",
+    fontFamily: Theme.typography.fonts.regular,
+  },
   carousel: {
-    height: width / 2 + Theme.typography.sizes.xl * 2 + 20,
+    height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
     minWidth: width,
   },
   carouselItem: {
@@ -170,8 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    padding: Theme.spacing.xl,
-    marginTop: Theme.spacing.xxl * 2,
+    maxHeight: Theme.spacing.lg * 4,
   },
   levelContainer: {
     backgroundColor: theme.colors.darkPurple,
@@ -188,10 +200,14 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   footer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
+    alignSelf: "flex-end",
+    maxHeight: height * 0.1,
     paddingBottom: Theme.spacing.lg,
-    paddingLeft: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
   },
 });

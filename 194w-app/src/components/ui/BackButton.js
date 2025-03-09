@@ -43,7 +43,6 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
     alignItems: "center",
     justifyContent: "center",
