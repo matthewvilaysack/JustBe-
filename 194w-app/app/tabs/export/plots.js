@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text, StyleSheet } from "react-native";
 import { fetchCountData, getHighestPainRatingPerDay } from "../../utils/supabase-helpers";
-import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme, VictoryPie } from "victory-native";
+import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme, VictoryPie, VictoryBar } from "victory-native";
 import Theme from "@/src/theme/theme";
+
+const palette = [Theme.colors.darkPurple, "lightblue", Theme.colors.darkBlue, Theme.colors.purple, Theme.colors.testColor];
 
 // Pain Chart Component
 const PainChart = ({ data }) => {
     if (!data || data.length === 0) {
         return; // <Text>Loading data...</Text>;
     }
-
     // Format data for VictoryChart
     const formattedData = data.map(d => ({
         x: new Date(d.day),  // Convert string to Date object
@@ -55,7 +56,9 @@ const PieChart = ({ data, title }) => {
   if (!data || Object.keys(data).length === 0) {
       return; // <Text>Loading data...</Text>;
   }
-  const palette = [Theme.colors.darkPurple, "lightblue", Theme.colors.darkBlue, Theme.colors.purple, Theme.colors.testColor];
+  if (Object.keys(data).length > 5) {
+      return <BarChart data={data} title={title}/>
+  }
 
   // Convert JSON object into an array format that VictoryPie understands
   const formattedData = Object.entries(data).map(([key, value]) => ({
@@ -80,6 +83,66 @@ const PieChart = ({ data, title }) => {
     </View>
   );
 };
+
+const BarChart = ({ data, title }) => {
+    if (!data || Object.keys(data).length === 0) {
+        return; // <Text>Loading data...</Text>;
+    }
+    const formattedData = Object.entries(data).map(([key, value]) => ({
+        x: key,  // JSON key as x (label)
+        y: value // JSON value as y (numeric data)
+    }));
+    
+    const barWidth = 30;  // You can adjust this value
+    // console.log("formattedData.length", formattedData.length);
+    // console.log(Object.keys(data));
+    const maxLabelLen = Object.keys(data).reduce((a, b) => a.length > b.length ? a : b).length 
+    // console.log("Object.keys(jsonObject)" , maxLabelLen);
+    const leftPad = 10+8*maxLabelLen;
+    const chartWidth = formattedData.length * barWidth + (formattedData.length + 1) * 20;
+    return (
+        <ScrollView horizontal showsHorizontalScrollIndicator={true}>
+      <View style={styles.container}>
+      <Text style={styles.title}> Most Common {title} </Text>
+        <VictoryChart 
+          theme={VictoryTheme.clean} 
+          domainPadding={20}
+          height={chartWidth}
+          width = {chartWidth + 100}
+          padding={{ left: leftPad, bottom: 50 }}
+        >
+          {/* X-axis */}
+          <VictoryAxis 
+          style={{
+            axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
+            ticks: { stroke: Theme.colors.white}, // Changes tick color
+            tickLabels: { fill: Theme.colors.white, fontWeight: "bold", fontSize: 14, padding: 10 } 
+            }} />
+  
+  
+          {/* Y-axis */}
+          <VictoryAxis dependentAxis style={{
+            axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
+            ticks: { stroke: Theme.colors.white}, // Changes tick color
+            tickLabels: { fill: Theme.colors.white, fontWeight: "bold", fontSize: 14,  } }} />
+  
+          {/* Bar chart */}
+          <VictoryBar data={formattedData} 
+          barWidth={barWidth}
+          barRatio={1}
+          horizontal={true}
+          style={{
+            data: {
+                fillOpacity: 1,
+                strokeWidth: 0,
+                fill: ({ index }) => palette[index % palette.length] // Cycle through colors
+            }
+          }} />
+        </VictoryChart>
+      </View>
+      </ScrollView>
+    );
+  };
 
 // Parent Component: Fetch Data and Pass to PainChart
 const PlotDisplayer = () => {
@@ -112,7 +175,6 @@ const PlotDisplayer = () => {
         getCountData();
     }, []);
     return (
-      <ScrollView >
         <View style={styles.container}>
             <PainChart data={pain_data}/>
 
@@ -123,8 +185,11 @@ const PlotDisplayer = () => {
             <PieChart data={count_data.causes} title="Causes"/>
 
             <PieChart data={count_data.concerns} title="Concerns"/>
+
+            <PieChart data={count_data.pain_rating} title="Pain Ratings"/>
+            
+            <PieChart data={count_data.symptoms} title="Symptoms"/>
         </View>
-      </ScrollView>
     );
 };
 

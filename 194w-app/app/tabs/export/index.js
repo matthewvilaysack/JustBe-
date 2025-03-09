@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   FlatList,
   Dimensions,
   TouchableOpacity,
@@ -42,6 +43,7 @@ export default function Export() {
       resizeMode="cover"
       style={styles.background}
     >
+      <ScrollView vertical>
       <TouchableOpacity
         style={styles.summaryWrapper}
         onPress={() => router.push("/tabs/export/generating")}
@@ -99,6 +101,7 @@ export default function Export() {
           /> */}
         </LinearGradient>
       </View>
+      </ScrollView>
     </ImageBackground>
   );
 }
