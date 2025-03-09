@@ -18,7 +18,6 @@ export default function History() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const today = new Date().toISOString().split("T");
-  const today = new Date().toISOString().split("T");
   const { journalLogs, isLoading, getLogsByDate } = useJournalStore();
 
   // Load logs only once when component mounts
