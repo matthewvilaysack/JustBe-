@@ -29,7 +29,7 @@ export default function History() {
     setSelectedDate(today);
     // reload the logs once when component mounts
     useJournalStore.getState().getJournalLogs();
-  }, [today]);
+  }, []);
 
   // Get logs for the selected date
   const selectedLog = selectedDate ? getLogsByDate(selectedDate) : [];
