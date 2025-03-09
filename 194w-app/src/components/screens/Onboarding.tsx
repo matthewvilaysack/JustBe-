@@ -68,9 +68,9 @@ export default function Onboarding() {
       title: "What kind of chronic pain do you experience?",
       subtitle: "(Choose one)",
       options: [
-        ["Sciatic", "OCD"],
-        ["Arthritis", "CKD"],
-        ["Joint Pain", "Alzheimers"],
+        ["Sciatic", "Migraines"],
+        ["Arthritis", "IBS"],
+        ["Back Pain", "Endometriosis"],
         ["Other"],
       ],
       character: true,
