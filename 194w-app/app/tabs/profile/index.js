@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { supabase } from "@/src/lib/api/supabase";
 import useJournalStore from "@/src/store/journalStore";
 import Theme from "@/src/theme/theme";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -62,8 +63,14 @@ export default function Profile() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.container}>
-        <Text style={styles.heading}>Profile</Text>
+      <LinearGradient
+        colors={["#5CA2C0", "#2B4F8E"]}
+        locations={[0, 0.55]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.container}
+      >
+        <Text style={styles.heading}>Your Profile</Text>
         <View style={styles.profileImageContainer}>
           {profileImage ? (
             <Image source={{ uri: profileImage }} style={styles.profileImage} />
@@ -91,7 +98,7 @@ export default function Profile() {
         <TouchableOpacity style={styles.button} onPress={handleSignOut}>
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
-      </View>
+      </LinearGradient>
     </ImageBackground>
   );
 }
