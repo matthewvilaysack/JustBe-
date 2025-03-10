@@ -236,7 +236,7 @@ export const extractExport = async (
         messages: [
           {
             role: "system",
-            content: `You are a helpful assistant that extracts key symptoms  **strictly based on the provided structured medical data** and reformats them into clear, structured statements for a doctor. Provide three concise summaries with:
+            content: `You are a helpful assistant that extracts key symptoms  **strictly based on the provided structured medical data** and reformats them into clear, structured statements for a doctor. Provide up to 15 concise summaries with:
               - When the symptom started (e.g., "three days ago," "since this morning").
               - How it has changed over time (e.g., worsening, stable, intermittent).
               - How severe it is and how it affects daily life (e.g., "severe fatigue, making it hard to focus").
