@@ -26,6 +26,12 @@ export default function Layout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="plots"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

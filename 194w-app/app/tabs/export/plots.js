@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+} from "react-native";
 import {
   fetchCountData,
   getHighestPainRatingPerDay,
@@ -161,59 +168,64 @@ const BarChart = ({ data, title }) => {
   const chartWidth =
     formattedData.length * barWidth + (formattedData.length + 1) * 20;
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-      <View style={styles.chartContainer}>
-        <Text style={styles.title}> Most Common {title} </Text>
-        <VictoryChart
-          theme={VictoryTheme.clean}
-          domainPadding={20}
-          width={width - 20}
-        >
-          {/* X-axis */}
-          <VictoryAxis
-            style={{
-              axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
-              ticks: { stroke: Theme.colors.white }, // Changes tick color
-              tickLabels: {
-                fill: Theme.colors.white,
-                fontWeight: "bold",
-                fontSize: 14,
-                padding: 10,
-              },
-            }}
-          />
+    <View style={styles.chartContainer}>
+      <Text style={styles.title}> Most Common {title} </Text>
+      <VictoryChart
+        theme={VictoryTheme.clean}
+        domainPadding={20}
+        width={width - 20}
+      >
+        {/* X-axis */}
+        <VictoryAxis
+          style={{
+            axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
+            ticks: { stroke: Theme.colors.white }, // Changes tick color
+            tickLabels: {
+              fill: Theme.colors.white,
+              fontWeight: "bold",
+              fontSize: 14,
+              padding: 10,
+            },
+          }}
+        />
 
-          {/* Y-axis */}
-          <VictoryAxis
-            dependentAxis
-            style={{
-              axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
-              ticks: { stroke: Theme.colors.white }, // Changes tick color
-              tickLabels: {
-                fill: Theme.colors.white,
-                fontWeight: "bold",
-                fontSize: 14,
-              },
-            }}
-          />
+        {/* Y-axis */}
+        <VictoryAxis
+          dependentAxis
+          domain={[1, 10]}
+          tickValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          style={{
+            axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
+            ticks: { stroke: Theme.colors.darkBlue }, // Changes tick color
+            tickLabels: {
+              fill: Theme.colors.darkBlue,
+              fontWeight: "bold",
+              fontSize: 14,
+            },
+            axisLabel: {
+              fill: Theme.colors.darkBlue,
+              fontFamily: Theme.typography.fonts.regular,
+            },
+          }}
+          label="Pain Rating"
+        />
 
-          {/* Bar chart */}
-          <VictoryBar
-            data={formattedData}
-            barWidth={barWidth}
-            barRatio={1}
-            horizontal={true}
-            style={{
-              data: {
-                fillOpacity: 1,
-                strokeWidth: 0,
-                fill: ({ index }) => palette[index % palette.length], // Cycle through colors
-              },
-            }}
-          />
-        </VictoryChart>
-      </View>
-    </ScrollView>
+        {/* Bar chart */}
+        <VictoryBar
+          data={formattedData}
+          barWidth={barWidth}
+          barRatio={1}
+          horizontal={true}
+          style={{
+            data: {
+              fillOpacity: 1,
+              strokeWidth: 0,
+              fill: ({ index }) => palette[index % palette.length], // Cycle through colors
+            },
+          }}
+        />
+      </VictoryChart>
+    </View>
   );
 };
 
@@ -248,23 +260,29 @@ const PlotDisplayer = () => {
     getCountData();
   }, []);
   return (
-    <View style={styles.container}>
-      <PainChart data={pain_data} />
+    <ImageBackground
+      source={require("@/assets/background.png")}
+      resizeMode="cover"
+      style={styles.background}
+    >
+      <ScrollView>
+        <View style={styles.container}>
+          <PainChart data={pain_data} />
 
-      <PieChart data={count_data.symptoms} title="Symptoms" />
+          <PieChart data={count_data.symptoms} title="Symptoms" />
 
-      <PieChart data={count_data.pain_rating} title="Pain Ratings" />
+          <PieChart data={count_data.sensation} title="Sensations" />
 
-      <PieChart data={count_data.sensation} title="Sensations" />
+          <PieChart data={count_data.causes} title="Causes" />
 
-      <PieChart data={count_data.causes} title="Causes" />
+          <PieChart data={count_data.concerns} title="Concerns" />
 
-      <PieChart data={count_data.concerns} title="Concerns" />
+          <PieChart data={count_data.duration} title="Durations" />
 
-      <PieChart data={count_data.duration} title="Durations" />
-
-      <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
-    </View>
+          <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 };
 
@@ -272,6 +290,7 @@ export default PlotDisplayer;
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: Theme.spacing.lg,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
