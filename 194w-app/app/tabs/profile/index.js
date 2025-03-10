@@ -11,7 +11,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
-// import { supabase } from "@/src/lib/api/supabase";
+import { supabase } from "@/src/lib/api/supabase";
 import useJournalStore from "@/src/store/journalStore";
 import Theme from "@/src/theme/theme";
 
@@ -23,12 +23,12 @@ export default function Profile() {
 
   useEffect(() => {
     async function fetchUser() {
-      // const { data, error } = await supabase.auth.getUser();
-      // if (error) {
-      //   Alert.alert("Error fetching user", error.message);
-      // } else {
-      //   setUser(data.user);
-      // }
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        Alert.alert("Error fetching user", error.message);
+      } else {
+        setUser(data.user);
+      }
     }
 
     fetchUser();
@@ -36,12 +36,12 @@ export default function Profile() {
 
   async function handleSignOut() {
     useJournalStore.getState().clearLogs();
-    // const { error } = await supabase.auth.signOut();
-    // if (error) {
-    //   Alert.alert("Error", error.message);
-    // } else {
-    //   router.replace("/"); // Redirect to login page after sign out
-    // }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      router.replace("/"); // Redirect to login page after sign out
+    }
   }
 
   async function pickImage() {
@@ -71,7 +71,7 @@ export default function Profile() {
             <FontAwesome
               name="user-circle"
               size={150}
-              color={Theme.colors.darkBlue}
+              color={Theme.colors.primary[200]}
               style={styles.profileImage}
             />
           )}
@@ -106,13 +106,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: Theme.colors.darkBlue,
-    padding: Theme.spacing.xxl * 2,
+    padding: Theme.spacing.xxl * 1.5,
     borderRadius: Theme.radius.xl * 2,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     fontWeight: "bold",
-    marginBottom: Theme.spacing.lg,
+    marginBottom: Theme.spacing.xl,
     color: Theme.colors.primary[50],
   },
   profileImageContainer: {

@@ -52,7 +52,7 @@ export default function Button({
 const styles = StyleSheet.create({
   button: {
     paddingHorizontal: BUTTON_WIDTH * 0.3,
-    paddingVertical: BUTTON_HEIGHT * 0.2,
+    paddingVertical: BUTTON_HEIGHT * 0.4,
     backgroundColor: Theme.colors.white,
     borderRadius: Theme.radius.pill,
     alignItems: "center",
