@@ -157,7 +157,6 @@ const BarChart = ({ data, title }) => {
     y: value, // JSON value as y (numeric data)
   }));
 
-  const barWidth = 30; // You can adjust this value
   // console.log("formattedData.length", formattedData.length);
   // console.log(Object.keys(data));
   const maxLabelLen = Object.keys(data).reduce((a, b) =>
@@ -167,13 +166,25 @@ const BarChart = ({ data, title }) => {
   const leftPad = 10 + 8 * maxLabelLen;
   const chartWidth =
     formattedData.length * barWidth + (formattedData.length + 1) * 20;
+  const minChartHeight = 200; // Prevents charts from being too small
+  const maxChartHeight = 600; // Prevents overly tall charts
+  const chartHeight = Math.min(
+    maxChartHeight,
+    Math.max(minChartHeight, formattedData.length * 30 + 50)
+  );
+  const barWidth = Math.max(
+    15,
+    Math.min(25, chartHeight / formattedData.length)
+  ); // You can adjust this value
+
   return (
     <View style={styles.chartContainer}>
       <Text style={styles.title}> Most Common {title} </Text>
       <VictoryChart
         theme={VictoryTheme.clean}
-        domainPadding={20}
+        domainPadding={{ x: 30, y: 15 }}
         width={width - 20}
+        height={chartHeight}
       >
         {/* X-axis */}
         <VictoryAxis
@@ -181,10 +192,12 @@ const BarChart = ({ data, title }) => {
             axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
             ticks: { stroke: Theme.colors.white }, // Changes tick color
             tickLabels: {
-              fill: Theme.colors.white,
+              fill: "transparent",
               fontWeight: "bold",
-              fontSize: 14,
-              padding: 10,
+              fontSize: 12,
+              angle: -15, // Rotates the labels slightly for better fit
+              textAnchor: "end",
+              padding: 5,
             },
           }}
         />
@@ -192,7 +205,7 @@ const BarChart = ({ data, title }) => {
         {/* Y-axis */}
         <VictoryAxis
           dependentAxis
-          domain={[1, 10]}
+          domain={[0, Math.max(...formattedData.map((d) => d.y)) + 2]} // Ensures bars extend fully
           tickValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
           style={{
             axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
@@ -207,15 +220,27 @@ const BarChart = ({ data, title }) => {
               fontFamily: Theme.typography.fonts.regular,
             },
           }}
-          label="Pain Rating"
+          label="Symptom Count"
         />
 
         {/* Bar chart */}
         <VictoryBar
           data={formattedData}
           barWidth={barWidth}
-          barRatio={1}
           horizontal={true}
+          labels={({ datum }) => datum.x}
+          labelComponent={
+            <VictoryLabel
+              textAnchor="end" // Center text inside the bars
+              dx={-3} // Keep text centered
+              dy={3} // Adjust for better vertical alignment
+              style={{
+                fill: "white", // Ensure visibility inside bars
+                fontSize: 10,
+                fontWeight: "normal",
+              }}
+            />
+          }
           style={{
             data: {
               fillOpacity: 1,
