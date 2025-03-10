@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   FlatList,
   Dimensions,
   TouchableOpacity,
@@ -21,6 +22,7 @@ import { useRouter, Link } from "expo-router";
 import theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import PlotDisplayer from "./plots";
 
 const { width } = Dimensions.get("window");
 
@@ -71,32 +73,36 @@ export default function Export() {
           </View>
         </LinearGradient>
       </TouchableOpacity>
-      <View style={styles.logContainer}>
+      <TouchableOpacity
+        style={styles.summaryWrapper}
+        onPress={() => router.push("/tabs/export/plots")}
+      >
         <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", "#2C4DC7"]}
-          locations={[0, 0.01, 1]}
+          colors={["#69BBDE", "#5CA2C0", theme.colors.darkPurple]}
+          locations={[0, 0.01, 0.4]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[styles.gradient, { padding: theme.spacing.md }]}
+          style={[styles.gradient]}
         >
-          <Text style={styles.sectionTitle}>Log History</Text>
-          <FlatList
-            data={logs}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.logItem}
-                onPress={() => router.push("/tabs/export/log_single")}
-              >
-                <Text style={styles.logDate}>{item.date}</Text>
-                <Text style={styles.logText}>{item.summary}</Text>
-                <Ionicons name="chevron-forward" size={20} color="white" />
-              </TouchableOpacity>
-            )}
-            contentContainerStyle={{ paddingBottom: 80 }}
-          />
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryContent}>
+              <Text style={styles.cardTitle}>Health Plots</Text>
+              <Text style={styles.cardSubtitle}>
+                Get an overview glance at your logging history, including trends
+                and insights.
+              </Text>
+            </View>
+            <View style={styles.arrowContainer}>
+              <Ionicons
+                name="chevron-forward"
+                size={24}
+                color="white"
+                style={styles.arrow}
+              />
+            </View>
+          </View>
         </LinearGradient>
-      </View>
+      </TouchableOpacity>
     </ImageBackground>
   );
 }
@@ -104,10 +110,10 @@ export default function Export() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    paddingTop: theme.spacing.xxl,
   },
   summaryWrapper: {
-    marginTop: theme.spacing.xxl * 2,
-    marginHorizontal: theme.spacing.md,
+    margin: theme.spacing.md,
   },
   gradient: {
     borderRadius: theme.radius.lg,
@@ -120,6 +126,7 @@ const styles = StyleSheet.create({
   },
   summaryContent: {
     flexDirection: "column",
+    maxWidth: "80%",
   },
   card: {
     //backgroundColor: theme.colors.lightBlue,  // need to figure out how to copy the gradient background on figma
