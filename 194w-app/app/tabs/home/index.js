@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/NextButton";
 import { useRouter } from "expo-router";
+import Blob from "@/src/components/ui/Blob";
 
 export default function Page() {
   const router = useRouter();
@@ -15,10 +16,7 @@ export default function Page() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
-        <Image
-          source={require("@/assets/blob-no-pain.png")}
-          style={styles.blobImage}
-        />
+        <Blob size={250} />
         <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
           <Button
             title="Log Entry"
@@ -28,10 +26,10 @@ export default function Page() {
             title="History"
             onPress={() => router.push("/tabs/home/history")}
           />
-          {/* <Button
+          <Button
             title="Plots"
             onPress={() => router.push("/tabs/home/plots")}
-          /> */}
+          />
         </View>
       </View>
     </ImageBackground>

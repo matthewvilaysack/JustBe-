@@ -13,18 +13,12 @@ const MedicalSummaryHeader = ({ handleGeneratePDF, handleSharePDF }) => {
         <TouchableOpacity onPress={handleGeneratePDF}>
           <MaterialCommunityIcons size={24} name="reload" color={"white"} />
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-        <MaterialCommunityIcons size={24} name="view-grid" color={"white"} />
-      </TouchableOpacity> */}
         <TouchableOpacity onPress={handleSharePDF}>
           <MaterialCommunityIcons
             size={24}
             name="export-variant"
             color={"white"}
           />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <MaterialCommunityIcons size={24} name="bookmark" color={"white"} />
         </TouchableOpacity>
       </View>
     </View>

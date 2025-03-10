@@ -31,10 +31,10 @@ const MedicalSummaryScreen = ({
             title="What you can bring up during your next appointment"
             items={suggestions}
           />
-          <Section 
+          <Section
             title="Pain History"
             items={[
-              `You have reported experiencing ${painType} for ${painDuration}.`
+              `You have reported experiencing ${painType} for ${painDuration}.`,
             ]}
           />
         </ScrollView>
