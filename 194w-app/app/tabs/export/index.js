@@ -22,7 +22,7 @@ import { useRouter, Link } from "expo-router";
 import theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import PlotDisplayer from "./plots"
+import PlotDisplayer from "./plots";
 
 const { width } = Dimensions.get("window");
 
@@ -44,47 +44,47 @@ export default function Export() {
       style={styles.background}
     >
       <ScrollView vertical>
-      <TouchableOpacity
-        style={styles.summaryWrapper}
-        onPress={() => router.push("/tabs/export/generating")}
-      >
-        <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
-          locations={[0, 0.05, 0.8]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
+        <TouchableOpacity
+          style={styles.summaryWrapper}
+          onPress={() => router.push("/tabs/export/generating")}
         >
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryContent}>
-              <Text style={styles.cardTitle}>Generate Suggestions</Text>
-              <Text style={styles.cardSubtitle}>
-                Prepare for your medical appointment by generating a complete
-                and formal summary of your logs.
-              </Text>
+          <LinearGradient
+            colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
+            locations={[0, 0.05, 0.8]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradient}
+          >
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryContent}>
+                <Text style={styles.cardTitle}>Generate Suggestions</Text>
+                <Text style={styles.cardSubtitle}>
+                  Prepare for your medical appointment by generating a complete
+                  and formal summary of your logs.
+                </Text>
+              </View>
+              <View style={styles.arrowContainer}>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="white"
+                  style={styles.arrow}
+                />
+              </View>
             </View>
-            <View style={styles.arrowContainer}>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="white"
-                style={styles.arrow}
-              />
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-      <View style={styles.logContainer}>
-        <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", "#2C4DC7"]}
-          locations={[0, 0.01, 1]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.gradient, { padding: theme.spacing.md }]}
-        >
-          <Text style={styles.sectionTitle}>Health Plots</Text>
-          <PlotDisplayer></PlotDisplayer>
-          {/* <FlatList
+          </LinearGradient>
+        </TouchableOpacity>
+        <View style={styles.logContainer}>
+          <LinearGradient
+            colors={["#69BBDE", "#5CA2C0", theme.colors.darkPurple]}
+            locations={[0, 0.01, 0.4]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.gradient, { padding: theme.spacing.md }]}
+          >
+            <Text style={styles.sectionTitle}>Health Plots</Text>
+            <PlotDisplayer></PlotDisplayer>
+            {/* <FlatList
             data={logs}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -99,8 +99,8 @@ export default function Export() {
             )}
             contentContainerStyle={{ paddingBottom: 80 }}
           /> */}
-        </LinearGradient>
-      </View>
+          </LinearGradient>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
