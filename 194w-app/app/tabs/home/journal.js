@@ -38,7 +38,7 @@ export default function Page() {
   const { setJSONData, jsonData } = useJSONDataStore();
   // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
-  const { addJournalLog } = useJournalStore();  
+  const { addJournalLog } = useJournalStore();
 
   const { refetch } = useQuery({
     queryKey: ["keywords", text],
@@ -122,7 +122,7 @@ export default function Page() {
           console.error("❌ Supabase returned null. Insert might have failed.");
           throw new Error("Supabase insert failed - No data returned.");
         }
-        
+
         // eagerly add new log to journal store
         addJournalLog(data[0]);
 
@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: "absolute",
     top: "7%",
-    left: "5%",
-    opacity: 0.9,
+    left: "3%",
+    //opacity: 0.9,
   },
   errorText: { color: "red", marginTop: 10 },
   keywordsContainer: {
