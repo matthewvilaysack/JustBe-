@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -18,6 +19,7 @@ import BackButton from "@/src/components/ui/BackButton";
 import theme from "@/src/theme/theme";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 
+const { width, height } = Dimensions.get("window");
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.5;
 const ITEM_MARGIN = 30;
@@ -43,6 +45,7 @@ const painLevelDescriptions = {
   4: "Distracting pain but no interruptions",
   5: "Moderate pain that interrupts activities",
   5: "Moderate pain that interrupts activities",
+  5: "Moderate pain that interrupts activities",
   6: "Hard to ignore pain and avoiding activities",
   7: "Severe pain that is focus of attention",
   8: "Very severe pain that is hard to tolerate",
@@ -55,6 +58,10 @@ export default function Page() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { painLevel, setPainLevel } = usePainLevelStore();
   const flatListRef = useRef(null);
+
+  useEffect(() => {
+    setPainLevel(0);
+  }, []);
 
   useEffect(() => {
     setPainLevel(0);
@@ -82,6 +89,14 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
+
+      <View style={styles.background}>
       <BackButton
         onPress={() => {
           router.back();
@@ -147,6 +162,12 @@ export default function Page() {
             showArrow={true}
           />
         </View>
+        <View style={styles.footer}>
+          <NextButton
+            onPress={() => router.push("/tabs/home/journal")}
+            showArrow={true}
+          />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -161,10 +182,14 @@ const styles = StyleSheet.create({
     height: height,
     flexDirection: "column",
     justifyContent: "center",
+    height: height,
+    flexDirection: "column",
+    justifyContent: "center",
   },
   container: {
     justifyContent: "flex-start",
     alignItems: "center",
+    alignSelf: "center",
     alignSelf: "center",
     alignSelf: "center",
   },
@@ -173,7 +198,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
-    marginHorizontal: Theme.spacing.sm,
+    paddingHorizontal: Theme.spacing.sm,
   },
   description: {
     fontSize: Theme.typography.sizes.lg,
@@ -182,6 +207,7 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.regular,
   },
   carousel: {
+    height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
     height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
     height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
     minWidth: width,
@@ -201,6 +227,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     maxHeight: Theme.spacing.lg * 4,
     maxHeight: Theme.spacing.lg * 4,
+    maxHeight: Theme.spacing.lg * 4,
   },
   levelContainer: {
     backgroundColor: theme.colors.darkPurple,
@@ -217,6 +244,8 @@ const styles = StyleSheet.create({
     //opacity: 0.9,
     left: "3%",
     //opacity: 0.9,
+    left: "3%",
+    //opacity: 0.9,
   },
   footer: {
     position: "absolute",
@@ -225,8 +254,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
+    alignSelf: "flex-end",
+    maxHeight: height * 0.1,
     alignSelf: "flex-end",
     maxHeight: height * 0.1,
     alignSelf: "flex-end",

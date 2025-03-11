@@ -17,9 +17,11 @@ import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
 import { useQuery } from "@tanstack/react-query";
 import { extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
+import { extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 import { useJSONDataStore } from "@/src/store/jsonDataStore";
+import { statusBarHeight } from "@/src/components/ui/Constants";
 import { statusBarHeight } from "@/src/components/ui/Constants";
 import { addNewDetailedEntry } from "../../utils/supabase-helpers";
 import useJournalStore from "@/src/store/journalStore";
@@ -214,6 +216,13 @@ export default function Page() {
           showArrow={true}
         />
 
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+
         <View style={styles.container}>
           <Text style={styles.heading}>What symptoms are you feeling?</Text>
           <View style={styles.journalContainer}>
@@ -267,12 +276,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Theme.spacing.xl,
     paddingVertical: Theme.spacing.md,
-    marginTop: statusBarHeight + Theme.spacing.xxl,
+    marginTop: statusBarHeight,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
+    marginBottom: Theme.spacing.md,
     marginBottom: Theme.spacing.md,
     marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
@@ -294,10 +304,10 @@ const styles = StyleSheet.create({
   textArea: {
     fontSize: Theme.typography.sizes.lg,
     fontSize: Theme.typography.sizes.lg,
+    fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
+    maxHeight: "90%",
     minHeight: Theme.typography.sizes.lg * 5,
-    maxHeight: "95%",
-    marginHorizontal: Theme.spacing.sm,
   },
   buttonContainer: {
     position: "absolute",
