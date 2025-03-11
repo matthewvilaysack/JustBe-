@@ -196,8 +196,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: "absolute",
     top: "7%",
-    left: "5%",
-    opacity: 0.9,
+    left: "3%",
+    //opacity: 0.9,
   },
   footer: {
     position: "absolute",

@@ -52,6 +52,7 @@ const PainChart = ({ data }) => {
           theme={VictoryTheme.clean}
           scale={{ x: "time" }}
           width={width * 0.85}
+          padding={{ top: 20, bottom: 65, left: 60, right: 50 }}
         >
           <VictoryAxis
             style={{
@@ -127,7 +128,7 @@ const PieChart = ({ data, title }) => {
         data={formattedData}
         // colorScale={["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"]}
         colorScale={palette}
-        labelRadius={50}
+        labelRadius={90}
         labels={({ datum }) => `${datum.x}: ${datum.y}`} // Display both key and value
         style={{
           labels: { fill: "white", fontSize: 14 },
@@ -140,6 +141,7 @@ const PieChart = ({ data, title }) => {
             lineHeight={1.2}
             dx={0}
             dy={0}
+            angle={-20}
           />
         }
         width={width - 20}
@@ -182,9 +184,10 @@ const BarChart = ({ data, title }) => {
       <Text style={styles.title}> Most Common {title} </Text>
       <VictoryChart
         theme={VictoryTheme.clean}
-        domainPadding={{ x: 30, y: 15 }}
+        domainPadding={{ x: 20, y: 15 }}
         width={width - 20}
         height={chartHeight}
+        padding={{ top: 10, bottom: 50, left: 40, right: 40 }}
       >
         {/* X-axis */}
         <VictoryAxis
@@ -231,12 +234,12 @@ const BarChart = ({ data, title }) => {
           labels={({ datum }) => datum.x}
           labelComponent={
             <VictoryLabel
-              textAnchor="end" // Center text inside the bars
-              dx={-3} // Keep text centered
-              dy={3} // Adjust for better vertical alignment
+              textAnchor="start" // Center text inside the bars
+              dx={3} // Keep text centered
+              dy={0} // Adjust for better vertical alignment
               style={{
-                fill: "white", // Ensure visibility inside bars
-                fontSize: 10,
+                fill: "black", // Ensure visibility inside bars
+                fontSize: 12,
                 fontWeight: "normal",
               }}
             />
@@ -295,12 +298,6 @@ const PlotDisplayer = () => {
           <PainChart data={pain_data} />
 
           <PieChart data={count_data.symptoms} title="Symptoms" />
-
-          <PieChart data={count_data.sensation} title="Sensations" />
-
-          <PieChart data={count_data.causes} title="Causes" />
-
-          <PieChart data={count_data.concerns} title="Concerns" />
 
           <PieChart data={count_data.duration} title="Durations" />
 
