@@ -15,7 +15,6 @@ import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
-
 import { useKeywordStore } from "@/src/store/summaryStore";
 
 const { width, height } = Dimensions.get("window");
@@ -48,14 +47,12 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.buttonContainer}>
-        <BackButton
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
       <View style={styles.container}>
         <Text style={styles.heading}>I hear you're feeling</Text>
         <View style={styles.journalContainer}>
@@ -141,8 +138,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: "absolute",
     top: "7%",
-    left: "5%",
-    opacity: 0.8,
+    left: "3%",
+    //opacity: 0.8,
   },
   footer: {
     flexDirection: "row",

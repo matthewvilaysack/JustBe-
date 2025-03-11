@@ -4,41 +4,39 @@ import {
   View,
   ImageBackground,
   Text,
-  Dimensions,
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
-  ScrollView,
   ActivityIndicator,
   Alert,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
-
 import { useQuery } from "@tanstack/react-query";
-import { extractKeywords, extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
-import { supabase } from "../../../src/lib/api/supabase";
+import { extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 import { useJSONDataStore } from "@/src/store/jsonDataStore";
+import { statusBarHeight } from "@/src/components/ui/Constants";
 import { addNewDetailedEntry } from "../../utils/supabase-helpers";
+import useJournalStore from "@/src/store/journalStore";
 
 export default function Page() {
   const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const currentDate = new Date().toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
-  // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
+  const { addJournalLog } = useJournalStore();
 
-  const { isLoading, isError, refetch } = useQuery({
+  const { refetch } = useQuery({
     queryKey: ["keywords", text],
     queryFn: async () => {
-      // const fetchedKeywords = await extractKeywords(text);      
       const fetchedJSON = await extractDetailedEntryJSON(text);
       let fetchedKeywords = [];
       for (const key in fetchedJSON) {
@@ -46,11 +44,10 @@ export default function Page() {
           fetchedKeywords.push(fetchedJSON[key]);
         }
       }
-      console.log("Extracted Keywords ", fetchedKeywords);
+      console.log("Extracted Keywords:", fetchedKeywords);
       setKeywords(fetchedKeywords);
       setJSONData(fetchedJSON);
-      // console.log(fetchedJSON);
-      return fetchedKeywords;
+      return { keywords: fetchedKeywords, jsonData: fetchedJSON };
     },
     enabled: false,
   });
@@ -59,20 +56,26 @@ export default function Page() {
   - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
   issue w ios, need to research further into issue
   */
-  const fetchedKeywords = async(text) => {
+  const fetchedKeywords = async (text) => {
     console.log("🔹 Fetching latest keywords...");
     try {
-      const refetchResult = await refetch();  
-      const keywords = refetchResult.data || []; 
+      const refetchResult = await refetch();
+      const fetchedJSON = refetchResult.data?.jsonData || {};
+      const symptoms = fetchedJSON.symptoms
+        ? fetchedJSON.symptoms.split(",").map((s) => s.trim())
+        : [];
 
-      if (!keywords.length) {
+      console.log("✅ Extracted Symptoms:", symptoms);
+
+      if (!symptoms.length) {
         console.warn("⚠️ No keywords extracted.");
-        return null;
+        router.push("/tabs/home/confirm");
+        return { keywords: null, jsonData: null };
       }
 
-      console.log("✅ Extracted Keywords:", keywords);
-      return keywords;
-
+      setKeywords(symptoms); // only symptoms now
+      setJSONData(fetchedJSON);
+      return { keywords: keywords, jsonData: fetchedJSON };
     } catch (error) {
       console.error(`❌ Error extracting keywords:`, error);
 
@@ -85,24 +88,27 @@ export default function Page() {
             { text: "Retry", onPress: () => fetchKeywords(text) },
           ]
         );
-        return null;
+        return { keywords: null, jsonData: null };
       }
     }
-    return null;
+    return { keywords: null, jsonData: null };
   };
 
   /* update supabase backend with fetched JSON/symptoms 
     - introducing temp fix of 3 retries as there is a cur POST/HTTP request 
   issue w ios, need to research further into issue
   */
-  const saveToSupabase  = async (updateData, retryCount = 3) => {
+  const saveToSupabase = async (updateData, retryCount = 3) => {
     console.log("🔹 Attempting to update Supabase...");
     while (retryCount > 0) {
       try {
         const { data, error } = await addNewDetailedEntry(updateData);
 
         if (error) {
-          console.error(`❌ Supabase Error (Attempts left: ${retryCount - 1}):`, error);
+          console.error(
+            `❌ Supabase Error (Attempts left: ${retryCount - 1}):`,
+            error
+          );
           throw error;
         }
 
@@ -110,11 +116,17 @@ export default function Page() {
           console.error("❌ Supabase returned null. Insert might have failed.");
           throw new Error("Supabase insert failed - No data returned.");
         }
-        
+
+        // eagerly add new log to journal store
+        addJournalLog(data[0]);
+
         console.log("✅ Supabase Updated:", data);
         return true;
       } catch (err) {
-        console.error(`❌ Supabase Update Failed (Attempts left: ${retryCount - 1}):`, err);
+        console.error(
+          `❌ Supabase Update Failed (Attempts left: ${retryCount - 1}):`,
+          err
+        );
         retryCount--;
         if (retryCount === 0) {
           Alert.alert(
@@ -127,7 +139,9 @@ export default function Page() {
           );
           return false;
         }
-        console.warn(`⚠️ Retrying Supabase Update... ${retryCount} attempts left`);
+        console.warn(
+          `⚠️ Retrying Supabase Update... ${retryCount} attempts left`
+        );
         await new Promise((resolve) => setTimeout(resolve, 2000)); // Delay before retry
       }
     }
@@ -136,20 +150,24 @@ export default function Page() {
 
   /* display keywords screen */
   const displayKeywords = async (text, router) => {
-    setJSONData(null);
-    
-    console.log("json data should be null", jsonData);
-    const keywords = await fetchedKeywords(text);
-    if (!keywords) return; // stop if keyword extraction fails
+    setLoading(true); // Show spinner at start
+    const { keywords, jsonData } = await fetchedKeywords(text);
+    if (!keywords || !jsonData) {
+      setLoading(false); // Hide spinner if Together AI fails
+      return;
+    }
     console.log("Entry Text: ", text);
-    
+    console.log("Extracted JSON data", jsonData);
+
     // get json from LLM output, add entry_text and pain_rating
-    console.log("json data", jsonData);
-    let updateData = jsonData; 
-    updateData.entry_text = text;
-    updateData.pain_rating = painLevel;
+    const updateData = {
+      ...jsonData,
+      entry_text: text,
+      pain_rating: painLevel,
+    };
 
     const success = await saveToSupabase(updateData);
+    setLoading(false); // Hide spinner after Supabase update completes
     if (!success) return; // stop if Supabase update fails
 
     router.push("/tabs/home/summary");
@@ -162,14 +180,13 @@ export default function Page() {
         resizeMode="cover"
         style={styles.background}
       >
-        <View style={styles.buttonContainer}>
-          <BackButton
-            onPress={() => {
-              router.back();
-            }}
-            showArrow={true}
-          />
-        </View>
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+
         <View style={styles.container}>
           <Text style={styles.heading}>What symptoms are you feeling?</Text>
           <View style={styles.journalContainer}>
@@ -186,7 +203,7 @@ export default function Page() {
           </View>
         </View>
 
-        {isLoading && (
+        {loading && (
           <ActivityIndicator
             size="large"
             color="white"
@@ -214,13 +231,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: Theme.spacing.xl,
+    paddingHorizontal: Theme.spacing.xl,
+    paddingVertical: Theme.spacing.md,
+    marginTop: statusBarHeight,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
-    marginBottom: Theme.spacing.xl,
+    marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
   },
   dateText: {
@@ -231,7 +250,6 @@ const styles = StyleSheet.create({
   },
   journalContainer: {
     backgroundColor: "white",
-    minHeight: "40%",
     minWidth: "100%",
     borderRadius: Theme.radius.lg,
     borderWidth: 1,
@@ -239,14 +257,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   textArea: {
-    fontSize: Theme.typography.sizes.xl,
+    fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
+    maxHeight: "90%",
+    minHeight: Theme.typography.sizes.lg * 5,
   },
   buttonContainer: {
     position: "absolute",
     top: "7%",
-    left: "5%",
-    opacity: 0.9,
+    left: "3%",
+    //opacity: 0.9,
   },
   errorText: { color: "red", marginTop: 10 },
   keywordsContainer: {

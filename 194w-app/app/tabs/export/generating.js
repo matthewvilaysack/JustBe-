@@ -4,19 +4,52 @@ import Theme from "@/src/theme/theme";
 import { useRouter } from "expo-router";
 import LoadingThinkingBlob from "@/src/animations/LoadingThinkingBlob";
 import { extractExport } from "@/src/lib/api/togetherai";
+import {
+  fetchDetailedEntriesForUser,
+  formatEntriesForAI,
+} from "../../utils/supabase-helpers";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
+import { useUserPainStore } from "@/src/store/userPainStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function GeneratingPage() {
   const router = useRouter();
   const { setSuggestions } = useSuggestionStore();
+  const { setPainType, setPainDuration } = useUserPainStore();
 
   useEffect(() => {
+    const loadPainData = async () => {
+      const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
+      const storedDuration =
+        (await AsyncStorage.getItem("painDuration")) || "Unknown";
+      setPainType(storedType);
+      setPainDuration(storedDuration);
+    };
+
     const fetchData = async () => {
       try {
-        // TODO: Replace this journal entry with your actual data
-        const journalEntry =
-          "I started feeling extremely fatigued three days ago. At first, it was mild, but by the second day, I felt so exhausted that even small tasks like walking to the kitchen felt draining. I also started experiencing dizziness, especially when standing up quickly. Yesterday, I noticed nausea that made it difficult to eat, and this morning, I nearly vomited after trying to have breakfast. The symptoms seem to be getting worse each day.";
-        const output = await extractExport(journalEntry);
+        await loadPainData();
+
+        const entries = await fetchDetailedEntriesForUser();
+        if (!entries) {
+          Alert.alert(
+            "No Entries",
+            "No journal entries found for your account."
+          );
+          router.push("/tabs/home"); // Redirect to a safer page if no entry found
+          return;
+        }
+
+        const combinedJournalText = formatEntriesForAI(entries);
+        console.log("raw combined text:", combinedJournalText);
+        const output = await extractExport(combinedJournalText);
+        if (!output.length) {
+          Alert.alert(
+            "No Suggestions",
+            "AI could not generate any suggestions."
+          );
+          return;
+        }
         setSuggestions(output);
         router.push("/tabs/export/summary");
       } catch (error) {
@@ -35,7 +68,9 @@ export default function GeneratingPage() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Generating Summary...</Text>
-        <LoadingThinkingBlob />
+        <View style={styles.blobImage}>
+          <LoadingThinkingBlob />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -57,12 +92,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.bold,
   },
   blobImage: {
-    width: 250,
-    height: 250,
-    resizeMode: "contain",
-  },
-  buttonContainer: {
-    marginVertical: 10,
-    flexDirection: "row",
+    marginTop: Theme.spacing.xl,
   },
 });

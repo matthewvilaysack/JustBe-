@@ -1,8 +1,17 @@
-import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  View,
+  StatusBar,
+} from "react-native";
 import Theme from "@/src/theme/theme";
 import ArrowLeft from "./ArrowLeft";
+import Constants from "expo-constants";
 
-export default function Button({
+const statusBarHeight = Constants.statusBarHeight;
+
+export default function BackButton({
   title,
   onPress,
   variant = "primary", // primary or secondary
@@ -11,42 +20,48 @@ export default function Button({
   style,
 }) {
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        variant === "secondary" && styles.buttonSecondary,
-        disabled && styles.buttonDisabled,
-        style,
-      ]}
-      onPress={onPress}
-      disabled={disabled}
-    >
-      {/* Text Button */}
-      {!showArrow && (
-        <Text
-          style={[
-            styles.text,
-            variant === "secondary" && styles.textSecondary,
-            disabled && styles.textDisabled,
-          ]}
-        >
-          {title}
-        </Text>
-      )}
+    <View style={styles.buttonContainer}>
+      <TouchableOpacity
+        style={[
+          styles.button,
+          variant === "secondary" && styles.buttonSecondary,
+          disabled && styles.buttonDisabled,
+          style,
+        ]}
+        onPress={onPress}
+        disabled={disabled}
+      >
+        {/* Text Button */}
+        {!showArrow && (
+          <Text
+            style={[
+              styles.text,
+              variant === "secondary" && styles.textSecondary,
+              disabled && styles.textDisabled,
+            ]}
+          >
+            {title}
+          </Text>
+        )}
 
-      {showArrow && <ArrowLeft />}
-    </TouchableOpacity>
+        {showArrow && <ArrowLeft />}
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    position: "absolute",
+    top: StatusBar.currentHeight || statusBarHeight,
+    left: 20,
+    opacity: 0.9,
+    zIndex: 10,
+    alignSelf: "flex-start",
+  },
   button: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 10,
-    backgroundColor: Theme.colors.white,
-    borderRadius: Theme.radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
     ...Theme.shadows.button,
   },
   buttonSecondary: {

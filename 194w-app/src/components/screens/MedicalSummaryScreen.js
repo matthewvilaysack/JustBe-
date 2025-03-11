@@ -1,13 +1,16 @@
-import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, ScrollView } from "react-native";
 import theme from "@/src/theme/theme";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
+import { useUserPainStore } from "@/src/store/userPainStore";
 import MedicalSummaryHeader from "@/src/components/ui/MedicalSummaryHeader";
 
 // TODO: fetch data from supabase
-const DIAGNOSES = ["Anemia", "Gastroenteritis"];
+//const DIAGNOSES = ["Anemia", "Gastroenteritis"];
 
 const MedicalSummaryScreen = ({
   dateTime,
+  painType,
+  painDuration,
   handleGeneratePDF,
   handleSharePDF,
 }) => {
@@ -20,14 +23,21 @@ const MedicalSummaryScreen = ({
         handleSharePDF={handleSharePDF}
       />
       <View style={styles.content}>
-        <Text style={styles.title}>Comprehensive Summary</Text>
-        <Text style={styles.date}>Generated on {dateTime}</Text>
+        <ScrollView>
+          <Text style={styles.title}>Comprehensive Summary</Text>
+          <Text style={styles.date}>Generated on {dateTime}</Text>
 
-        <Section
-          title="What you can bring up during your next appointment"
-          items={suggestions}
-        />
-        <Section title="Reminder of relevant diagnoses" items={DIAGNOSES} />
+          <Section
+            title="What you can bring up during your next appointment"
+            items={suggestions}
+          />
+          <Section
+            title="Pain History"
+            items={[
+              `You have reported experiencing ${painType} for ${painDuration}.`,
+            ]}
+          />
+        </ScrollView>
       </View>
       <View style={styles.footer}>
         <Text style={styles.pageNumber}>Page 1/1</Text>
