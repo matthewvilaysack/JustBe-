@@ -12,6 +12,7 @@ import {
   Text,
   View,
   ScrollView,
+  ScrollView,
   FlatList,
   Dimensions,
   TouchableOpacity,
@@ -23,6 +24,7 @@ import { useRouter, Link } from "expo-router";
 import theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import PlotDisplayer from "./plots";
 import PlotDisplayer from "./plots";
 
 const { width } = Dimensions.get("window");

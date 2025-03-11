@@ -50,6 +50,12 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
       <View style={styles.container}>
         <Text style={styles.heading}>I hear you're feeling</Text>
         <View style={styles.listContainer}>

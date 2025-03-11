@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -18,6 +19,7 @@ import BackButton from "@/src/components/ui/BackButton";
 import theme from "@/src/theme/theme";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 
+const { width, height } = Dimensions.get("window");
 const { width, height } = Dimensions.get("window");
 const ITEM_WIDTH = width * 0.5;
 const ITEM_MARGIN = 30;

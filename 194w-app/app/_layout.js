@@ -1,6 +1,8 @@
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/api/supabase";
 import { updateUserProfile } from "@/src/lib/api/utils";
 
@@ -25,12 +27,13 @@ export default function RootLayout() {
         setHasCompletedOnboarding(hasOnboarded === 'true');
 
         // Update profile if needed
-        if (hasOnboarded === "true" && initialSession?.user) {
+        if (hasOnboarded === "true" && session?.user) {
           const painType = await AsyncStorage.getItem("painType");
           const painDuration = await AsyncStorage.getItem("painDuration");
           if (painType && painDuration) {
             await updateUserProfile(initialSession.user.id, {
               pain_type: painType,
+              pain_duration: painDuration,
               pain_duration: painDuration,
             });
             // Only clear these specific items
@@ -38,7 +41,7 @@ export default function RootLayout() {
           }
         }
       } catch (error) {
-        console.error("Error during initialization:", error);
+        console.error("Error checking app state:", error);
       } finally {
         setIsLoading(false);
       }
@@ -93,3 +96,4 @@ export default function RootLayout() {
     </Stack>
   );
 }
+
