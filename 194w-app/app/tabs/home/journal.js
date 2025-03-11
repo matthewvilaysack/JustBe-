@@ -10,21 +10,16 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
-
 import { useQuery } from "@tanstack/react-query";
-import {
-  extractKeywords,
-  extractDetailedEntryJSON,
-} from "@/src/lib/api/togetherai";
-import { supabase } from "../../../src/lib/api/supabase";
+import { extractDetailedEntryJSON } from "@/src/lib/api/togetherai";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
 import { useJSONDataStore } from "@/src/store/jsonDataStore";
+import { statusBarHeight } from "@/src/components/ui/Constants";
 import { addNewDetailedEntry } from "../../utils/supabase-helpers";
 import useJournalStore from "@/src/store/journalStore";
 
@@ -38,7 +33,6 @@ export default function Page() {
     .toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
-  // const [jsonData, setJSONData] = useState([]);
   const { painLevel } = usePainLevelStore();
   const { addJournalLog } = useJournalStore();
 
@@ -188,14 +182,13 @@ export default function Page() {
         resizeMode="cover"
         style={styles.background}
       >
-        <View style={styles.buttonContainer}>
-          <BackButton
-            onPress={() => {
-              router.back();
-            }}
-            showArrow={true}
-          />
-        </View>
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+
         <View style={styles.container}>
           <Text style={styles.heading}>What symptoms are you feeling?</Text>
           <View style={styles.journalContainer}>
@@ -240,13 +233,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: Theme.spacing.xl,
-    marginTop: Theme.spacing.lg * 3,
+    paddingHorizontal: Theme.spacing.xl,
+    paddingVertical: Theme.spacing.md,
+    marginTop: statusBarHeight,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
+    marginBottom: Theme.spacing.md,
     marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
   },
@@ -258,7 +253,6 @@ const styles = StyleSheet.create({
   },
   journalContainer: {
     backgroundColor: "white",
-    flex: 1,
     minWidth: "100%",
     borderRadius: Theme.radius.lg,
     borderWidth: 1,
@@ -267,8 +261,10 @@ const styles = StyleSheet.create({
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,
+    fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
     maxHeight: "90%",
+    minHeight: Theme.typography.sizes.lg * 5,
   },
   buttonContainer: {
     position: "absolute",

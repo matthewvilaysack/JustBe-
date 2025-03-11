@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
-import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/api/supabase";
 import { updateUserProfile } from "@/src/lib/api/utils";
 
@@ -24,20 +24,20 @@ export default function RootLayout() {
         const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
         setHasCompletedOnboarding(hasOnboarded === 'true');
         // Update profile if needed
-        if (hasOnboarded === 'true' && session?.user) {
+        if (hasOnboarded === "true" && session?.user) {
           const painType = await AsyncStorage.getItem("painType");
           const painDuration = await AsyncStorage.getItem("painDuration");
           if (painType && painDuration) {
             await updateUserProfile(session.user.id, {
               pain_type: painType,
-              pain_duration: painDuration
+              pain_duration: painDuration,
             });
             // Only clear these specific items
             await AsyncStorage.multiRemove(["painType", "painDuration"]);
           }
         }
       } catch (error) {
-        console.error('Error checking app state:', error);
+        console.error("Error checking app state:", error);
       } finally {
         setIsLoading(false);
       }

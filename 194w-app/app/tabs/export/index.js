@@ -12,16 +12,19 @@ import {
   Text,
   View,
   ScrollView,
+  ScrollView,
   FlatList,
   Dimensions,
   TouchableOpacity,
   Alert,
   ImageBackground,
+  SafeAreaView,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
 import theme from "@/src/theme/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import PlotDisplayer from "./plots";
 import PlotDisplayer from "./plots";
 
 const { width } = Dimensions.get("window");
@@ -43,66 +46,68 @@ export default function Export() {
       resizeMode="cover"
       style={styles.background}
     >
-      <TouchableOpacity
-        style={styles.summaryWrapper}
-        onPress={() => router.push("/tabs/export/generating")}
-      >
-        <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
-          locations={[0, 0.05, 0.8]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
+      <SafeAreaView style={styles.background}>
+        <TouchableOpacity
+          style={styles.summaryWrapper}
+          onPress={() => router.push("/tabs/export/generating")}
         >
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryContent}>
-              <Text style={styles.cardTitle}>Generate Suggestions</Text>
-              <Text style={styles.cardSubtitle}>
-                Prepare for your medical appointment by generating a complete
-                and formal summary of your logs.
-              </Text>
+          <LinearGradient
+            colors={["#69BBDE", "#5CA2C0", "#2B4F8E"]}
+            locations={[0, 0.05, 0.8]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradient}
+          >
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryContent}>
+                <Text style={styles.cardTitle}>Generate Suggestions</Text>
+                <Text style={styles.cardSubtitle}>
+                  Prepare for your medical appointment by generating a complete
+                  and formal summary of your logs.
+                </Text>
+              </View>
+              <View style={styles.arrowContainer}>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="white"
+                  style={styles.arrow}
+                />
+              </View>
             </View>
-            <View style={styles.arrowContainer}>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="white"
-                style={styles.arrow}
-              />
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.summaryWrapper}
-        onPress={() => router.push("/tabs/export/plots")}
-      >
-        <LinearGradient
-          colors={["#69BBDE", "#5CA2C0", theme.colors.darkPurple]}
-          locations={[0, 0.01, 0.4]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.gradient]}
+          </LinearGradient>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.summaryWrapper}
+          onPress={() => router.push("/tabs/export/plots")}
         >
-          <View style={styles.summaryContainer}>
-            <View style={styles.summaryContent}>
-              <Text style={styles.cardTitle}>Health Plots</Text>
-              <Text style={styles.cardSubtitle}>
-                Get an overview glance at your logging history, including trends
-                and insights.
-              </Text>
+          <LinearGradient
+            colors={["#69BBDE", "#5CA2C0", theme.colors.darkPurple]}
+            locations={[0, 0.1, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.gradient]}
+          >
+            <View style={styles.summaryContainer}>
+              <View style={styles.summaryContent}>
+                <Text style={styles.cardTitle}>Health Plots</Text>
+                <Text style={styles.cardSubtitle}>
+                  Get an overview glance at your logging history, including
+                  trends and insights.
+                </Text>
+              </View>
+              <View style={styles.arrowContainer}>
+                <Ionicons
+                  name="chevron-forward"
+                  size={24}
+                  color="white"
+                  style={styles.arrow}
+                />
+              </View>
             </View>
-            <View style={styles.arrowContainer}>
-              <Ionicons
-                name="chevron-forward"
-                size={24}
-                color="white"
-                style={styles.arrow}
-              />
-            </View>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
+          </LinearGradient>
+        </TouchableOpacity>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -110,13 +115,17 @@ export default function Export() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    paddingTop: theme.spacing.xxl,
+    paddingTop: theme.spacing.xxl * 2,
+    paddingBottom: theme.spacing.xxl,
+    justifyContent: "center",
   },
   summaryWrapper: {
     margin: theme.spacing.md,
+    flex: 1,
   },
   gradient: {
     borderRadius: theme.radius.lg,
+    flex: 1,
   },
   summaryContainer: {
     flexDirection: "row",
@@ -125,8 +134,9 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
   },
   summaryContent: {
+    height: "100%",
     flexDirection: "column",
-    maxWidth: "80%",
+    // justifyContent: "space-around",
   },
   card: {
     //backgroundColor: theme.colors.lightBlue,  // need to figure out how to copy the gradient background on figma
