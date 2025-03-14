@@ -165,7 +165,9 @@ const BarChart = ({ data, title }) => {
     x: key, // JSON key as x (label)
     y: value, // JSON value as y (numeric data)
   }));
-  formattedData = formattedData.sort((a, b) => a.y - b.y);
+  formattedData = formattedData.sort((a, b) => a.y - b.y); // limit to 6 
+  console.log(formattedData);
+  formattedData = formattedData.slice(-6); 
 
   const lenFirstKey = formattedData[formattedData.length-1]["x"].length;
   // console.log(lenFirstKey);
@@ -319,7 +321,7 @@ const PlotDisplayer = () => {
           <BarChart data={count_data["when-does-it-hurt"]} title="Timings" />
 
           <BarChart data={count_data["context"]} title="Context" />
-          
+
           <PieChart data={count_data["sensation"]} title="Sensations" />
         </View>
       </ScrollView>
