@@ -1,6 +1,6 @@
-import { StyleSheet, View, ImageBackground, Text, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ImageBackground, Text, ActivityIndicator, Animated, Easing } from "react-native";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/NextButton";
 import useJournalStore from "@/src/store/journalStore";
@@ -10,10 +10,12 @@ import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
 
+
 export default function Page() {
   const router = useRouter();
   const [painRating, setPainRating] = useState(0);
   const { getJournalLogs, isLoading, journalLogs } = useJournalStore();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const loadData = async () => {
@@ -31,6 +33,29 @@ export default function Page() {
     setPainRating(latestLog?.pain_rating ?? 0);
   }, [journalLogs]); 
 
+  useEffect(() => {
+    const bounce = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 0.9,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    bounce.start();
+
+    return () => bounce.stop();
+  }, [scaleAnim]);
+
   const PainBlob = () => {
     if (isLoading) {
       return (
@@ -40,26 +65,34 @@ export default function Page() {
       );
     }
 
-    switch (painRating) {
-      case 0:
-        return <LoadingNoPainBlob size={150} />;
-      case 1:
-      case 2:
-        return <LoadingMildPainBlob size={150} />;
-      case 3:
-      case 4:
-        return <LoadingSeverePainBlob size={150} />;
-      case 5:
-      case 6:
-        return <LoadingVerySeverePainBlob size={150} />;
-      case 7:
-      case 8:
-      case 9:
-      case 10:
-        return <LoadingWorstPainBlob size={150} />;
-      default:
-        return <LoadingNoPainBlob size={150} />;
-    }
+    const BlobComponent = (() => {
+      switch (painRating) {
+        case 0:
+          return LoadingNoPainBlob;
+        case 1:
+        case 2:
+          return LoadingMildPainBlob;
+        case 3:
+        case 4:
+          return LoadingSeverePainBlob;
+        case 5:
+        case 6:
+          return LoadingVerySeverePainBlob;
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+          return LoadingWorstPainBlob;
+        default:
+          return LoadingNoPainBlob;
+      }
+    })();
+
+    return (
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <BlobComponent size={150} />
+      </Animated.View>
+    );
   };
 
   return (
