@@ -210,7 +210,6 @@ export default function History() {
                       }
                     )}
                   </Text>
-
                   {selectedLog && selectedLog.length > 0 ? (
                     selectedLog
                       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))

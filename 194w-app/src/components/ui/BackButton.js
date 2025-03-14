@@ -62,9 +62,6 @@ const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderRadius: Theme.radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
     ...Theme.shadows.button,
   },
   buttonSecondary: {

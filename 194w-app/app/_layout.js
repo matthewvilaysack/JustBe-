@@ -23,6 +23,7 @@ export default function RootLayout() {
       try {
         const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
         setHasCompletedOnboarding(hasOnboarded === 'true');
+
         // Update profile if needed
         if (hasOnboarded === "true" && session?.user) {
           const painType = await AsyncStorage.getItem("painType");
@@ -61,28 +62,28 @@ export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       {session ? (
-        <Stack.Screen 
-          name="tabs" 
-          options={{ 
+        <Stack.Screen
+          name="tabs"
+          options={{
             headerShown: false,
-            gestureEnabled: false 
-          }} 
+            gestureEnabled: false,
+          }}
         />
       ) : !hasCompletedOnboarding ? (
-        <Stack.Screen 
-          name="onboarding" 
+        <Stack.Screen
+          name="onboarding"
           options={{
             headerShown: false,
-            gestureEnabled: false
-          }} 
+            gestureEnabled: false,
+          }}
         />
       ) : (
-        <Stack.Screen 
-          name="index" 
+        <Stack.Screen
+          name="index"
           options={{
             headerShown: false,
-            gestureEnabled: false
-          }} 
+            gestureEnabled: false,
+          }}
         />
       )}
     </Stack>

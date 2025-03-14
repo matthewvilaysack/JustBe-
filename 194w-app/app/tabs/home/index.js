@@ -9,7 +9,6 @@ import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
 import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
-
 export default function Page() {
   const router = useRouter();
   const [painRating, setPainRating] = useState(0);
@@ -61,6 +60,31 @@ export default function Page() {
         return <LoadingNoPainBlob size={150} />;
     }
   };
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const bounce = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 0.9, // Grow
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1, // Shrink back
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    bounce.start();
+
+    return () => bounce.stop(); // Cleanup on unmount
+  }, [scaleAnim]);
 
   return (
     <ImageBackground
