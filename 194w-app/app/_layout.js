@@ -36,7 +36,6 @@ export default function RootLayout() {
               pain_duration: painDuration,
               pain_duration: painDuration,
             });
-            // Only clear these specific items
             await AsyncStorage.multiRemove(["painType", "painDuration"]);
           }
         }
