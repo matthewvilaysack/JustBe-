@@ -116,6 +116,9 @@ const PieChart = ({ data, title }) => {
   // if (Object.keys(data).length > 5) {
   //   return <BarChart data={data} title={title} />;
   // }
+  // if (Object.keys(data).length > 5) {
+  //   return <BarChart data={data} title={title} />;
+  // }
 
   // Convert JSON object into an array format that VictoryPie understands
   let formattedData = Object.entries(data).map(([key, value]) => ({
