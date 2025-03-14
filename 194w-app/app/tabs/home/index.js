@@ -9,6 +9,8 @@ import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
 import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
+import { supabase } from '@/src/lib/api/supabase';
+import PainTracker from '@/src/components/ui/PainTracker';
 
 
 export default function Page() {
@@ -16,6 +18,7 @@ export default function Page() {
   const [painRating, setPainRating] = useState(0);
   const { getJournalLogs, isLoading, journalLogs } = useJournalStore();
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [painType, setPainType] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -55,6 +58,25 @@ export default function Page() {
 
     return () => bounce.stop();
   }, [scaleAnim]);
+
+  useEffect(() => {
+    async function fetchPainType() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('pain_type')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (!error && data) {
+          setPainType(data.pain_type);
+        }
+      }
+    }
+
+    fetchPainType();
+  }, []);
 
   const PainBlob = () => {
     if (isLoading) {
@@ -96,26 +118,29 @@ export default function Page() {
   };
 
   return (
-    <ImageBackground
-      source={require("@/assets/background.png")}
-      resizeMode="cover"
-      style={styles.background}
-    >
-      <View style={styles.container}>
-        <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
-        <PainBlob />
-        <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
-          <Button
-            title="Log Entry"
-            onPress={() => router.push("/tabs/home/painscale")}
-          />
-          <Button
-            title="History"
-            onPress={() => router.push("/tabs/home/history")}
-          />
+    <View style={{ flex: 1 }}>
+      <PainTracker painType={painType} />
+      <ImageBackground
+        source={require("@/assets/background.png")}
+        resizeMode="cover"
+        style={styles.background}
+      >
+        <View style={styles.container}>
+          <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
+          <PainBlob />
+          <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
+            <Button
+              title="Log Entry"
+              onPress={() => router.push("/tabs/home/painscale")}
+            />
+            <Button
+              title="History"
+              onPress={() => router.push("/tabs/home/history")}
+            />
+          </View>
         </View>
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+    </View>
   );
 }
 
