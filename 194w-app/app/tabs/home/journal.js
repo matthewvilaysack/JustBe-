@@ -175,6 +175,11 @@ export default function Page() {
     router.push("/tabs/home/summary");
   };
 
+  // Add this new function to handle submit editing
+  const handleSubmitEditing = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
@@ -201,6 +206,9 @@ export default function Page() {
               value={text}
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
+              blurOnSubmit={true}
+              onSubmitEditing={handleSubmitEditing}
+              returnKeyType="done"
             />
           </View>
         </View>
