@@ -125,7 +125,7 @@ export default function Page() {
         style={styles.background}
       >
         <View style={styles.container}>
-          <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
+          <Text style={styles.heading}>Hi,{"\n"}how's your {painType} today?</Text>
           <PainBlob />
           <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
             <Button
@@ -157,6 +157,8 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
+    marginLeft: 20,
+    marginRight: 20,
     marginBottom: 20,
   },
   blobImage: {
