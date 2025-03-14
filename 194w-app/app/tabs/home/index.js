@@ -85,26 +85,34 @@ export default function Page() {
       );
     }
 
-    switch (painRating) {
-      case 0:
-        return <LoadingNoPainBlob size={150} />;
-      case 1:
-      case 2:
-        return <LoadingMildPainBlob size={150} />;
-      case 3:
-      case 4:
-        return <LoadingSeverePainBlob size={150} />;
-      case 5:
-      case 6:
-        return <LoadingVerySeverePainBlob size={150} />;
-      case 7:
-      case 8:
-      case 9:
-      case 10:
-        return <LoadingWorstPainBlob size={150} />;
-      default:
-        return <LoadingNoPainBlob size={150} />;
-    }
+    const BlobComponent = (() => {
+      switch (painRating) {
+        case 0:
+          return LoadingNoPainBlob;
+        case 1:
+        case 2:
+          return LoadingMildPainBlob;
+        case 3:
+        case 4:
+          return LoadingSeverePainBlob;
+        case 5:
+        case 6:
+          return LoadingVerySeverePainBlob;
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+          return LoadingWorstPainBlob;
+        default:
+          return LoadingNoPainBlob;
+      }
+    })();
+
+    return (
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <BlobComponent size={150} />
+      </Animated.View>
+    );
   };
 
   return (
