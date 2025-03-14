@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
@@ -28,7 +27,6 @@ import useJournalStore from "@/src/store/journalStore";
 export default function Page() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const router = useRouter();

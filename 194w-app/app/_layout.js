@@ -1,11 +1,8 @@
-import { Stack } from "expo-router";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/api/supabase";
 import { updateUserProfile } from "@/src/lib/api/utils";
-
+import { Stack } from "expo-router";
 export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
