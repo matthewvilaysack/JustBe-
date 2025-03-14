@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
@@ -30,11 +31,13 @@ export default function Page() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const router = useRouter();
   const now = new Date();
-  const currentDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
-    .toLocaleDateString();
+  const currentDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
   const { painLevel } = usePainLevelStore();
@@ -182,11 +185,11 @@ export default function Page() {
   // Add keyboard listeners
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => setKeyboardVisible(true)
     );
     const keyboardDidHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => setKeyboardVisible(false)
     );
 
@@ -197,7 +200,7 @@ export default function Page() {
   }, []);
 
   const handleKeyPress = ({ nativeEvent }) => {
-    if (nativeEvent.key === 'Enter') {
+    if (nativeEvent.key === "Enter") {
       Keyboard.dismiss();
     }
   };
@@ -239,6 +242,10 @@ export default function Page() {
               blurOnSubmit={true}
               onKeyPress={handleKeyPress}
               onSubmitEditing={() => Keyboard.dismiss()}
+              returnKeyType="done"
+              blurOnSubmit={true}
+              onKeyPress={handleKeyPress}
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
           </View>
         </View>
@@ -251,10 +258,12 @@ export default function Page() {
           />
         )}
 
-        <View style={[
-          styles.footer,
-          keyboardVisible && { marginBottom: Platform.OS === 'ios' ? 20 : 0 }
-        ]}>
+        <View
+          style={[
+            styles.footer,
+            keyboardVisible && { marginBottom: Platform.OS === "ios" ? 20 : 0 },
+          ]}
+        >
           <NextButton
             onPress={() => displayKeywords(text, router)}
             showArrow={true}
@@ -300,7 +309,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
     padding: 10,
-    flex: 1,
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,

@@ -8,13 +8,28 @@ import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
 import { usePainLevelStore } from "@/src/store/painlevelStore";
+import LoadingNoPainBlob from "@/src/animations/LoadingNoPainBlob";
+import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
+import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
+import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
+import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
+import { usePainLevelStore } from "@/src/store/painlevelStore";
 
 export default function Page() {
   const router = useRouter();
   const [showSuccess, setShowSuccess] = useState(false);
   const { painLevel } = usePainLevelStore();
 
+  const [showSuccess, setShowSuccess] = useState(false);
+  const { painLevel } = usePainLevelStore();
+
   useEffect(() => {
+    // Show loading for 1 second, then success for 1 second
+    const loadingTimer = setTimeout(() => {
+      setShowSuccess(true);
+    }, 1000);
+
+    const navigationTimer = setTimeout(() => {
     // Show loading for 1 second, then success for 1 second
     const loadingTimer = setTimeout(() => {
       setShowSuccess(true);
@@ -28,7 +43,34 @@ export default function Page() {
       clearTimeout(loadingTimer);
       clearTimeout(navigationTimer);
     };
+    return () => {
+      clearTimeout(loadingTimer);
+      clearTimeout(navigationTimer);
+    };
   }, [router]);
+
+  const PainBlob = () => {
+    switch (painLevel) {
+      case 0:
+        return <LoadingNoPainBlob size={150} />;
+      case 1:
+      case 2:
+        return <LoadingMildPainBlob size={150} />;
+      case 3:
+      case 4:
+        return <LoadingSeverePainBlob size={150} />;
+      case 5:
+      case 6:
+        return <LoadingVerySeverePainBlob size={150} />;
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+        return <LoadingWorstPainBlob size={150} />;
+      default:
+        return <LoadingNoPainBlob size={150} />;
+    }
+  };
 
   const PainBlob = () => {
     switch (painLevel) {
@@ -79,6 +121,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: Theme.spacing.xl,
+  },
+  contentContainer: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   contentContainer: {
     alignItems: "center",
