@@ -194,6 +194,12 @@ export default function Page() {
     };
   }, []);
 
+  const handleKeyPress = ({ nativeEvent }) => {
+    if (nativeEvent.key === 'Enter') {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
@@ -220,13 +226,10 @@ export default function Page() {
               value={text}
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
-              returnKeyType={Platform.OS === 'ios' ? 'default' : 'none'}
-              blurOnSubmit={false}
-              onBlur={() => {
-                if (keyboardVisible) {
-                  Keyboard.dismiss();
-                }
-              }}
+              returnKeyType="done"
+              blurOnSubmit={true}
+              onKeyPress={handleKeyPress}
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
           </View>
         </View>
