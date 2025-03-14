@@ -119,7 +119,7 @@ export default function Page() {
 
   return (
     <View style={{ flex: 1 }}>
-      <PainTracker painType={painType} />
+      {/* <PainTracker painType={painType} /> */}
       <ImageBackground
         source={require("@/assets/background.png")}
         resizeMode="cover"
