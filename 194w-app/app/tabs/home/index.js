@@ -1,6 +1,6 @@
-import { StyleSheet, View, ImageBackground, Text, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ImageBackground, Text, ActivityIndicator, Animated, Easing } from "react-native";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/NextButton";
 import LoadingNoPainBlob from "@/src/animations/LoadingNoPainBlob";
@@ -13,6 +13,7 @@ export default function Page() {
   const router = useRouter();
   const [painRating, setPainRating] = useState(0);
   const { getJournalLogs, isLoading, journalLogs } = useJournalStore();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const loadData = async () => {
