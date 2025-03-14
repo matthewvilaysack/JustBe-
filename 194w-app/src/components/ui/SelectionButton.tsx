@@ -4,7 +4,7 @@
  * Supports both regular selection buttons and a special "Other" option with text input.
  */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   TouchableOpacity,
   Text,
@@ -12,6 +12,9 @@ import {
   ViewStyle,
   View,
   TextInput,
+  Animated,
+  Keyboard,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import theme from "@/src/theme/theme";
@@ -37,7 +40,11 @@ export default function SelectionButton({
 }: SelectionButtonProps) {
   return (
     <View style={[styles.wrapper, style]}>
-      <TouchableOpacity onPress={onPress} style={styles.buttonContainer}>
+      <TouchableOpacity 
+        onPress={onPress} 
+        style={styles.buttonContainer}
+        activeOpacity={0.8}
+      >
         {selected ? (
           <View style={[styles.gradient, styles.selected]}>
             <Text style={[styles.text, { color: theme.colors.primary[400] }]}>
@@ -58,15 +65,19 @@ export default function SelectionButton({
       </TouchableOpacity>
 
       {isOther && selected && (
-        <TextInput
-          value={customValue}
-          onChangeText={onCustomValueChange}
-          placeholder="Type your condition..."
-          placeholderTextColor={theme.colors.white + "60"}
-          style={styles.input}
-          autoFocus
-          returnKeyType="done"
-        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            value={customValue}
+            onChangeText={onCustomValueChange}
+            placeholder="Type your condition..."
+            placeholderTextColor={theme.colors.white + "60"}
+            style={styles.input}
+            autoFocus
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
+            blurOnSubmit={true}
+          />
+        </View>
       )}
     </View>
   );
@@ -80,14 +91,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "100%",
     height: 40,
-    shadowColor: "#344A66",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#344A66",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   gradient: {
     width: "100%",
@@ -108,6 +122,10 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontWeight: "bold",
   },
+  inputContainer: {
+    width: "100%",
+    marginTop: theme.spacing.sm,
+  },
   input: {
     width: "100%",
     height: 40,
@@ -115,7 +133,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.pill,
     borderWidth: 1,
     borderColor: theme.colors.white + "40",
-    marginTop: theme.spacing.md,
     color: theme.colors.white,
     fontSize: theme.typography.sizes.md,
     fontFamily: theme.typography.fonts.regular,

@@ -16,6 +16,9 @@ import {
   ImageBackground,
   TextInput,
   StyleSheet,
+  Keyboard,
+  Platform,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUserPainStore } from "@/src/store/userPainStore";
@@ -53,6 +56,7 @@ export default function Onboarding() {
     LexendDecaBold: require("@/assets/fonts/LexendDeca-Bold.ttf"),
     LexendDecaRegular: require("@/assets/fonts/LexendDeca-Regular.ttf"),
   });
+  const contentOffset = useRef(new Animated.Value(0)).current;
 
   const slides: Slide[] = [
     {
@@ -264,28 +268,55 @@ export default function Onboarding() {
     }
   };
 
+  useEffect(() => {
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        Animated.timing(contentOffset, {
+          toValue: (-e.endCoordinates.height / 2) - 100,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+
+        flatListRef.current?.scrollToIndex({
+          index: currentIndex,
+          animated: true,
+          viewPosition: 0.3,
+        });
+      }
+    );
+
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        Animated.timing(contentOffset, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
+  }, [currentIndex]);
+
   return (
     <View style={{ flex: 1 }}>
       <StatusBar style="light" />
       <ImageBackground
         source={require("@/assets/background.png")}
         resizeMode="cover"
-        style={{
-          flex: 1,
-          width: "100%",
-          height: "100%",
-        }}
+        style={styles.background}
       >
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: "transparent",
-          }}
-        >
-          <View
-            style={{
-              paddingVertical: theme.spacing.lg,
-            }}
+        <SafeAreaView style={styles.safeArea}>
+          <Animated.View
+            style={[
+              styles.contentWrapper,
+              { transform: [{ translateY: contentOffset }] }
+            ]}
           >
             <FlatList
               data={slides}
@@ -315,67 +346,55 @@ export default function Onboarding() {
               }}
               keyExtractor={(item) => item.id}
               ref={flatListRef}
+              contentContainerStyle={styles.flatListContent}
             />
 
-            {/* dots  */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                marginBottom: theme.spacing.lg,
-              }}
-            >
+            <View style={styles.dotsContainer}>
               {slides.map((_, index) => (
                 <View
                   key={index}
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 4,
-                    backgroundColor: theme.colors.white,
-                    marginHorizontal: 4,
-                    opacity: currentIndex === index ? 1 : 0.5,
-                  }}
+                  style={[
+                    styles.dot,
+                    { opacity: currentIndex === index ? 1 : 0.5 }
+                  ]}
                 />
               ))}
             </View>
-          </View>
+          </Animated.View>
         </SafeAreaView>
-        {currentIndex !== 0 && currentIndex !== slides.length - 1 && (
-          <View
-            style={{
-              paddingHorizontal: theme.spacing.lg,
-              alignItems: "flex-end",
-            }}
-          >
-            {/* <Button
-              title="Next"
-              onPress={() => moveToNextSlide()}
-              variant="primary"
-              showArrow={true}
-              style={{
-                position: "absolute",
-                bottom: 40,
-                right: 25,
-              }}
-            /> */}
-          </View>
-        )}
       </ImageBackground>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  contentWrapper: {
+    flex: 1,
+    paddingVertical: theme.spacing.lg,
+  },
+  flatListContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   slideContainer: {
     width,
     alignItems: "center",
     padding: theme.spacing.lg,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   contentContainer: {
-    marginTop: theme.spacing.lg,
     width: "100%",
     alignItems: "center",
+    paddingTop: theme.spacing.md,
   },
   title: {
     fontSize: theme.typography.sizes.xl,
@@ -396,5 +415,18 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     gap: theme.spacing.md,
+  },
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: theme.spacing.lg,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.white,
+    marginHorizontal: 4,
   },
 });
