@@ -115,10 +115,11 @@ const PieChart = ({ data, title }) => {
   }
 
   // Convert JSON object into an array format that VictoryPie understands
-  const formattedData = Object.entries(data).map(([key, value]) => ({
+  let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key, // JSON key as x (label)
     y: value, // JSON value as y (numeric data)
   }));
+  formattedData = formattedData.sort((a, b) => a.y - b.y);
 
   // console.log("Pie chart formatted data: ", formattedData);
   return (
@@ -154,20 +155,15 @@ const BarChart = ({ data, title }) => {
   if (!data || Object.keys(data).length === 0) {
     return; // <Text>Loading data...</Text>;
   }
-  const formattedData = Object.entries(data).map(([key, value]) => ({
+  let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key, // JSON key as x (label)
     y: value, // JSON value as y (numeric data)
   }));
+  formattedData = formattedData.sort((a, b) => a.y - b.y);
 
-  // console.log("formattedData.length", formattedData.length);
-  // console.log(Object.keys(data));
-  const maxLabelLen = Object.keys(data).reduce((a, b) =>
-    a.length > b.length ? a : b
-  ).length;
-  // console.log("Object.keys(jsonObject)" , maxLabelLen);
-  const leftPad = 10 + 8 * maxLabelLen;
-  const chartWidth =
-    formattedData.length * barWidth + (formattedData.length + 1) * 20;
+  const lenFirstKey = formattedData[formattedData.length-1]["x"].length;
+  // console.log(lenFirstKey);
+  const rightPad = 40 + 2 * lenFirstKey;
   const minChartHeight = 200; // Prevents charts from being too small
   const maxChartHeight = 600; // Prevents overly tall charts
   const chartHeight = Math.min(
@@ -187,7 +183,7 @@ const BarChart = ({ data, title }) => {
         domainPadding={{ x: 20, y: 15 }}
         width={width - 20}
         height={chartHeight}
-        padding={{ top: 10, bottom: 50, left: 40, right: 40 }}
+        padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
       >
         {/* X-axis */}
         <VictoryAxis
@@ -302,6 +298,10 @@ const PlotDisplayer = () => {
           <PieChart data={count_data.duration} title="Durations" />
 
           <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
+
+          <BarChart data={count_data["sensations"]} title="Sensations" />
+
+          <BarChart data={count_data["context"]} title="Context" />
         </View>
       </ScrollView>
     </ImageBackground>
