@@ -258,6 +258,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,
+    fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
     maxHeight: "90%",
     minHeight: Theme.typography.sizes.lg * 5,

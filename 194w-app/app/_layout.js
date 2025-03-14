@@ -17,9 +17,7 @@ export default function RootLayout() {
         const {
           data: { session },
         } = await supabase.auth.getSession();
-        const hasOnboarded = await AsyncStorage.getItem(
-          "hasCompletedOnboarding"
-        );
+        const hasOnboarded = await AsyncStorage.getItem("hasCompletedOnboarding");
         setSession(session);
         setHasCompletedOnboarding(hasOnboarded === "true");
         // Update profile if needed
