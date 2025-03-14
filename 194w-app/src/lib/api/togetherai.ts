@@ -90,7 +90,7 @@ export const extractDetailedEntryJSON = async (
             content: `Journal Entry: ${journalText}`,
           },
         ],
-        temperature: 0,
+        temperature: 0,        
       });
 
       const data = await response.data;
@@ -99,9 +99,16 @@ export const extractDetailedEntryJSON = async (
       let rawText: string = response.data.choices?.[0]?.message?.content || "";
       console.log("raw text: ", rawText);
 
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/); // remove additional assumptions
+      let jsonMatch = rawText.match(/\{[\s\S]*\}/); // remove additional assumptions
+      
+      // console.log("jsonMatch: ", jsonMatch);
       if (!jsonMatch) {
-        throw new Error("No JSON object found in AI response.");
+        rawText = rawText.slice(0, -2) + "}";
+        console.log("raw text didn't generate properly, manually tweaked : ", rawText);
+        jsonMatch = rawText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error("No JSON object found in AI response.");
+        }
       }
 
       const cleanedJson = jsonMatch[0]; // this should be only the JSON part
