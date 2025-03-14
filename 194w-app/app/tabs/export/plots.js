@@ -116,9 +116,6 @@ const PieChart = ({ data, title }) => {
   // if (Object.keys(data).length > 5) {
   //   return <BarChart data={data} title={title} />;
   // }
-  // if (Object.keys(data).length > 5) {
-  //   return <BarChart data={data} title={title} />;
-  // }
 
   // Convert JSON object into an array format that VictoryPie understands
   let formattedData = Object.entries(data).map(([key, value]) => ({
@@ -314,14 +311,16 @@ const PlotDisplayer = () => {
           <PainChart data={pain_data} />
 
           <BarChart data={count_data.symptoms} title="Symptoms" />
+          <BarChart data={count_data.symptoms} title="Symptoms" />
 
           <BarChart data={count_data.duration} title="Durations" />
+          <BarChart data={count_data.duration} title="Durations" />
 
-          <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
-
-          <BarChart data={count_data["sensations"]} title="Sensations" />
+          <BarChart data={count_data["when-does-it-hurt"]} title="Timings" />
 
           <BarChart data={count_data["context"]} title="Context" />
+          
+          <PieChart data={count_data["sensation"]} title="Sensations" />
         </View>
       </ScrollView>
     </ImageBackground>
