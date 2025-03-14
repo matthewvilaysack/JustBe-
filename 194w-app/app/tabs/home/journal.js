@@ -31,9 +31,8 @@ export default function Page() {
 
   const router = useRouter();
   const now = new Date();
-  const currentDate = new Date(
-    now.getTime() - now.getTimezoneOffset() * 60000
-  ).toLocaleDateString();
+  const currentDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+    .toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
   const { painLevel } = usePainLevelStore();
