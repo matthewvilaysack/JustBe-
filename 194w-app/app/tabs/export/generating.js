@@ -16,7 +16,6 @@ export default function GeneratingPage() {
   const router = useRouter();
   const { setSuggestions } = useSuggestionStore();
   const { setPainType, setPainDuration } = useUserPainStore();
-  const { setPainType, setPainDuration } = useUserPainStore();
 
   useEffect(() => {
     const loadPainData = async () => {
