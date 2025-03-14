@@ -168,7 +168,7 @@ const BarChart = ({ data, title }) => {
 
   const lenFirstKey = formattedData[formattedData.length-1]["x"].length;
   // console.log(lenFirstKey);
-  const rightPad = 40 + 2 * lenFirstKey;
+  const rightPad = 48 + 5 * lenFirstKey;
   const minChartHeight = 200; // Prevents charts from being too small
   const maxChartHeight = height * 0.7; // Prevents overly tall charts
   const chartHeight = Math.min(
