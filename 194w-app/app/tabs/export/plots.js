@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   ImageBackground,
+  SafeAreaView,
 } from "react-native";
 import {
   fetchCountData,
@@ -19,10 +20,12 @@ import {
   VictoryPie,
   VictoryBar,
   VictoryLabel,
+  VictoryTooltip,
 } from "victory-native";
+import { useRouter } from "expo-router";
+import BackButton from "@/src/components/ui/BackButton";
 import Theme from "@/src/theme/theme";
-
-const { width } = Dimensions.get("window");
+import { statusBarHeight, width, height } from "@/src/components/ui/Constants";
 
 const palette = [
   Theme.colors.primary["500"],
@@ -169,15 +172,12 @@ const BarChart = ({ data, title }) => {
   const chartWidth =
     formattedData.length * barWidth + (formattedData.length + 1) * 20;
   const minChartHeight = 200; // Prevents charts from being too small
-  const maxChartHeight = 600; // Prevents overly tall charts
+  const maxChartHeight = height * 0.7; // Prevents overly tall charts
   const chartHeight = Math.min(
     maxChartHeight,
-    Math.max(minChartHeight, formattedData.length * 30 + 50)
+    Math.max(minChartHeight, formattedData.length * 30 + 70)
   );
-  const barWidth = Math.max(
-    15,
-    Math.min(25, chartHeight / formattedData.length)
-  ); // You can adjust this value
+  const barWidth = Math.min(20, chartHeight / (formattedData.length * 1.5));
 
   return (
     <View style={styles.chartContainer}>
@@ -187,19 +187,18 @@ const BarChart = ({ data, title }) => {
         domainPadding={{ x: 20, y: 15 }}
         width={width - 20}
         height={chartHeight}
-        padding={{ top: 10, bottom: 50, left: 40, right: 40 }}
+        padding={{ top: 10, bottom: 50, left: 40, right: 100 }}
       >
         {/* X-axis */}
         <VictoryAxis
           style={{
-            axis: { stroke: Theme.colors.lightBlue }, // Changes the axis line color
-            ticks: { stroke: Theme.colors.white }, // Changes tick color
+            axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
+            ticks: { stroke: Theme.colors.darkBlue }, // Changes tick color
             tickLabels: {
               fill: "transparent",
               fontWeight: "bold",
               fontSize: 12,
               angle: -15, // Rotates the labels slightly for better fit
-              textAnchor: "end",
               padding: 5,
             },
           }}
@@ -208,11 +207,14 @@ const BarChart = ({ data, title }) => {
         {/* Y-axis */}
         <VictoryAxis
           dependentAxis
-          domain={[0, Math.max(...formattedData.map((d) => d.y)) + 2]} // Ensures bars extend fully
-          tickValues={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          domain={[0, Math.max(...formattedData.map((d) => d.y))]}
+          tickValues={Array.from(
+            { length: Math.ceil(Math.max(...formattedData.map((d) => d.y))) },
+            (_, i) => i + 1
+          )}
           style={{
             axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
-            ticks: { stroke: Theme.colors.darkBlue }, // Changes tick color
+            ticks: { stroke: "transparent" }, // Changes tick color
             tickLabels: {
               fill: Theme.colors.darkBlue,
               fontWeight: "bold",
@@ -261,6 +263,7 @@ const BarChart = ({ data, title }) => {
 const PlotDisplayer = () => {
   const [pain_data, setPainData] = useState([]);
   const [count_data, setCountData] = useState([]);
+  const router = useRouter();
 
   // Async function to fetch data
   async function fetchPainData() {
@@ -293,7 +296,17 @@ const PlotDisplayer = () => {
       resizeMode="cover"
       style={styles.background}
     >
-      <ScrollView>
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
+
+      <View style={styles.header}>
+        <Text style={styles.cardTitle}>Your Health Plots</Text>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
         <View style={styles.container}>
           <PainChart data={pain_data} />
 
@@ -311,11 +324,19 @@ const PlotDisplayer = () => {
 export default PlotDisplayer;
 
 const styles = StyleSheet.create({
+  header: {
+    marginTop: statusBarHeight,
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
   container: {
-    marginTop: Theme.spacing.lg,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  scrollView: {
+    flex: 1,
   },
   chartContainer: {
     backgroundColor: Theme.colors.white,
@@ -331,5 +352,12 @@ const styles = StyleSheet.create({
     margin: Theme.spacing.md,
     marginBottom: 0,
     textAlign: "center",
+  },
+  cardTitle: {
+    fontSize: Theme.typography.sizes.xl,
+    color: "white",
+    fontWeight: "bold",
+    fontFamily: Theme.typography.fonts.bold,
+    marginBottom: Theme.spacing.sm,
   },
 });
