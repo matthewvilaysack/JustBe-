@@ -8,8 +8,6 @@ import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
 import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
-import { getTodayLatestPainEntry } from "@/src/lib/api/utils";
-import useJournalStore from "@/src/store/journalStore";
 
 export default function Page() {
   const router = useRouter();
