@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ImageBackground, Text } from "react-native";
+import { StyleSheet, View, ImageBackground, Text, Image } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 
@@ -21,6 +21,10 @@ export default function Page() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Your entry have been logged!</Text>
+        <Image
+          source={require("@/assets/blob-wink.png")}
+          style={styles.blobImage}
+        />
       </View>
     </ImageBackground>
   );
@@ -40,7 +44,6 @@ const styles = StyleSheet.create({
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
-    marginBottom: Theme.spacing.xl,
     fontFamily: Theme.typography.fonts.bold,
   },
   dateText: {
@@ -73,5 +76,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     paddingBottom: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
+  },
+  blobImage: {
+    padding: Theme.spacing.lg,
+    resizeMode: "contain",
   },
 });

@@ -40,7 +40,7 @@ export default function Auth() {
 
     if (error) Alert.alert(error.message);
     if (!session)
-      Alert.alert("Please check your inbox for email verification!");
+      Alert.alert("Got it, please check your inbox for email verification!");
     setLoading(false);
   }
 
@@ -100,14 +100,14 @@ export default function Auth() {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: Theme.spacing.lg,
   },
   container: {
     marginVertical: Theme.spacing.xl,
     padding: Theme.spacing.xl,
-    width: '90%',
+    width: "90%",
     maxWidth: 400,
     backgroundColor: Theme.colors.primary[400],
     borderRadius: Theme.radius.xl,

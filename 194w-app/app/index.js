@@ -3,8 +3,10 @@ import { Redirect } from "expo-router";
 import { supabase } from "@/src/lib/api/supabase";
 import { useFonts } from "expo-font";
 import Auth from "./components/Auth";
-import { View, ActivityIndicator, ImageBackground } from "react-native";
+import { View, ActivityIndicator, ImageBackground, LogBox } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+LogBox.ignoreAllLogs();
 
 export default function Index() {
   const [session, setSession] = useState(null);

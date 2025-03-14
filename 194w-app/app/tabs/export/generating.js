@@ -34,9 +34,9 @@ export default function GeneratingPage() {
         if (!entries) {
           Alert.alert(
             "No Entries",
-            "No journal entries found for your account."
+            "Whoops, there were no journal entries found for your account!"
           );
-          router.push("/tabs/home"); // Redirect to a safer page if no entry found
+          router.push("/tabs/home");
           return;
         }
 
@@ -46,7 +46,7 @@ export default function GeneratingPage() {
         if (!output.length) {
           Alert.alert(
             "No Suggestions",
-            "AI could not generate any suggestions."
+            "Hm, we couldn't generate any suggestions... please try again when you've recorded more logs."
           );
           return;
         }

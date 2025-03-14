@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
-    paddingHorizontal: Theme.spacing.sm,
+    marginHorizontal: Theme.spacing.sm,
   },
   description: {
     fontSize: Theme.typography.sizes.lg,

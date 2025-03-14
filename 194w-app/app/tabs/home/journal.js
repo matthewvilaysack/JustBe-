@@ -81,8 +81,8 @@ export default function Page() {
 
       if (retryCount === 0) {
         Alert.alert(
-          "AI Extraction Failed",
-          "Could not process the journal entry. Would you like to retry?",
+          "ACK!",
+          "We couldn't process the journal entry. Would you like to retry?",
           [
             { text: "Cancel", style: "cancel" },
             { text: "Retry", onPress: () => fetchKeywords(text) },
@@ -130,8 +130,8 @@ export default function Page() {
         retryCount--;
         if (retryCount === 0) {
           Alert.alert(
-            "Database Error",
-            "An unexpected issue occurred. Would you like to retry?",
+            "Saving Error",
+            "Sorry, an unexpected issue occurred. Would you like to retry?",
             [
               { text: "Cancel", style: "cancel" },
               { text: "Retry", onPress: () => saveToSupabase(updateData, 3) },
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Theme.spacing.xl,
     paddingVertical: Theme.spacing.md,
-    marginTop: statusBarHeight,
+    marginTop: statusBarHeight + Theme.spacing.xxl,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
@@ -255,13 +255,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
     padding: 10,
+    flex: 1,
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,
     fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
-    maxHeight: "90%",
     minHeight: Theme.typography.sizes.lg * 5,
+    maxHeight: "95%",
+    marginHorizontal: Theme.spacing.sm,
   },
   buttonContainer: {
     position: "absolute",

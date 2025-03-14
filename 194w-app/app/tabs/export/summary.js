@@ -14,7 +14,6 @@ import { useUserPainStore } from "@/src/store/userPainStore";
 import MedicalSummaryScreen from "@/src/components/screens/MedicalSummaryScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 // TODO: fetch diagnoses from supabase
 //const DIAGNOSES = ["Anemia", "Gastroenteritis"];
 
@@ -25,7 +24,8 @@ const GeneratePDF = () => {
     format(new Date(), "EEEE, MMMM dd, yyyy HH:mm")
   );
   const { suggestions, setSuggestions } = useSuggestionStore();
-  const { painType, painDuration, setPainType, setPainDuration } = useUserPainStore();
+  const { painType, painDuration, setPainType, setPainDuration } =
+    useUserPainStore();
 
   useEffect(() => {
     if (suggestions.length > 0) generatePDF(suggestions);
@@ -36,6 +36,16 @@ const GeneratePDF = () => {
     setDateTime(format(new Date(), "EEEE, MMMM dd, yyyy HH:mm"));
     const htmlContent = `
       <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, Helvetica, sans-serif;
+            }
+            h1, h2, p, ol, li {
+              font-family: Arial, Helvetica, sans-serif;
+            }
+          </style>
+        </head>
         <body>
           <h1>Comprehensive Summary</h1>
           <p>Generated on ${dateTime}</p>
@@ -49,17 +59,20 @@ const GeneratePDF = () => {
     try {
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
       setPdfUri(uri);
-      Alert.alert("Success", "PDF generated successfully!");
     } catch (error) {
       console.error("❌ Error:", error);
-      Alert.alert("Error", "Failed to generate PDF. Please try again.");
+      Alert.alert(
+        "Uh oh...",
+        "We failed to generate PDF for  you, please try again?"
+      );
     }
     setLoading(false);
   };
 
   const loadPainData = async () => {
-    const storedType = await AsyncStorage.getItem("painType") || "Unknown";
-    const storedDuration = await AsyncStorage.getItem("painDuration") || "Unknown";
+    const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
+    const storedDuration =
+      (await AsyncStorage.getItem("painDuration")) || "Unknown";
     setPainType(storedType);
     setPainDuration(storedDuration);
   };
@@ -68,7 +81,7 @@ const GeneratePDF = () => {
     setLoading(true);
 
     try {
-      await loadPainData(); 
+      await loadPainData();
 
       const entries = await fetchDetailedEntriesForUser();
       if (!entries) {
@@ -92,20 +105,45 @@ const GeneratePDF = () => {
       generatePDF(suggestions);
     } catch (error) {
       console.error("❌ Error:", error);
-      Alert.alert("Error", "Failed to retrieve suggestions. Please try again.");
+      Alert.alert(
+        "Ack!",
+        "Something went wrong when we tried generating suggestions for you. Reload to try again?"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleSharePDF = async () => {
-    if (!pdfUri) return;
+    if (!pdfUri) {
+      Alert.alert(
+        "Oops!",
+        "Looks like there's no PDF to share. Try generating one first!"
+      );
+      return;
+    }
+
     try {
-      if (await Sharing.isAvailableAsync()) await Sharing.shareAsync(pdfUri);
-      else Alert.alert("Error", "Sharing is not available.");
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(pdfUri);
+      } else {
+        Alert.alert(
+          "Sharing Not Supported",
+          "Hmm... it looks like your device doesn’t support file sharing, or permissions are restricted. You might need to check your settings."
+        );
+      }
     } catch (error) {
       console.error("❌ Error sharing PDF:", error);
-      Alert.alert("Error", "Failed to share PDF.");
+
+      let errorMessage =
+        "Something went wrong while trying to share the PDF. Please try again!";
+      if (error instanceof Error) {
+        errorMessage = error.message.includes("permission")
+          ? "Sharing didn’t work because of a permission issue. Check your settings and give it another go!"
+          : `Uh-oh! We hit a snag: ${error.message}`;
+      }
+
+      Alert.alert("Sharing Error", errorMessage);
     }
   };
 
