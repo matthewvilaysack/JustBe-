@@ -4,9 +4,36 @@ import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/NextButton";
 import { useRouter } from "expo-router";
 import Blob from "@/src/components/ui/Blob";
+import { Animated, Easing } from "react-native";
+import React, { useEffect, useRef } from "react";
 
 export default function Page() {
   const router = useRouter();
+
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const bounce = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
+          toValue: 0.9, // Grow
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1, // Shrink back
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    bounce.start();
+
+    return () => bounce.stop(); // Cleanup on unmount
+  }, [scaleAnim]);
 
   return (
     <ImageBackground
@@ -16,7 +43,9 @@ export default function Page() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
-        <Blob size={250} />
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+          <Blob size={250} />
+        </Animated.View>
         <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
           <Button
             title="Log Entry"
