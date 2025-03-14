@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/api/supabase";
 import { updateUserProfile } from "@/src/lib/api/utils";
-import { Stack } from "expo-router";
 export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
@@ -13,18 +12,22 @@ export default function RootLayout() {
     const initialize = async () => {
       try {
         // persist session if already logged in on reload
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        const {
+          data: { session: initialSession },
+        } = await supabase.auth.getSession();
         setSession(initialSession);
         if (initialSession) {
-          console.log('Session restored:', initialSession.user.email);
+          console.log("Session restored:", initialSession.user.email);
         }
 
         // ! TESTING ONLY
         // await AsyncStorage.clear();
 
         // Check onboarding status
-        const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
-        setHasCompletedOnboarding(hasOnboarded === 'true');
+        const hasOnboarded = await AsyncStorage.getItem(
+          "hasCompletedOnboarding"
+        );
+        setHasCompletedOnboarding(hasOnboarded === "true");
 
         // Update profile if needed
         if (hasOnboarded === "true" && initialSession?.user) {
@@ -47,10 +50,12 @@ export default function RootLayout() {
 
     initialize();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) {
-        console.log('Auth state changed:', session.user.email);
+        console.log("Auth state changed:", session.user.email);
       }
     });
 

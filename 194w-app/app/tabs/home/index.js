@@ -1,15 +1,24 @@
-import { StyleSheet, View, ImageBackground, Text, ActivityIndicator, Animated, Easing } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ImageBackground,
+  Text,
+  ActivityIndicator,
+  Animated,
+  Easing,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useEffect, useState, useRef } from "react";
 import Theme from "@/src/theme/theme";
 import Button from "@/src/components/ui/NextButton";
+import useJournalStore from "@/src/store/journalStore";
 import LoadingNoPainBlob from "@/src/animations/LoadingNoPainBlob";
 import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
 import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
-import { supabase } from '@/src/lib/api/supabase';
-import PainTracker from '@/src/components/ui/PainTracker';
+import { supabase } from "@/src/lib/api/supabase";
+import PainTracker from "@/src/components/ui/PainTracker";
 
 export default function Page() {
   const router = useRouter();
@@ -27,12 +36,12 @@ export default function Page() {
   }, []); // Initial load
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const todayLogs = journalLogs[today] || [];
     // Get the first log since it's already the latest
     const latestLog = todayLogs[0];
     setPainRating(latestLog?.pain_rating ?? 0);
-  }, [journalLogs]); 
+  }, [journalLogs]);
 
   useEffect(() => {
     const bounce = Animated.loop(
@@ -59,14 +68,16 @@ export default function Page() {
 
   useEffect(() => {
     async function fetchPainType() {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('pain_type')
-          .eq('id', session.user.id)
+          .from("profiles")
+          .select("pain_type")
+          .eq("id", session.user.id)
           .single();
-        
+
         if (!error && data) {
           setPainType(data.pain_type);
         }
@@ -117,14 +128,16 @@ export default function Page() {
 
   return (
     <View style={{ flex: 1 }}>
-      <PainTracker painType={painType} />
+      {/* <PainTracker painType={painType} /> */}
       <ImageBackground
         source={require("@/assets/background.png")}
         resizeMode="cover"
         style={styles.background}
       >
         <View style={styles.container}>
-          <Text style={styles.heading}>Hi,{"\n"}how's your pain today?</Text>
+          <Text style={styles.heading}>
+            Hi,{"\n"}how's your {painType} today?
+          </Text>
           <PainBlob />
           <View style={[styles.buttonContainer, { borderTopRightRadius: 0 }]}>
             <Button
@@ -159,6 +172,11 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginBottom: 20,
+  },
+  blobImage: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
   },
   buttonContainer: {
     marginTop: 20,

@@ -20,7 +20,8 @@ export default function GeneratingPage() {
   useEffect(() => {
     const loadPainData = async () => {
       const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
-      const storedDuration = (await AsyncStorage.getItem("painDuration")) || "Unknown";
+      const storedDuration =
+        (await AsyncStorage.getItem("painDuration")) || "Unknown";
       setPainType(storedType);
       setPainDuration(storedDuration);
     };
@@ -67,9 +68,6 @@ export default function GeneratingPage() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Generating Summary...</Text>
-        <View style={styles.blobImage}>
-          <LoadingThinkingBlob />
-        </View>
         <View style={styles.blobImage}>
           <LoadingThinkingBlob />
         </View>

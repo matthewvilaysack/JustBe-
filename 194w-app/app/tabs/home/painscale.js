@@ -95,76 +95,77 @@ export default function Page() {
       />
 
       <View style={styles.background}>
-      <BackButton
-        onPress={() => {
-          router.back();
-        }}
-        showArrow={true}
-      />
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
 
-      <View style={styles.background}>
-        <View style={styles.container}>
-          <Text style={styles.heading}>How would you rate your pain?</Text>
-          <View style={styles.carousel}>
-            <FlatList
-              ref={flatListRef}
-              data={images}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
-              keyExtractor={(_, index) => index.toString()}
-              scrollEnabled={false}
-              contentContainerStyle={{
-                paddingHorizontal: (width - ITEM_WIDTH) / 2,
-              }}
-              ItemSeparatorComponent={() => (
-                <View style={{ width: ITEM_MARGIN }} />
-              )}
-              renderItem={({ item }) => (
-                <View style={styles.carouselItem}>
-                  <Image source={item.src} style={styles.blobImage} />
-                </View>
-              )}
+        <View style={styles.background}>
+          <View style={styles.container}>
+            <Text style={styles.heading}>How would you rate your pain?</Text>
+            <View style={styles.carousel}>
+              <FlatList
+                ref={flatListRef}
+                data={images}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
+                keyExtractor={(_, index) => index.toString()}
+                scrollEnabled={false}
+                contentContainerStyle={{
+                  paddingHorizontal: (width - ITEM_WIDTH) / 2,
+                }}
+                ItemSeparatorComponent={() => (
+                  <View style={{ width: ITEM_MARGIN }} />
+                )}
+                renderItem={({ item }) => (
+                  <View style={styles.carouselItem}>
+                    <Image source={item.src} style={styles.blobImage} />
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+          <View style={styles.sliderContainer}>
+            <View style={styles.levelContainer}>
+              <Text style={styles.description}>
+                {painLevel} - {painLevelDescriptions[painLevel]}
+              </Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={10}
+              step={1}
+              value={selectedIndex * 2}
+              onValueChange={handleSliderChange}
+              minimumTrackTintColor={theme.colors.primary[200]}
+              maximumTrackTintColor={theme.colors.white}
+              thumbTintColor={theme.colors.white}
             />
           </View>
-        </View>
-        <View style={styles.sliderContainer}>
-          <View style={styles.levelContainer}>
-            <Text style={styles.description}>
-              {painLevel} - {painLevelDescriptions[painLevel]}
-            </Text>
-          </View>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={10}
-            step={1}
-            value={selectedIndex * 2}
-            onValueChange={handleSliderChange}
-            minimumTrackTintColor={theme.colors.primary[200]}
-            maximumTrackTintColor={theme.colors.white}
-            thumbTintColor={theme.colors.white}
-          />
-        </View>
 
-        <View style={styles.footer}>
-          <NextButton
-            onPress={() => router.push("/tabs/home/journal")}
-            showArrow={true}
-          />
-        </View>
-        <View style={styles.footer}>
-          <NextButton
-            onPress={() => router.push("/tabs/home/journal")}
-            showArrow={true}
-          />
-        </View>
-        <View style={styles.footer}>
-          <NextButton
-            onPress={() => router.push("/tabs/home/journal")}
-            showArrow={true}
-          />
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
         </View>
       </View>
     </ImageBackground>

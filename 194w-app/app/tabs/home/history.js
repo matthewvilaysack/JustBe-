@@ -19,9 +19,9 @@ import useJournalStore from "@/src/store/journalStore";
 const DateWidget = ({ selectedDate, today }) => {
   const formatDate = (date) => {
     return new Date(date + "T00:00:00").toLocaleDateString("en-US", {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
+      weekday: "long",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -31,9 +31,7 @@ const DateWidget = ({ selectedDate, today }) => {
         <Text style={styles.dateLabel}>
           {selectedDate === today ? "Today" : "Selected Date"}
         </Text>
-        <Text style={styles.dateText}>
-          {formatDate(selectedDate)}
-        </Text>
+        <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
       </View>
     </View>
   );
@@ -50,7 +48,8 @@ const PainScale = ({ painRating, getPainColor }) => {
           style={[
             styles.painDot,
             {
-              backgroundColor: index < painRating ? getPainColor(painRating) : '#ffffff40',
+              backgroundColor:
+                index < painRating ? getPainColor(painRating) : "#ffffff40",
             },
           ]}
         />
@@ -65,17 +64,37 @@ const TabSelector = ({ activeTab, onTabChange }) => {
     <View style={styles.tabContainer}>
       <View style={styles.tabLine} />
       <View style={styles.tabButtons}>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'logs' && styles.activeTabButton]} 
-          onPress={() => onTabChange('logs')}
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === "logs" && styles.activeTabButton,
+          ]}
+          onPress={() => onTabChange("logs")}
         >
-          <Text style={[styles.tabText, activeTab === 'logs' && styles.activeTabText]}>Log History</Text>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "logs" && styles.activeTabText,
+            ]}
+          >
+            Log History
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'calendar' && styles.activeTabButton]} 
-          onPress={() => onTabChange('calendar')}
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === "calendar" && styles.activeTabButton,
+          ]}
+          onPress={() => onTabChange("calendar")}
         >
-          <Text style={[styles.tabText, activeTab === 'calendar' && styles.activeTabText]}>Calendar</Text>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "calendar" && styles.activeTabText,
+            ]}
+          >
+            Calendar
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.tabLine} />
@@ -86,15 +105,16 @@ const TabSelector = ({ activeTab, onTabChange }) => {
 export default function History() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
-  const [activeTab, setActiveTab] = useState('logs');
-  
+  const [activeTab, setActiveTab] = useState("logs");
+
   // get today's date in the correct timezone format
   const now = new Date();
-  const today = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+  const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
     .toISOString()
-    .split('T')[0];
-    
-  const { journalLogs, isLoading, getLogsByDate, getJournalLogs } = useJournalStore();
+    .split("T")[0];
+
+  const { journalLogs, isLoading, getLogsByDate, getJournalLogs } =
+    useJournalStore();
 
   // load logs when component mounts
   useEffect(() => {
@@ -104,7 +124,7 @@ export default function History() {
       // fetch latest logs from the database
       await getJournalLogs();
     };
-    
+
     loadData();
   }, []);
 
@@ -180,18 +200,15 @@ export default function History() {
       style={styles.background}
     >
       <View style={styles.buttonContainer}>
-        <BackButton
-          onPress={() => router.back()}
-          showArrow={true}
-        />
+        <BackButton onPress={() => router.back()} showArrow={true} />
       </View>
-      
+
       <View style={styles.contentContainer}>
         <DateWidget selectedDate={selectedDate} today={today} />
         <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
         <View style={styles.scrollcontainer}>
           <ScrollView>
-            {activeTab === 'logs' ? (
+            {activeTab === "logs" ? (
               <View style={styles.logContainer}>
                 <LinearGradient
                   colors={["#3B67B2", "#3B67B2", "#6580D8"]}
@@ -210,82 +227,104 @@ export default function History() {
                       }
                     )}
                   </Text>
-
                   {selectedLog && selectedLog.length > 0 ? (
                     selectedLog
-                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                      .sort(
+                        (a, b) =>
+                          new Date(b.created_at) - new Date(a.created_at)
+                      )
                       .map((log, index) => (
                         <View key={index} style={styles.logContent}>
                           <LinearGradient
-                            colors={['#ffffff10', '#ffffff20']}
+                            colors={["#ffffff10", "#ffffff20"]}
                             style={styles.logGradient}
                           >
                             <View style={styles.logHeader}>
                               <Text style={styles.logTime}>
                                 {formatLogTime(log.created_at)}
                               </Text>
-                              <Text style={[
-                                styles.logPain, 
-                                { 
-                                  color: 'white',
-                                  textDecorationColor: 'white',
-                                  textDecorationStyle: 'solid',
-                                }
-                              ]}>
+                              <Text
+                                style={[
+                                  styles.logPain,
+                                  {
+                                    color: "white",
+                                    textDecorationColor: "white",
+                                    textDecorationStyle: "solid",
+                                  },
+                                ]}
+                              >
                                 {getPainLevel(log.pain_rating)}
                               </Text>
                             </View>
-                            
-                            <PainScale 
-                              painRating={log.pain_rating} 
+
+                            <PainScale
+                              painRating={log.pain_rating}
                               getPainColor={getPainColor}
                             />
-                            
-                            <Text style={styles.logText}>
-                              {log.entry_text}
-                            </Text>
-                            
+
+                            <Text style={styles.logText}>{log.entry_text}</Text>
+
                             {/* Additional Fields */}
                             {log.duration && (
                               <View style={styles.fieldContainer}>
                                 <Text style={styles.fieldLabel}>Duration:</Text>
-                                <Text style={styles.fieldText}>{log.duration}</Text>
+                                <Text style={styles.fieldText}>
+                                  {log.duration}
+                                </Text>
                               </View>
                             )}
                             {log.sensation && (
                               <View style={styles.fieldContainer}>
-                                <Text style={styles.fieldLabel}>Sensation:</Text>
-                                <Text style={styles.fieldText}>{log.sensation}</Text>
+                                <Text style={styles.fieldLabel}>
+                                  Sensation:
+                                </Text>
+                                <Text style={styles.fieldText}>
+                                  {log.sensation}
+                                </Text>
                               </View>
                             )}
                             {log["what-happened"] && (
                               <View style={styles.fieldContainer}>
-                                <Text style={styles.fieldLabel}>What Happened:</Text>
-                                <Text style={styles.fieldText}>{log["what-happened"]}</Text>
+                                <Text style={styles.fieldLabel}>
+                                  What Happened:
+                                </Text>
+                                <Text style={styles.fieldText}>
+                                  {log["what-happened"]}
+                                </Text>
                               </View>
                             )}
                             {log.concerns && (
                               <View style={styles.fieldContainer}>
                                 <Text style={styles.fieldLabel}>Concerns:</Text>
-                                <Text style={styles.fieldText}>{log.concerns}</Text>
+                                <Text style={styles.fieldText}>
+                                  {log.concerns}
+                                </Text>
                               </View>
                             )}
                             {log.causes && (
                               <View style={styles.fieldContainer}>
                                 <Text style={styles.fieldLabel}>Causes:</Text>
-                                <Text style={styles.fieldText}>{log.causes}</Text>
+                                <Text style={styles.fieldText}>
+                                  {log.causes}
+                                </Text>
                               </View>
                             )}
                             {log["when-does-it-hurt"] && (
                               <View style={styles.fieldContainer}>
-                                <Text style={styles.fieldLabel}>When Does it Hurt:</Text>
-                                <Text style={styles.fieldText}>{log["when-does-it-hurt"]}</Text>
+                                <Text style={styles.fieldLabel}>
+                                  When Does it Hurt:
+                                </Text>
+                                <Text style={styles.fieldText}>
+                                  {log["when-does-it-hurt"]}
+                                </Text>
                               </View>
                             )}
                             {log.symptoms && (
                               <View style={styles.fieldContainer}>
                                 <Text style={styles.fieldLabel}>Symptoms:</Text>
-                                <Text style={styles.fieldText}>{log.symptoms}</Text>
+                                <Text style={styles.fieldText}>
+                                  {log.symptoms}
+                                </Text>
                               </View>
                             )}
                           </LinearGradient>
@@ -347,7 +386,8 @@ const styles = StyleSheet.create({
   },
   scrollcontainer: {
     flex: 1,
-    width: '100%',
+    width: "100%",
+    width: "100%",
   },
   card: {
     padding: theme.spacing.lg,
@@ -375,6 +415,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing.md,
   },
   logContainer: {
+    marginHorizontal: theme.spacing.md,
     marginHorizontal: theme.spacing.md,
   },
   sectionTitle: {
@@ -417,21 +458,41 @@ const styles = StyleSheet.create({
   logContent: {
     marginBottom: 16,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   logGradient: {
     padding: 16,
     borderRadius: 12,
   },
   logHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   logTime: {
     fontSize: theme.typography.sizes.sm,
-    color: '#FFFFFF80',
+    color: "#FFFFFF80",
+    fontFamily: theme.typography.fonts.regular,
+  },
+  logContent: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+  logGradient: {
+    padding: 16,
+    borderRadius: 12,
+  },
+  logHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  logTime: {
+    fontSize: theme.typography.sizes.sm,
+    color: "#FFFFFF80",
     fontFamily: theme.typography.fonts.regular,
   },
   logPain: {
@@ -440,11 +501,11 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   painScaleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 12,
     padding: 8,
-    backgroundColor: '#ffffff10',
+    backgroundColor: "#ffffff10",
     borderRadius: 8,
   },
   painDot: {
@@ -454,10 +515,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     paddingBottom: 2,
   },
+  painScaleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+    padding: 8,
+    backgroundColor: "#ffffff10",
+    borderRadius: 8,
+  },
+  painDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginHorizontal: 2,
+  },
   logText: {
     fontSize: theme.typography.sizes.md,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
+    color: "#FFFFFF",
     fontFamily: theme.typography.fonts.regular,
+    lineHeight: 20,
     lineHeight: 20,
   },
   buttonContainer: {
@@ -469,31 +546,31 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 60,
   },
   dateWidgetContainer: {
     width: 314,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
     marginTop: 20,
   },
   dateTextContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   dateLabel: {
-    fontFamily: 'Lexend Deca',
+    fontFamily: "Lexend Deca",
     fontSize: 14,
-    color: '#9997E1',
+    color: "#9997E1",
     marginBottom: 4,
   },
   dateText: {
-    fontFamily: 'Lexend Deca',
+    fontFamily: "Lexend Deca",
     fontSize: 18,
     lineHeight: 24,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    shadowColor: '#9997E1',
+    color: "#FFFFFF",
+    textAlign: "center",
+    shadowColor: "#9997E1",
     shadowOffset: {
       width: 0,
       height: 0,
@@ -508,32 +585,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   tabButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
   },
   tabButton: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 8,
   },
   activeTabButton: {
     borderRadius: 8,
   },
   tabText: {
-    fontFamily: 'Lexend Deca',
+    fontFamily: "Lexend Deca",
     fontSize: 16,
-    color: '#FFFFFF80',
+    color: "#FFFFFF80",
   },
   activeTabText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    color: "#FFFFFF",
+    fontWeight: "bold",
   },
   tabLine: {
     width: 314,
     height: 2,
-    backgroundColor: '#7089E6',
-    shadowColor: '#9997E1',
+    backgroundColor: "#7089E6",
+    shadowColor: "#9997E1",
     shadowOffset: {
       width: 0,
       height: 0,
@@ -546,17 +623,110 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#ffffff20',
+    borderTopColor: "#ffffff20",
   },
   fieldLabel: {
     fontSize: theme.typography.sizes.sm,
-    color: '#FFFFFF80',
+    color: "#FFFFFF80",
     fontFamily: theme.typography.fonts.bold,
     marginBottom: 4,
   },
   fieldText: {
     fontSize: theme.typography.sizes.md,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
+    fontFamily: theme.typography.fonts.regular,
+    lineHeight: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: 60,
+  },
+  dateWidgetContainer: {
+    width: 314,
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  dateTextContainer: {
+    alignItems: "center",
+  },
+  dateLabel: {
+    fontFamily: "Lexend Deca",
+    fontSize: 14,
+    color: "#9997E1",
+    marginBottom: 4,
+  },
+  dateText: {
+    fontFamily: "Lexend Deca",
+    fontSize: 18,
+    lineHeight: 24,
+    color: "#FFFFFF",
+    textAlign: "center",
+    shadowColor: "#9997E1",
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  tabContainer: {
+    width: 314,
+    height: 70,
+    marginBottom: 10,
+  },
+  tabButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  activeTabButton: {
+    borderRadius: 8,
+  },
+  tabText: {
+    fontFamily: "Lexend Deca",
+    fontSize: 16,
+    color: "#FFFFFF80",
+  },
+  activeTabText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+  },
+  tabLine: {
+    width: 314,
+    height: 2,
+    backgroundColor: "#7089E6",
+    shadowColor: "#9997E1",
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fieldContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#ffffff20",
+  },
+  fieldLabel: {
+    fontSize: theme.typography.sizes.sm,
+    color: "#FFFFFF80",
+    fontFamily: theme.typography.fonts.bold,
+    marginBottom: 4,
+  },
+  fieldText: {
+    fontSize: theme.typography.sizes.md,
+    color: "#FFFFFF",
     fontFamily: theme.typography.fonts.regular,
     lineHeight: 20,
   },
