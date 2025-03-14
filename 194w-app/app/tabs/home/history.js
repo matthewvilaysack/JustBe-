@@ -16,7 +16,7 @@ import { Calendar } from "react-native-calendars";
 import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
 
-// Date Widget Component
+// date widget
 const DateWidget = ({ selectedDate, today }) => {
   const formatDate = (date) => {
     return new Date(date + "T00:00:00").toLocaleDateString("en-US", {
@@ -40,7 +40,7 @@ const DateWidget = ({ selectedDate, today }) => {
   );
 };
 
-// Pain Scale Component
+// pain scale
 const PainScale = ({ painRating, getPainColor }) => {
   const dots = Array(10).fill(0);
   return (
@@ -60,7 +60,7 @@ const PainScale = ({ painRating, getPainColor }) => {
   );
 };
 
-// Tab Selector Component
+// tab selector
 const TabSelector = ({ activeTab, onTabChange }) => {
   return (
     <View style={styles.tabContainer}>
@@ -89,7 +89,7 @@ export default function History() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeTab, setActiveTab] = useState('logs');
   
-  // Get today's date in the correct timezone format
+  // get today's date in the correct timezone format
   const now = new Date();
   const today = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
     .toISOString()
@@ -97,12 +97,12 @@ export default function History() {
     
   const { journalLogs, isLoading, getLogsByDate, getJournalLogs } = useJournalStore();
 
-  // Load logs when component mounts
+  // load logs when component mounts
   useEffect(() => {
     const loadData = async () => {
-      // Set today as the selected date
+      // set today as the selected date
       setSelectedDate(today);
-      // Fetch latest logs from the database
+      // fetch latest logs from the database
       await getJournalLogs();
     };
     
@@ -215,7 +215,7 @@ export default function History() {
 
                   {selectedLog && selectedLog.length > 0 ? (
                     selectedLog
-                      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                       .map((log, index) => (
                         <View key={index} style={styles.logContent}>
                           <LinearGradient
@@ -350,6 +350,7 @@ const styles = StyleSheet.create({
   scrollcontainer: {
     flex: 1,
     width: '100%',
+    width: '100%',
   },
   card: {
     padding: theme.spacing.lg,
@@ -377,6 +378,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing.md,
   },
   logContainer: {
+    marginHorizontal: theme.spacing.md,
     marginHorizontal: theme.spacing.md,
   },
   sectionTitle: {
@@ -436,9 +438,44 @@ const styles = StyleSheet.create({
     color: '#FFFFFF80',
     fontFamily: theme.typography.fonts.regular,
   },
+  logContent: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  logGradient: {
+    padding: 16,
+    borderRadius: 12,
+  },
+  logHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  logTime: {
+    fontSize: theme.typography.sizes.sm,
+    color: '#FFFFFF80',
+    fontFamily: theme.typography.fonts.regular,
+  },
   logPain: {
     fontSize: theme.typography.sizes.md,
     fontFamily: theme.typography.fonts.bold,
+    paddingBottom: 2,
+  },
+  painScaleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    padding: 8,
+    backgroundColor: '#ffffff10',
+    borderRadius: 8,
+  },
+  painDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginHorizontal: 2,
     paddingBottom: 2,
   },
   painScaleContainer: {
@@ -458,7 +495,9 @@ const styles = StyleSheet.create({
   logText: {
     fontSize: theme.typography.sizes.md,
     color: '#FFFFFF',
+    color: '#FFFFFF',
     fontFamily: theme.typography.fonts.regular,
+    lineHeight: 20,
     lineHeight: 20,
   },
   buttonContainer: {
@@ -467,6 +506,99 @@ const styles = StyleSheet.create({
     left: "5%",
     opacity: 0.9,
     zIndex: 10,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingTop: 60,
+  },
+  dateWidgetContainer: {
+    width: 314,
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 20,
+  },
+  dateTextContainer: {
+    alignItems: 'center',
+  },
+  dateLabel: {
+    fontFamily: 'Lexend Deca',
+    fontSize: 14,
+    color: '#9997E1',
+    marginBottom: 4,
+  },
+  dateText: {
+    fontFamily: 'Lexend Deca',
+    fontSize: 18,
+    lineHeight: 24,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    shadowColor: '#9997E1',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  tabContainer: {
+    width: 314,
+    height: 70,
+    marginBottom: 10,
+  },
+  tabButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  activeTabButton: {
+    borderRadius: 8,
+  },
+  tabText: {
+    fontFamily: 'Lexend Deca',
+    fontSize: 16,
+    color: '#FFFFFF80',
+  },
+  activeTabText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
+  tabLine: {
+    width: 314,
+    height: 2,
+    backgroundColor: '#7089E6',
+    shadowColor: '#9997E1',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fieldContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#ffffff20',
+  },
+  fieldLabel: {
+    fontSize: theme.typography.sizes.sm,
+    color: '#FFFFFF80',
+    fontFamily: theme.typography.fonts.bold,
+    marginBottom: 4,
+  },
+  fieldText: {
+    fontSize: theme.typography.sizes.md,
+    color: '#FFFFFF',
+    fontFamily: theme.typography.fonts.regular,
+    lineHeight: 20,
   },
   contentContainer: {
     flex: 1,
