@@ -6,7 +6,6 @@ import {
   ImageBackground,
   StyleSheet,
   TouchableOpacity,
-  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import theme from "@/src/theme/theme";
