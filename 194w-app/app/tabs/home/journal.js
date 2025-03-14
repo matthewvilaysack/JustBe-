@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   ActivityIndicator,
   Alert,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
@@ -26,6 +27,7 @@ import useJournalStore from "@/src/store/journalStore";
 export default function Page() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const router = useRouter();
   const now = new Date();
@@ -175,10 +177,22 @@ export default function Page() {
     router.push("/tabs/home/summary");
   };
 
-  // Add this new function to handle submit editing
-  const handleSubmitEditing = () => {
-    Keyboard.dismiss();
-  };
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
+    };
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -206,9 +220,13 @@ export default function Page() {
               value={text}
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
-              blurOnSubmit={true}
-              onSubmitEditing={handleSubmitEditing}
-              returnKeyType="done"
+              returnKeyType={Platform.OS === 'ios' ? 'default' : 'none'}
+              blurOnSubmit={false}
+              onBlur={() => {
+                if (keyboardVisible) {
+                  Keyboard.dismiss();
+                }
+              }}
             />
           </View>
         </View>
@@ -221,7 +239,10 @@ export default function Page() {
           />
         )}
 
-        <View style={styles.footer}>
+        <View style={[
+          styles.footer,
+          keyboardVisible && { marginBottom: Platform.OS === 'ios' ? 20 : 0 }
+        ]}>
           <NextButton
             onPress={() => displayKeywords(text, router)}
             showArrow={true}
