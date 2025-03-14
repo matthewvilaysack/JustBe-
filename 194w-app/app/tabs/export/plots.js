@@ -122,9 +122,11 @@ const PieChart = ({ data, title }) => {
 
   // Convert JSON object into an array format that VictoryPie understands
   let formattedData = Object.entries(data).map(([key, value]) => ({
+  let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key, // JSON key as x (label)
     y: value, // JSON value as y (numeric data)
   }));
+  formattedData = formattedData.sort((a, b) => a.y - b.y);
   formattedData = formattedData.sort((a, b) => a.y - b.y);
 
   // console.log("Pie chart formatted data: ", formattedData);
@@ -162,12 +164,11 @@ const BarChart = ({ data, title }) => {
     return; // <Text>Loading data...</Text>;
   }
   let formattedData = Object.entries(data).map(([key, value]) => ({
+  let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key, // JSON key as x (label)
     y: value, // JSON value as y (numeric data)
   }));
-  formattedData = formattedData.sort((a, b) => a.y - b.y); // limit to 6 
-  console.log(formattedData);
-  formattedData = formattedData.slice(-6); 
+  formattedData = formattedData.sort((a, b) => a.y - b.y);
 
   const lenFirstKey = formattedData[formattedData.length-1]["x"].length;
   // console.log(lenFirstKey);
@@ -188,6 +189,7 @@ const BarChart = ({ data, title }) => {
         domainPadding={{ x: 20, y: 15 }}
         width={width - 20}
         height={chartHeight}
+        padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
         padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
       >
         {/* X-axis */}
@@ -315,11 +317,11 @@ const PlotDisplayer = () => {
 
           <BarChart data={count_data.duration} title="Durations" />
 
-          <BarChart data={count_data["when-does-it-hurt"]} title="Timings" />
+          <PieChart data={count_data["when-does-it-hurt"]} title="Timings" />
+
+          <BarChart data={count_data["sensations"]} title="Sensations" />
 
           <BarChart data={count_data["context"]} title="Context" />
-
-          <PieChart data={count_data["sensation"]} title="Sensations" />
         </View>
       </ScrollView>
     </ImageBackground>
