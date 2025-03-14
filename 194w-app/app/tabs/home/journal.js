@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   ActivityIndicator,
   Alert,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
@@ -26,9 +27,13 @@ import useJournalStore from "@/src/store/journalStore";
 export default function Page() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const router = useRouter();
-  const currentDate = new Date().toLocaleDateString();
+  const now = new Date();
+  const currentDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
   const { painLevel } = usePainLevelStore();
@@ -173,6 +178,29 @@ export default function Page() {
     router.push("/tabs/home/summary");
   };
 
+  // Add keyboard listeners
+  useEffect(() => {
+    const keyboardDidShow = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHide = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShow.remove();
+      keyboardDidHide.remove();
+    };
+  }, []);
+
+  const handleKeyPress = ({ nativeEvent }) => {
+    if (nativeEvent.key === "Enter") {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <ImageBackground
@@ -199,6 +227,10 @@ export default function Page() {
               value={text}
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
+              returnKeyType="done"
+              blurOnSubmit={true}
+              onKeyPress={handleKeyPress}
+              onSubmitEditing={() => Keyboard.dismiss()}
             />
           </View>
         </View>
@@ -211,7 +243,12 @@ export default function Page() {
           />
         )}
 
-        <View style={styles.footer}>
+        <View
+          style={[
+            styles.footer,
+            keyboardVisible && { marginBottom: Platform.OS === "ios" ? 20 : 0 },
+          ]}
+        >
           <NextButton
             onPress={() => displayKeywords(text, router)}
             showArrow={true}
@@ -240,6 +277,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     marginBottom: Theme.spacing.md,
+    marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
   },
   dateText: {
@@ -255,7 +293,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
     padding: 10,
-    flex: 1,
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,

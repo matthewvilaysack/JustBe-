@@ -10,44 +10,53 @@ export default function RootLayout() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    const checkAppState = async () => {
+    const initialize = async () => {
       try {
+        // persist session if already logged in on reload
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        if (initialSession) {
+          console.log('Session restored:', initialSession.user.email);
+        }
+
         // ! TESTING ONLY
         // await AsyncStorage.clear();
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        const hasOnboarded = await AsyncStorage.getItem("hasCompletedOnboarding");
-        setSession(session);
-        setHasCompletedOnboarding(hasOnboarded === "true");
+
+        // Check onboarding status
+        const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
+        setHasCompletedOnboarding(hasOnboarded === 'true');
+
         // Update profile if needed
-        if (hasOnboarded === "true" && session?.user) {
+        if (hasOnboarded === "true" && initialSession?.user) {
           const painType = await AsyncStorage.getItem("painType");
           const painDuration = await AsyncStorage.getItem("painDuration");
           if (painType && painDuration) {
-            await updateUserProfile(session.user.id, {
+            await updateUserProfile(initialSession.user.id, {
               pain_type: painType,
               pain_duration: painDuration,
             });
-            await AsyncStorage.clear();
+            await AsyncStorage.multiRemove(["painType", "painDuration"]);
           }
         }
       } catch (error) {
-        console.error("Error checking app state:", error);
+        console.error("Error during initialization:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAppState();
+    initialize();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        console.log('Auth state changed:', session.user.email);
+      }
     });
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   if (isLoading) {

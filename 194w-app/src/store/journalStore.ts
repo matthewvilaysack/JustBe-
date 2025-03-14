@@ -90,11 +90,15 @@ const useJournalStore = create<JournalState>()(
 
       // Add a new log entry 
       addJournalLog: (log: JournalLog) => {
-        const date = new Date(log.created_at).toISOString().split('T')[0];
+        const date = new Date(log.created_at);
+        const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+          .toISOString()
+          .split('T')[0];
+          
         set((state) => ({
           journalLogs: {
             ...state.journalLogs,
-            [date]: [log, ...(state.journalLogs[date] || [])],
+            [localDate]: [log, ...(state.journalLogs[localDate] || [])],
           },
         }));
       },
@@ -117,14 +121,18 @@ const useJournalStore = create<JournalState>()(
           if (error) throw error;
 
           // Transform array into date-indexed object
-          // this is used to display the logs in the history page storing each journal log by date
-          // in a dictionary, the key is the date and the value is an array of logs for that date
           const logsByDate = (data || []).reduce((journalLogs: { [key: string]: JournalLog[] }, log) => {
-            const date = new Date(log.created_at).toISOString().split('T')[0];
-            if (!journalLogs[date]) {
-              journalLogs[date] = [];
+            const date = new Date(log.created_at);
+            const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+              .toISOString()
+              .split('T')[0];
+              
+            if (!journalLogs[localDate]) {
+              journalLogs[localDate] = [];
             }
-            journalLogs[date].push(log);
+            // Since data is already ordered by created_at desc from Supabase,
+            // we can just push to maintain the order
+            journalLogs[localDate].push(log);
             return journalLogs;
           }, {});
 

@@ -3,10 +3,10 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["node", "react-native", "react-native-dotenv"]
   },
-  "extends": "expo/tsconfig.base"
+  "extends": "./node_modules/expo/tsconfig.base.json"
 }
