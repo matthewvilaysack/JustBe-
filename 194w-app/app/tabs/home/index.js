@@ -107,17 +107,10 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
-    marginTop: 20,
     marginVertical: 10,
     flexDirection: "row",
     justifyContent: "space-evenly",
     width: "100%",
-  },
-  loadingContainer: {
-    width: 150,
-    height: 150,
-    justifyContent: "center",
-    alignItems: "center",
   },
   loadingContainer: {
     width: 150,

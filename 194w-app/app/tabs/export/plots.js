@@ -119,11 +119,9 @@ const PieChart = ({ data, title }) => {
 
   // Convert JSON object into an array format that VictoryPie understands
   let formattedData = Object.entries(data).map(([key, value]) => ({
-  let formattedData = Object.entries(data).map(([key, value]) => ({
-    x: key, // JSON key as x (label)
-    y: value, // JSON value as y (numeric data)
+    x: key,
+    y: value,
   }));
-  formattedData = formattedData.sort((a, b) => a.y - b.y);
   formattedData = formattedData.sort((a, b) => a.y - b.y);
 
   // console.log("Pie chart formatted data: ", formattedData);
@@ -161,9 +159,8 @@ const BarChart = ({ data, title }) => {
     return; // <Text>Loading data...</Text>;
   }
   let formattedData = Object.entries(data).map(([key, value]) => ({
-  let formattedData = Object.entries(data).map(([key, value]) => ({
-    x: key, // JSON key as x (label)
-    y: value, // JSON value as y (numeric data)
+    x: key,
+    y: value,
   }));
   formattedData = formattedData.sort((a, b) => a.y - b.y); // limit to 6 
   console.log(formattedData);
@@ -188,7 +185,6 @@ const BarChart = ({ data, title }) => {
         domainPadding={{ x: 20, y: 15 }}
         width={width - 20}
         height={chartHeight}
-        padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
         padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
       >
         {/* X-axis */}

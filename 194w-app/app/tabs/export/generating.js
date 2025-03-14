@@ -8,10 +8,6 @@ import {
   fetchDetailedEntriesForUser,
   formatEntriesForAI,
 } from "../../utils/supabase-helpers";
-import {
-  fetchDetailedEntriesForUser,
-  formatEntriesForAI,
-} from "../../utils/supabase-helpers";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
 import { useUserPainStore } from "@/src/store/userPainStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,19 +16,13 @@ export default function GeneratingPage() {
   const router = useRouter();
   const { setSuggestions } = useSuggestionStore();
   const { setPainType, setPainDuration } = useUserPainStore();
-  const { setPainType, setPainDuration } = useUserPainStore();
 
   useEffect(() => {
     const loadPainData = async () => {
       const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
-      const storedDuration =
-        (await AsyncStorage.getItem("painDuration")) || "Unknown";
-      const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
-      const storedDuration =
-        (await AsyncStorage.getItem("painDuration")) || "Unknown";
+      const storedDuration = (await AsyncStorage.getItem("painDuration")) || "Unknown";
       setPainType(storedType);
       setPainDuration(storedDuration);
-    };
     };
 
     const fetchData = async () => {
