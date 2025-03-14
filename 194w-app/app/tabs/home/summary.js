@@ -47,14 +47,12 @@ export default function Page() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.buttonContainer}>
-        <BackButton
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
       <View style={styles.container}>
         <Text style={styles.heading}>I hear you're feeling</Text>
         <View style={styles.journalContainer}>

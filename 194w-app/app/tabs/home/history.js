@@ -100,14 +100,12 @@ export default function History() {
       resizeMode="cover"
       style={styles.background}
     >
-      <View style={styles.buttonContainer}>
-        <BackButton
-          onPress={() => {
-            router.back();
-          }}
-          showArrow={true}
-        />
-      </View>
+      <BackButton
+        onPress={() => {
+          router.back();
+        }}
+        showArrow={true}
+      />
       <View style={styles.scrollcontainer}>
         <ScrollView>
           <View style={styles.calendarContainer}>

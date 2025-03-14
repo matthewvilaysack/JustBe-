@@ -4,11 +4,13 @@ import Theme from "@/src/theme/theme";
 import { useRouter } from "expo-router";
 import LoadingThinkingBlob from "@/src/animations/LoadingThinkingBlob";
 import { extractExport } from "@/src/lib/api/togetherai";
-import { fetchDetailedEntriesForUser, formatEntriesForAI } from "../../utils/supabase-helpers";
+import {
+  fetchDetailedEntriesForUser,
+  formatEntriesForAI,
+} from "../../utils/supabase-helpers";
 import { useSuggestionStore } from "@/src/store/suggestionStore";
 import { useUserPainStore } from "@/src/store/userPainStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 
 export default function GeneratingPage() {
   const router = useRouter();
@@ -17,11 +19,12 @@ export default function GeneratingPage() {
 
   useEffect(() => {
     const loadPainData = async () => {
-      const storedType = await AsyncStorage.getItem("painType") || "Unknown";
-      const storedDuration = await AsyncStorage.getItem("painDuration") || "Unknown";
+      const storedType = (await AsyncStorage.getItem("painType")) || "Unknown";
+      const storedDuration =
+        (await AsyncStorage.getItem("painDuration")) || "Unknown";
       setPainType(storedType);
       setPainDuration(storedDuration);
-    };  
+    };
 
     const fetchData = async () => {
       try {
@@ -29,8 +32,11 @@ export default function GeneratingPage() {
 
         const entries = await fetchDetailedEntriesForUser();
         if (!entries) {
-          Alert.alert("No Entries", "No journal entries found for your account.");
-          router.push("/tabs/home");  // Redirect to a safer page if no entry found
+          Alert.alert(
+            "No Entries",
+            "No journal entries found for your account."
+          );
+          router.push("/tabs/home"); // Redirect to a safer page if no entry found
           return;
         }
 
@@ -38,7 +44,10 @@ export default function GeneratingPage() {
         console.log("raw combined text:", combinedJournalText);
         const output = await extractExport(combinedJournalText);
         if (!output.length) {
-          Alert.alert("No Suggestions", "AI could not generate any suggestions.");
+          Alert.alert(
+            "No Suggestions",
+            "AI could not generate any suggestions."
+          );
           return;
         }
         setSuggestions(output);
@@ -59,7 +68,9 @@ export default function GeneratingPage() {
     >
       <View style={styles.container}>
         <Text style={styles.heading}>Generating Summary...</Text>
-        <LoadingThinkingBlob />
+        <View style={styles.blobImage}>
+          <LoadingThinkingBlob />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -81,12 +92,6 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.bold,
   },
   blobImage: {
-    width: 250,
-    height: 250,
-    resizeMode: "contain",
-  },
-  buttonContainer: {
-    marginVertical: 10,
-    flexDirection: "row",
+    marginTop: Theme.spacing.xl,
   },
 });

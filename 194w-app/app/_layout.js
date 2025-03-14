@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
-import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/src/lib/api/supabase";
 import { updateUserProfile } from "@/src/lib/api/utils";
 
@@ -14,24 +14,26 @@ export default function RootLayout() {
       try {
         // ! TESTING ONLY
         // await AsyncStorage.clear();
-        const { data: { session } } = await supabase.auth.getSession();
-        const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        const hasOnboarded = await AsyncStorage.getItem("hasCompletedOnboarding");
         setSession(session);
-        setHasCompletedOnboarding(hasOnboarded === 'true');
+        setHasCompletedOnboarding(hasOnboarded === "true");
         // Update profile if needed
-        if (hasOnboarded === 'true' && session?.user) {
+        if (hasOnboarded === "true" && session?.user) {
           const painType = await AsyncStorage.getItem("painType");
           const painDuration = await AsyncStorage.getItem("painDuration");
           if (painType && painDuration) {
             await updateUserProfile(session.user.id, {
               pain_type: painType,
-              pain_duration: painDuration
+              pain_duration: painDuration,
             });
             await AsyncStorage.clear();
           }
         }
       } catch (error) {
-        console.error('Error checking app state:', error);
+        console.error("Error checking app state:", error);
       } finally {
         setIsLoading(false);
       }
@@ -39,7 +41,9 @@ export default function RootLayout() {
 
     checkAppState();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
@@ -53,28 +57,28 @@ export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       {session ? (
-        <Stack.Screen 
-          name="tabs" 
-          options={{ 
+        <Stack.Screen
+          name="tabs"
+          options={{
             headerShown: false,
-            gestureEnabled: false 
-          }} 
+            gestureEnabled: false,
+          }}
         />
       ) : !hasCompletedOnboarding ? (
-        <Stack.Screen 
-          name="onboarding" 
+        <Stack.Screen
+          name="onboarding"
           options={{
             headerShown: false,
-            gestureEnabled: false
-          }} 
+            gestureEnabled: false,
+          }}
         />
       ) : (
-        <Stack.Screen 
-          name="index" 
+        <Stack.Screen
+          name="index"
           options={{
             headerShown: false,
-            gestureEnabled: false
-          }} 
+            gestureEnabled: false,
+          }}
         />
       )}
     </Stack>
