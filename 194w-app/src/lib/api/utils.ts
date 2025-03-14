@@ -7,6 +7,27 @@
 import { supabase } from "./supabase";
 import { useUserPainStore } from "@/src/store/userPainStore";
 
+// Get today's most recent pain entry
+export const getTodayLatestPainEntry = async (userId: string) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('pain_rating')
+    .eq('user_id', userId)
+    .gte('created_at', today.toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error('❌ Failed to fetch latest pain entry:', error.message);
+    return null;
+  }
+
+  return data?.pain_rating || null;
+};
 
 // Update user profile in supabase
 export const updateUserProfile = async (userId: string, updates: { pain_type: string, pain_duration: string }) => {
