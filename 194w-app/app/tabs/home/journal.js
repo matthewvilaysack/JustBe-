@@ -33,7 +33,9 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const currentDate = new Date().toLocaleDateString();
+  const now = new Date();
+  const currentDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+    .toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
   // const [jsonData, setJSONData] = useState([]);

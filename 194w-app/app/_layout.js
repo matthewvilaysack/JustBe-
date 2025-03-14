@@ -10,13 +10,18 @@ export default function RootLayout() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    // persist session if already logged in on reload
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
+      if (initialSession) {
+        console.log('Session restored:', initialSession.user.email);
+      }
+    });
+    // ! TESTING ONLY
+    // await AsyncStorage.clear();
     const checkAppState = async () => {
       try {
-        // ! TESTING ONLY
-        // await AsyncStorage.clear();
-        const { data: { session } } = await supabase.auth.getSession();
         const hasOnboarded = await AsyncStorage.getItem('hasCompletedOnboarding');
-        setSession(session);
         setHasCompletedOnboarding(hasOnboarded === 'true');
         // Update profile if needed
         if (hasOnboarded === 'true' && session?.user) {
@@ -27,7 +32,8 @@ export default function RootLayout() {
               pain_type: painType,
               pain_duration: painDuration
             });
-            await AsyncStorage.clear();
+            // Only clear these specific items
+            await AsyncStorage.multiRemove(["painType", "painDuration"]);
           }
         }
       } catch (error) {
@@ -38,12 +44,15 @@ export default function RootLayout() {
     };
 
     checkAppState();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        console.log('Auth state changed:', session.user.email);
+      }
     });
-
-    return () => subscription?.unsubscribe();
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   if (isLoading) {
