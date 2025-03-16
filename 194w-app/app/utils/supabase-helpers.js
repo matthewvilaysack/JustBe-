@@ -61,7 +61,9 @@ async function incrementValues(updates) {
     for (let column in updates) {
         const keys = String(updates[column]);
 
-        if (keys === null || keys === "null" || column == "entry_text" || column == "causes") continue;   
+        if (keys === null || keys === "null" || keys === "none specified" || column == "entry_text" || column == "causes") continue;   
+        
+        if (column == "what-happened") column = "context" 
 
         // console.log("Column: ", column, " Keys: ", keys);
         const jsonData = data[column] || {};  
@@ -74,7 +76,6 @@ async function incrementValues(updates) {
           // console.log("key ", keysArray[i]);
         }
         // console.log("jsondata", jsonData);
-        if (column == "what-happened") column = "context" 
         // Update the modified JSON objects in Supabase // not super efficient
         const { error: updateError } = await supabase
           .from("count_data")
