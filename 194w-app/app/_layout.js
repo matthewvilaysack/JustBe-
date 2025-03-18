@@ -62,6 +62,9 @@ export default function RootLayout() {
     return () => {
       subscription?.unsubscribe();
     };
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   if (isLoading) {

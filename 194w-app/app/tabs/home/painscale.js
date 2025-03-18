@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
   },
   carousel: {
     height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
+    height: height / 2 - Theme.spacing.xl * 2 - Theme.spacing.lg * 2,
     minWidth: width,
   },
   carouselItem: {
