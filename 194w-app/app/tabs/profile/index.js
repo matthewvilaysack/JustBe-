@@ -24,11 +24,25 @@ export default function Profile() {
 
   useEffect(() => {
     async function fetchUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        Alert.alert("Error fetching user", error.message);
-      } else {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+          console.error("User fetch error:", error);
+          Alert.alert(
+            "Oops! We couldn't retrieve your account details :(",
+            "Please check your connection and try again."
+          );
+          return;
+        }
+
         setUser(data.user);
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        Alert.alert(
+          "Unexpected Error",
+          "Something went wrong. Please try again later."
+        );
       }
     }
 
@@ -39,7 +53,10 @@ export default function Profile() {
     useJournalStore.getState().clearLogs();
     const { error } = await supabase.auth.signOut();
     if (error) {
-      Alert.alert("Error", error.message);
+      Alert.alert(
+        "Oops! Something went wrong",
+        "We're working on this, but in the meantime, please check your connection and try again."
+      );
     } else {
       router.replace("/"); // Redirect to login page after sign out
     }

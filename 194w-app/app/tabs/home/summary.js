@@ -3,12 +3,8 @@ import {
   StyleSheet,
   View,
   ImageBackground,
-  Image,
   Text,
-  Dimensions,
-  TextInput,
-  Keyboard,
-  TouchableWithoutFeedback,
+  ScrollView,
   Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -16,8 +12,8 @@ import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
 import BackButton from "@/src/components/ui/BackButton";
 import { useKeywordStore } from "@/src/store/summaryStore";
+import { width, height, statusBarHeight } from "@/src/components/ui/Constants";
 
-const { width, height } = Dimensions.get("window");
 export default function Page() {
   const { keywords } = useKeywordStore();
   const router = useRouter();
@@ -41,27 +37,27 @@ export default function Page() {
     }
   }, [keywords]);
 
+  const getFontSize = (word) => {
+    if (word.length <= 20) return Theme.typography.sizes.lg;
+
+    if (word.length <= 30) return Theme.typography.sizes.md;
+    return Theme.typography.sizes.sm;
+  };
+
   return (
     <ImageBackground
       source={require("@/assets/background.png")}
       resizeMode="cover"
       style={styles.background}
     >
-      <BackButton
-        onPress={() => {
-          router.back();
-        }}
-        showArrow={true}
-      />
       <View style={styles.container}>
         <Text style={styles.heading}>I hear you're feeling</Text>
-        <View style={styles.journalContainer}>
+        <View style={styles.listContainer}>
           {keywords.map((word, index) => {
             const opacity = animations[index];
 
-            const leftOffset = index % 2 === 0 ? -width / 3 : 0;
-            const left = width / 2 + leftOffset;
-
+            const leftOffset = index % 2 === 0 ? -width / 2 + 100 : -20;
+            const left = Math.min(width / 2 + leftOffset, width - 100);
             return (
               <Animated.View
                 key={index}
@@ -74,8 +70,23 @@ export default function Page() {
                   },
                 ]}
               >
-                <View style={styles.symptomContainer}>
-                  <Text style={styles.symptomText}>{word}</Text>
+                <View
+                  style={[
+                    styles.symptomContainer,
+                    {
+                      height: height / keywords.length,
+                      maxHeight: Theme.spacing.lg * 2,
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.symptomText,
+                      { fontSize: getFontSize(word) },
+                    ]}
+                  >
+                    {word}
+                  </Text>
                 </View>
               </Animated.View>
             );
@@ -100,7 +111,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: Theme.spacing.xl,
+    padding: Theme.spacing.sm,
+    marginTop: statusBarHeight + Theme.spacing.xl,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
@@ -110,37 +122,22 @@ const styles = StyleSheet.create({
     fontFamily: Theme.typography.fonts.bold,
   },
   symptomContainer: {
+    justifyContent: "center",
     backgroundColor: Theme.colors.white,
-    padding: 10,
-    borderRadius: Theme.radius.lg,
+    opacity: 0.95,
+    paddingHorizontal: 15,
+    borderRadius: Theme.radius.pill,
     alignSelf: "flex-start",
   },
   symptomText: {
-    fontSize: Theme.typography.sizes.sm,
     color: Theme.colors.darkGray,
     fontFamily: Theme.typography.fonts.bold,
+    flexWrap: "wrap",
   },
-  dateText: {
-    fontSize: Theme.typography.sizes.md,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: Theme.colors.darkGray,
-  },
-  journalContainer: {
-    minHeight: "50%",
+  listContainer: {
     minWidth: width,
-    borderRadius: Theme.radius.lg,
   },
-  textArea: {
-    fontSize: Theme.typography.sizes.xl,
-    fontFamily: Theme.typography.fonts.bold,
-  },
-  buttonContainer: {
-    position: "absolute",
-    top: "7%",
-    left: "3%",
-    //opacity: 0.8,
-  },
+  scrollContent: {},
   footer: {
     flexDirection: "row",
     justifyContent: "flex-end",

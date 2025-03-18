@@ -43,6 +43,7 @@ const painLevelDescriptions = {
   4: "Distracting pain but no interruptions",
   5: "Moderate pain that interrupts activities",
   5: "Moderate pain that interrupts activities",
+  5: "Moderate pain that interrupts activities",
   6: "Hard to ignore pain and avoiding activities",
   7: "Severe pain that is focus of attention",
   8: "Very severe pain that is hard to tolerate",
@@ -55,6 +56,10 @@ export default function Page() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { painLevel, setPainLevel } = usePainLevelStore();
   const flatListRef = useRef(null);
+
+  useEffect(() => {
+    setPainLevel(0);
+  }, []);
 
   useEffect(() => {
     setPainLevel(0);
@@ -90,62 +95,77 @@ export default function Page() {
       />
 
       <View style={styles.background}>
-        <View style={styles.container}>
-          <Text style={styles.heading}>How would you rate your pain?</Text>
-          <View style={styles.carousel}>
-            <FlatList
-              ref={flatListRef}
-              data={images}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
-              keyExtractor={(_, index) => index.toString()}
-              scrollEnabled={false}
-              contentContainerStyle={{
-                paddingHorizontal: (width - ITEM_WIDTH) / 2,
-              }}
-              ItemSeparatorComponent={() => (
-                <View style={{ width: ITEM_MARGIN }} />
-              )}
-              renderItem={({ item }) => (
-                <View style={styles.carouselItem}>
-                  <Image source={item.src} style={styles.blobImage} />
-                </View>
-              )}
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+
+        <View style={styles.background}>
+          <View style={styles.container}>
+            <Text style={styles.heading}>How would you rate your pain?</Text>
+            <View style={styles.carousel}>
+              <FlatList
+                ref={flatListRef}
+                data={images}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={ITEM_WIDTH + ITEM_MARGIN}
+                keyExtractor={(_, index) => index.toString()}
+                scrollEnabled={false}
+                contentContainerStyle={{
+                  paddingHorizontal: (width - ITEM_WIDTH) / 2,
+                }}
+                ItemSeparatorComponent={() => (
+                  <View style={{ width: ITEM_MARGIN }} />
+                )}
+                renderItem={({ item }) => (
+                  <View style={styles.carouselItem}>
+                    <Image source={item.src} style={styles.blobImage} />
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+          <View style={styles.sliderContainer}>
+            <View style={styles.levelContainer}>
+              <Text style={styles.description}>
+                {painLevel} - {painLevelDescriptions[painLevel]}
+              </Text>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={10}
+              step={1}
+              value={selectedIndex * 2}
+              onValueChange={handleSliderChange}
+              minimumTrackTintColor={theme.colors.primary[200]}
+              maximumTrackTintColor={theme.colors.white}
+              thumbTintColor={theme.colors.white}
             />
           </View>
-        </View>
-        <View style={styles.sliderContainer}>
-          <View style={styles.levelContainer}>
-            <Text style={styles.description}>
-              {painLevel} - {painLevelDescriptions[painLevel]}
-            </Text>
-          </View>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={10}
-            step={1}
-            value={selectedIndex * 2}
-            onValueChange={handleSliderChange}
-            minimumTrackTintColor={theme.colors.primary[200]}
-            maximumTrackTintColor={theme.colors.white}
-            thumbTintColor={theme.colors.white}
-          />
-        </View>
 
-        <View style={styles.footer}>
-          <NextButton
-            onPress={() => router.push("/tabs/home/journal")}
-            showArrow={true}
-          />
-        </View>
-        <View style={styles.footer}>
-          <NextButton
-            onPress={() => router.push("/tabs/home/journal")}
-            showArrow={true}
-          />
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
+          <View style={styles.footer}>
+            <NextButton
+              onPress={() => router.push("/tabs/home/journal")}
+              showArrow={true}
+            />
+          </View>
         </View>
       </View>
     </ImageBackground>
@@ -161,10 +181,14 @@ const styles = StyleSheet.create({
     height: height,
     flexDirection: "column",
     justifyContent: "center",
+    height: height,
+    flexDirection: "column",
+    justifyContent: "center",
   },
   container: {
     justifyContent: "flex-start",
     alignItems: "center",
+    alignSelf: "center",
     alignSelf: "center",
     alignSelf: "center",
   },
@@ -173,7 +197,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
-    paddingHorizontal: Theme.spacing.sm,
+    marginHorizontal: Theme.spacing.sm,
   },
   description: {
     fontSize: Theme.typography.sizes.lg,
@@ -201,6 +225,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     maxHeight: Theme.spacing.lg * 4,
     maxHeight: Theme.spacing.lg * 4,
+    maxHeight: Theme.spacing.lg * 4,
   },
   levelContainer: {
     backgroundColor: theme.colors.darkPurple,
@@ -217,6 +242,8 @@ const styles = StyleSheet.create({
     //opacity: 0.9,
     left: "3%",
     //opacity: 0.9,
+    left: "3%",
+    //opacity: 0.9,
   },
   footer: {
     position: "absolute",
@@ -225,8 +252,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     flexDirection: "row",
     justifyContent: "flex-end",
+    alignSelf: "flex-end",
+    maxHeight: height * 0.1,
     alignSelf: "flex-end",
     maxHeight: height * 0.1,
     alignSelf: "flex-end",

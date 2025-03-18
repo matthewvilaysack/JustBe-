@@ -31,8 +31,9 @@ export default function Page() {
 
   const router = useRouter();
   const now = new Date();
-  const currentDate = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
-    .toLocaleDateString();
+  const currentDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  ).toLocaleDateString();
   const { setKeywords, keywords } = useKeywordStore();
   const { setJSONData, jsonData } = useJSONDataStore();
   const { painLevel } = usePainLevelStore();
@@ -85,8 +86,8 @@ export default function Page() {
 
       if (retryCount === 0) {
         Alert.alert(
-          "AI Extraction Failed",
-          "Could not process the journal entry. Would you like to retry?",
+          "ACK!",
+          "We couldn't process the journal entry. Would you like to retry?",
           [
             { text: "Cancel", style: "cancel" },
             { text: "Retry", onPress: () => fetchKeywords(text) },
@@ -134,8 +135,8 @@ export default function Page() {
         retryCount--;
         if (retryCount === 0) {
           Alert.alert(
-            "Database Error",
-            "An unexpected issue occurred. Would you like to retry?",
+            "Saving Error",
+            "Sorry, an unexpected issue occurred. Would you like to retry?",
             [
               { text: "Cancel", style: "cancel" },
               { text: "Retry", onPress: () => saveToSupabase(updateData, 3) },
@@ -180,11 +181,11 @@ export default function Page() {
   // Add keyboard listeners
   useEffect(() => {
     const keyboardDidShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       () => setKeyboardVisible(true)
     );
     const keyboardDidHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => setKeyboardVisible(false)
     );
 
@@ -195,7 +196,7 @@ export default function Page() {
   }, []);
 
   const handleKeyPress = ({ nativeEvent }) => {
-    if (nativeEvent.key === 'Enter') {
+    if (nativeEvent.key === "Enter") {
       Keyboard.dismiss();
     }
   };
@@ -207,6 +208,13 @@ export default function Page() {
         resizeMode="cover"
         style={styles.background}
       >
+        <BackButton
+          onPress={() => {
+            router.back();
+          }}
+          showArrow={true}
+        />
+
         <BackButton
           onPress={() => {
             router.back();
@@ -227,7 +235,6 @@ export default function Page() {
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
               returnKeyType="done"
-              blurOnSubmit={true}
               onKeyPress={handleKeyPress}
               onSubmitEditing={() => Keyboard.dismiss()}
             />
@@ -242,10 +249,12 @@ export default function Page() {
           />
         )}
 
-        <View style={[
-          styles.footer,
-          keyboardVisible && { marginBottom: Platform.OS === 'ios' ? 20 : 0 }
-        ]}>
+        <View
+          style={[
+            styles.footer,
+            keyboardVisible && { marginBottom: Platform.OS === "ios" ? 20 : 0 },
+          ]}
+        >
           <NextButton
             onPress={() => displayKeywords(text, router)}
             showArrow={true}
@@ -267,13 +276,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: Theme.spacing.xl,
     paddingVertical: Theme.spacing.md,
-    marginTop: statusBarHeight,
+    marginTop: statusBarHeight + Theme.spacing.xxl,
   },
   heading: {
     fontSize: Theme.typography.sizes.xl,
     color: Theme.colors.white,
     textAlign: "center",
-    marginBottom: Theme.spacing.md,
     marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
   },
@@ -293,10 +301,10 @@ const styles = StyleSheet.create({
   },
   textArea: {
     fontSize: Theme.typography.sizes.lg,
-    fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
-    maxHeight: "90%",
     minHeight: Theme.typography.sizes.lg * 5,
+    maxHeight: "95%",
+    marginHorizontal: Theme.spacing.sm,
   },
   buttonContainer: {
     position: "absolute",

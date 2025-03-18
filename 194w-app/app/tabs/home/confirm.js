@@ -1,25 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, ImageBackground, Text } from "react-native";
+import { StyleSheet, View, ImageBackground, Text, Image } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
-import LoadingNoPainBlob from "@/src/animations/LoadingNoPainBlob";
-import LoadingMildPainBlob from "@/src/animations/LoadingMildPainBlob";
-import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
-import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
-import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
-import { usePainLevelStore } from "@/src/store/painlevelStore";
 
 export default function Page() {
   const router = useRouter();
-  const [showSuccess, setShowSuccess] = useState(false);
-  const { painLevel } = usePainLevelStore();
-
   useEffect(() => {
-    // Show loading for 1 second, then success for 1 second
-    const loadingTimer = setTimeout(() => {
-      setShowSuccess(true);
-    }, 1000);
-
     const navigationTimer = setTimeout(() => {
       router.push("/tabs/home");
     }, 2000);
@@ -30,29 +16,6 @@ export default function Page() {
     };
   }, [router]);
 
-  const PainBlob = () => {
-    switch (painLevel) {
-      case 0:
-        return <LoadingNoPainBlob size={150} />;
-      case 1:
-      case 2:
-        return <LoadingMildPainBlob size={150} />;
-      case 3:
-      case 4:
-        return <LoadingSeverePainBlob size={150} />;
-      case 5:
-      case 6:
-        return <LoadingVerySeverePainBlob size={150} />;
-      case 7:
-      case 8:
-      case 9:
-      case 10:
-        return <LoadingWorstPainBlob size={150} />;
-      default:
-        return <LoadingNoPainBlob size={150} />;
-    }
-  };
-
   return (
     <ImageBackground
       source={require("@/assets/background.png")}
@@ -60,15 +23,11 @@ export default function Page() {
       style={styles.background}
     >
       <View style={styles.container}>
-        <View style={styles.contentContainer}>
-          <PainBlob />
-          <Text style={[
-            styles.heading,
-            { marginTop: Theme.spacing.xl }
-          ]}>
-            {showSuccess ? "Your entry has been logged!" : "Saving your entry..."}
-          </Text>
-        </View>
+        <Text style={styles.heading}>Your entry have been logged!</Text>
+        <Image
+          source={require("@/assets/blob-wink.png")}
+          style={styles.blobImage}
+        />
       </View>
     </ImageBackground>
   );
@@ -93,7 +52,7 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     fontFamily: Theme.typography.fonts.bold,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
   },
@@ -118,14 +77,18 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     position: "absolute",
-    bottom: Theme.spacing.xxl,
-    alignItems: "center",
-    gap: Theme.spacing.xl,
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   footer: {
     flexDirection: "row",
     justifyContent: "flex-end",
     paddingBottom: Theme.spacing.lg,
     paddingRight: Theme.spacing.lg,
+  },
+  blobImage: {
+    padding: Theme.spacing.lg,
+    resizeMode: "contain",
   },
 });
