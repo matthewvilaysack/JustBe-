@@ -235,7 +235,6 @@ export default function Page() {
               placeholder="Type your journal entry here..."
               placeholderTextColor={Theme.colors.lightGray}
               returnKeyType="done"
-              blurOnSubmit={true}
               onKeyPress={handleKeyPress}
               onSubmitEditing={() => Keyboard.dismiss()}
             />
@@ -284,7 +283,6 @@ const styles = StyleSheet.create({
     color: Theme.colors.white,
     textAlign: "center",
     marginBottom: Theme.spacing.md,
-    marginBottom: Theme.spacing.md,
     fontFamily: Theme.typography.fonts.bold,
   },
   dateText: {
@@ -302,8 +300,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   textArea: {
-    fontSize: Theme.typography.sizes.lg,
-    fontSize: Theme.typography.sizes.lg,
     fontSize: Theme.typography.sizes.lg,
     fontFamily: Theme.typography.fonts.regular,
     minHeight: Theme.typography.sizes.lg * 5,
