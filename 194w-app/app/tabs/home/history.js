@@ -15,7 +15,6 @@ import { Calendar } from "react-native-calendars";
 import BackButton from "@/src/components/ui/BackButton";
 import useJournalStore from "@/src/store/journalStore";
 
-// date widget
 const DateWidget = ({ selectedDate, today }) => {
   const formatDate = (date) => {
     return new Date(date + "T00:00:00").toLocaleDateString("en-US", {
@@ -107,7 +106,6 @@ export default function History() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeTab, setActiveTab] = useState("logs");
 
-  // get today's date in the correct timezone format
   const now = new Date();
   const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
     .toISOString()
@@ -116,23 +114,15 @@ export default function History() {
   const { journalLogs, isLoading, getLogsByDate, getJournalLogs } =
     useJournalStore();
 
-  // load logs when component mounts
   useEffect(() => {
     const loadData = async () => {
-      // set today as the selected date
       setSelectedDate(today);
-      // fetch latest logs from the database
       await getJournalLogs();
     };
 
     loadData();
   }, []);
-
-  // Get logs for the selected date
   const selectedLog = selectedDate ? getLogsByDate(selectedDate) : [];
-  console.log("selectedLog", selectedLog); // Temp
-
-  // Get the time that a log was created (helper fn)
   const formatLogTime = (timestamp) => {
     if (!timestamp) return "Unknown Time";
     return new Date(timestamp).toLocaleTimeString("en-US", {
@@ -141,8 +131,6 @@ export default function History() {
       hour12: true,
     });
   };
-
-  // get pain level for log
   const getPainLevel = (pain_rating) => {
     if (pain_rating === 0) return "No Pain";
     if (pain_rating >= 1 && pain_rating <= 3) return "Mild Pain";
@@ -151,7 +139,6 @@ export default function History() {
     if (pain_rating === 10) return "Extreme Pain";
     return "Unknown Pain Level";
   };
-  // get pain color for calendar, displaying severity back to user
   const getPainColor = (pain_rating) => {
     if (pain_rating === 0) return "rgba(0, 255, 0, 0.5)";
     if (pain_rating >= 1 && pain_rating <= 2) return "rgba(173, 255, 47, 0.7)";
@@ -161,7 +148,6 @@ export default function History() {
     if (pain_rating >= 9) return "rgba(255, 0, 0, 0.7)";
   };
 
-  // create marked dates object from all journal logs
   const markedDates = Object.entries(journalLogs).reduce(
     (journalLogs, [date, logs]) => {
       if (logs.length === 0) return journalLogs;

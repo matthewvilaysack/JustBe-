@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
   ImageBackground,
   Text,
-  ScrollView,
   Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Theme from "@/src/theme/theme";
 import NextButton from "@/src/components/ui/NextButton";
-import BackButton from "@/src/components/ui/BackButton";
 import { useKeywordStore } from "@/src/store/summaryStore";
 import { width, height, statusBarHeight } from "@/src/components/ui/Constants";
 

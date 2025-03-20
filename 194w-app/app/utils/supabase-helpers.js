@@ -1,12 +1,15 @@
-import { supabase } from '../../src/lib/api/supabase';
+import { supabase } from "../../src/lib/api/supabase";
 
 /**
  * Fetches the user id for current user
  * @returns {user id} from Supabase
  */
 async function getUserID() {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
   if (authError || !user) {
     console.error("getUser failed");
   }
@@ -20,24 +23,23 @@ async function getUserID() {
 export async function fetchUserProfile() {
   const userId = await getUserID();
   if (!userId) {
-      console.error("No user ID found. Cannot fetch user profile.");
-      return null;
+    console.error("No user ID found. Cannot fetch user profile.");
+    return null;
   }
 
   const { data, error } = await supabase
-      .from('profiles')
-      .select("pain_type, pain_duration")
-      .eq('id', userId)
-      .single();  // Assuming there's only one profile per user
+    .from("profiles")
+    .select("pain_type, pain_duration")
+    .eq("id", userId)
+    .single(); // Assuming there's only one profile per user
 
   if (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
+    console.error("Error fetching user profile:", error);
+    return null;
   }
 
   return data;
 }
-
 
 /**
  * Called everytime a new entry is made
@@ -46,56 +48,55 @@ export async function fetchUserProfile() {
  * @param {Object} entry - The JSON data to insert
  */
 async function incrementValues(updates) {
-    // Fetch data for the user
-    const { data, error } = await supabase
-        .from('count_data').select('*').single();  // Get single user record
-    if (error) {
-        console.error("Error fetching data for incrementValues:", error);
-        return;
+  // Fetch data for the user
+  const { data, error } = await supabase
+    .from("count_data")
+    .select("*")
+    .single(); // Get single user record
+  if (error) {
+    console.error("Error fetching data for incrementValues:", error);
+    return;
+  }
+
+  const userId = await getUserID();
+
+  for (let column in updates) {
+    const keys = String(updates[column]);
+
+    if (
+      keys === null ||
+      keys === "null" ||
+      keys === "none specified" ||
+      column == "entry_text" ||
+      column == "causes"
+    )
+      continue;
+
+    if (column == "what-happened") column = "context";
+    const keysArray = keys.split(",").map((item) => item.trim());
+    for (const i in keysArray) {
+      jsonData[keysArray[i]] = (jsonData[keysArray[i]] || 0) + 1; // ++
     }
+    const { error: updateError } = await supabase
+      .from("count_data")
+      .update({ [column]: jsonData })
+      .eq("user_id", userId);
 
-    const userId = await getUserID();
-
-    // console.log("Function: Increment Values. Updates: ", updates);
-    // Loop through updates and modify the relevant column
-    for (let column in updates) {
-        const keys = String(updates[column]);
-
-        if (keys === null || keys === "null" || keys === "none specified" || column == "entry_text" || column == "causes") continue;   
-        
-        if (column == "what-happened") column = "context" 
-
-        // console.log("Column: ", column, " Keys: ", keys);
-        const jsonData = data[column] || {};  
-
-        // parse comma separated string key into array. e.g 'leg pain, headache' -> [leg pain, headache]
-        const keysArray = keys.split(",").map(item => item.trim());
-        // console.log("keysarray ", keysArray);
-        for (const i in keysArray) {
-          jsonData[keysArray[i]] = (jsonData[keysArray[i]] || 0) + 1; // ++
-          // console.log("key ", keysArray[i]);
-        }
-        // console.log("jsondata", jsonData);
-        // Update the modified JSON objects in Supabase // not super efficient
-        const { error: updateError } = await supabase
-          .from("count_data")
-          .update({ [column]: jsonData }) 
-          .eq("user_id", userId); 
-
-        if (updateError) {
-          console.error("Error updating data:", updateError);
-        } else {
-            console.log(`Successfully updated values for user ${userId}`);
-        }
+    if (updateError) {
+      console.error("Error updating data:", updateError);
     }
+  }
 }
 
 /**
-* Adds new detailed entry to Supabase
-* @param {Object} detailed_entry - JSON data to insert
-*/
+ * Adds new detailed entry to Supabase
+ * @param {Object} detailed_entry - JSON data to insert
+ */
 export const addNewDetailedEntry = async (detailed_entry) => {
-  const response = await supabase.from("detailed_entries").insert([detailed_entry]).select();
+  const response = await supabase
+    .from("detailed_entries")
+    .insert([detailed_entry])
+    .select();
   await incrementValues(detailed_entry);
   return response;
 };
@@ -108,19 +109,19 @@ export async function fetchDetailedEntriesForUser() {
   const userId = await getUserID();
 
   if (!userId) {
-      console.error("No user ID found. Cannot fetch detailed entries.");
-      return [];
+    console.error("No user ID found. Cannot fetch detailed entries.");
+    return [];
   }
 
   const { data, error } = await supabase
-      .from('detailed_entries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+    .from("detailed_entries")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   if (error) {
-      console.error("Error fetching detailed entries:", error);
-      return [];
+    console.error("Error fetching detailed entries:", error);
+    return [];
   }
 
   return data;
@@ -132,30 +133,35 @@ export async function fetchDetailedEntriesForUser() {
  * @returns The ai prompt from Supabase
  */
 export function formatEntriesForAI(entries) {
-  const combinedText = entries.map((entry) => {
-    const parts = [
+  const combinedText = entries
+    .map((entry) => {
+      const parts = [
         entry.symptoms ? `Symptoms: ${entry.symptoms}` : null,
         entry.duration ? `Duration: ${entry.duration}` : null,
         entry.sensation ? `Sensation: ${entry.sensation}` : null,
         entry.causes ? `Causes: ${entry.causes}` : null,
-        entry["what-happened"] ? `What happened: ${entry["what-happened"]}` : null,
+        entry["what-happened"]
+          ? `What happened: ${entry["what-happened"]}`
+          : null,
         entry.concerns ? `Concerns: ${entry.concerns}` : null,
-        entry["when-does-it-hurt"] ? `When does it hurt: ${entry["when-does-it-hurt"]}` : null,
-    ];
+        entry["when-does-it-hurt"]
+          ? `When does it hurt: ${entry["when-does-it-hurt"]}`
+          : null,
+      ];
 
-    // Join parts of a single entry and remove empty/null lines
-    return parts.filter(Boolean).join("\n");
-  }).join("\n\n---\n\n");
+      // Join parts of a single entry and remove empty/null lines
+      return parts.filter(Boolean).join("\n");
+    })
+    .join("\n\n---\n\n");
 
   // Clean up excess whitespace and multiple dividers
   return combinedText
-    .replace(/[\t ]+/g, ' ')                    // Collapse multiple spaces
-    .replace(/\n{3,}/g, '\n\n')                  // Collapse 3+ newlines into 2
-    .replace(/(\n---\n){2,}/g, '\n---\n')        // Collapse repeated dividers into 1
-    .replace(/(^---\n|\n---$)/g, '')             // Remove leading or trailing dividers
-    .trim();                                     // Trim final leading/trailing whitespace
+    .replace(/[\t ]+/g, " ") // Collapse multiple spaces
+    .replace(/\n{3,}/g, "\n\n") // Collapse 3+ newlines into 2
+    .replace(/(\n---\n){2,}/g, "\n---\n") // Collapse repeated dividers into 1
+    .replace(/(^---\n|\n---$)/g, "") // Remove leading or trailing dividers
+    .trim(); // Trim final leading/trailing whitespace
 }
-
 
 /**
  * Adds a row to a Supabase table
@@ -167,7 +173,7 @@ export function formatEntriesForAI(entries) {
 //   try {
 //     const { data: insertedData, error } = await supabase.from(tableName).insert([entry]).select();
 //     if (error) throw error;
-    
+
 //     return insertedData;
 //   } catch (error) {
 //     console.error("Error inserting data:", error.message);
@@ -176,37 +182,38 @@ export function formatEntriesForAI(entries) {
 // };
 
 /**
-* Fetches data of highest pain rating per day
-* @returns {Promise<Object>} JSON table data
-*/
+ * Fetches data of highest pain rating per day
+ * @returns {Promise<Object>} JSON table data
+ */
 export async function getHighestPainRatingPerDay() {
   const userId = await getUserID();
-  const { data, error } = await supabase
-      .rpc('get_highest_pain_rating_per_day', { user_id_param: userId });
+  const { data, error } = await supabase.rpc(
+    "get_highest_pain_rating_per_day",
+    { user_id_param: userId }
+  );
 
   if (error) {
-      console.error("Error fetching data from get_highest_pain_rating_per_day:", error);
-      return [];
+    console.error(
+      "Error fetching data from get_highest_pain_rating_per_day:",
+      error
+    );
+    return [];
   }
-
-  console.log("get_highest_pain_rating_per_day data: ", data);
   return data;
 }
 
 /**
-* Fetches countData 
-* @returns {Promise<Object>} JSON table data
-*/
-export async function fetchCountData(){
-  // Fetch data for the user
+ * Fetches countData
+ * @returns {Promise<Object>} JSON table data
+ */
+export async function fetchCountData() {
   const { data, error } = await supabase
-    .from('count_data').select('*').single();  // Get single user record
+    .from("count_data")
+    .select("*")
+    .single();
   if (error) {
     console.error("Error fetching data from count_data:", error);
     return error;
   }
-
-  // otherwise split up the data
-  console.log("fetch count data: ", data);
   return data;
 }

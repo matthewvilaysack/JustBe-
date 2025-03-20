@@ -14,9 +14,6 @@ import { useUserPainStore } from "@/src/store/userPainStore";
 import MedicalSummaryScreen from "@/src/components/screens/MedicalSummaryScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// TODO: fetch diagnoses from supabase
-//const DIAGNOSES = ["Anemia", "Gastroenteritis"];
-
 const GeneratePDF = () => {
   const [loading, setLoading] = useState(false);
   const [pdfUri, setPdfUri] = useState(null);
@@ -91,7 +88,6 @@ const GeneratePDF = () => {
       }
 
       const combinedJournalText = formatEntriesForAI(entries);
-      console.log("raw combined text:", combinedJournalText);
       const output = await extractExport(combinedJournalText);
 
       if (!output.length) {

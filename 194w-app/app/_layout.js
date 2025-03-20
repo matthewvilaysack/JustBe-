@@ -11,25 +11,17 @@ export default function RootLayout() {
   useEffect(() => {
     const initialize = async () => {
       try {
-        // persist session if already logged in on reload
         const {
           data: { session: initialSession },
         } = await supabase.auth.getSession();
         setSession(initialSession);
-        if (initialSession) {
-          console.log("Session restored:", initialSession.user.email);
-        }
 
         // ! TESTING ONLY
         // await AsyncStorage.clear();
-
-        // Check onboarding status
         const hasOnboarded = await AsyncStorage.getItem(
           "hasCompletedOnboarding"
         );
         setHasCompletedOnboarding(hasOnboarded === "true");
-
-        // Update profile if needed
         if (hasOnboarded === "true" && initialSession?.user) {
           const painType = await AsyncStorage.getItem("painType");
           const painDuration = await AsyncStorage.getItem("painDuration");
@@ -54,9 +46,6 @@ export default function RootLayout() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      if (session) {
-        console.log("Auth state changed:", session.user.email);
-      }
     });
 
     return () => {

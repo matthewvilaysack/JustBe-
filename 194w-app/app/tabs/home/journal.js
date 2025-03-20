@@ -49,7 +49,6 @@ export default function Page() {
           fetchedKeywords.push(fetchedJSON[key]);
         }
       }
-      console.log("Extracted Keywords:", fetchedKeywords);
       setKeywords(fetchedKeywords);
       setJSONData(fetchedJSON);
       return { keywords: fetchedKeywords, jsonData: fetchedJSON };
@@ -62,15 +61,12 @@ export default function Page() {
   issue w ios, need to research further into issue
   */
   const fetchedKeywords = async (text) => {
-    console.log("🔹 Fetching latest keywords...");
     try {
       const refetchResult = await refetch();
       const fetchedJSON = refetchResult.data?.jsonData || {};
       const symptoms = fetchedJSON.symptoms
         ? fetchedJSON.symptoms.split(",").map((s) => s.trim())
         : [];
-
-      console.log("✅ Extracted Symptoms:", symptoms);
 
       if (!symptoms.length) {
         console.warn("⚠️ No keywords extracted.");
@@ -104,7 +100,6 @@ export default function Page() {
   issue w ios, need to research further into issue
   */
   const saveToSupabase = async (updateData, retryCount = 3) => {
-    console.log("🔹 Attempting to update Supabase...");
     while (retryCount > 0) {
       try {
         const { data, error } = await addNewDetailedEntry(updateData);
@@ -122,10 +117,8 @@ export default function Page() {
           throw new Error("Supabase insert failed - No data returned.");
         }
 
-        // eagerly add new log to journal store
         addJournalLog(data[0]);
 
-        console.log("✅ Supabase Updated:", data);
         return true;
       } catch (err) {
         console.error(
@@ -161,8 +154,6 @@ export default function Page() {
       setLoading(false); // Hide spinner if Together AI fails
       return;
     }
-    console.log("Entry Text: ", text);
-    console.log("Extracted JSON data", jsonData);
 
     // get json from LLM output, add entry_text and pain_rating
     const updateData = {

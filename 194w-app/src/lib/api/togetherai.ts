@@ -17,7 +17,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
     "Accept-Encoding": "gzip, deflate, br",
   },
-  timeout: 15000, // 15 seconds timeout
+  timeout: 15000,
 });
 
 /**
@@ -29,19 +29,16 @@ const axiosInstance = axios.create({
  */
 export const extractDetailedEntryJSON = async (
   journalText: string,
-  retryCount = 3, // Retry logic
-  delay = 2000 // Delay between retries
+  retryCount = 3,
+  delay = 2000
 ) => {
   if (!journalText.trim()) return {};
 
-  console.log("🔹 Checking internet connection...");
   const connection = await isConnected();
   if (!connection) {
     console.warn("⚠️ No internet connection. Retrying...");
     return {};
   }
-
-  console.log("🔹 Sending request to Together AI...");
 
   while (retryCount > 0) {
     try {
@@ -90,32 +87,26 @@ export const extractDetailedEntryJSON = async (
             content: `Journal Entry: ${journalText}`,
           },
         ],
-        temperature: 0,        
+        temperature: 0,
       });
 
       const data = await response.data;
-      console.log("✅ Response from AI:", data);
 
       let rawText: string = response.data.choices?.[0]?.message?.content || "";
-      console.log("raw text: ", rawText);
 
-      let jsonMatch = rawText.match(/\{[\s\S]*\}/); // remove additional assumptions
-      
-      // console.log("jsonMatch: ", jsonMatch);
+      let jsonMatch = rawText.match(/\{[\s\S]*\}/);
+
       if (!jsonMatch) {
         rawText = rawText.slice(0, -2) + "}";
-        console.log("raw text didn't generate properly, manually tweaked : ", rawText);
         jsonMatch = rawText.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           throw new Error("No JSON object found in AI response.");
         }
       }
 
-      const cleanedJson = jsonMatch[0]; // this should be only the JSON part
-      console.log("Cleaned JSON:", cleanedJson);
+      const cleanedJson = jsonMatch[0];
 
       const parsedData = JSON.parse(cleanedJson);
-      // fallback defaults to guarantee all fields exist
       const defaultFields = {
         symptoms: null,
         duration: null,
@@ -128,7 +119,6 @@ export const extractDetailedEntryJSON = async (
 
       const finalData = { ...defaultFields, ...parsedData };
 
-      console.log("✅ Final Parsed Data:", finalData);
       return finalData;
     } catch (error) {
       console.error(
@@ -139,11 +129,11 @@ export const extractDetailedEntryJSON = async (
 
       if (retryCount === 0) {
         console.warn("⚠️ Max retries reached. Returning empty obj.");
-        return {}; // Max retries reached, return empty array
+        return {};
       }
       console.warn(`⚠️ Retrying AI Extraction... ${retryCount} attempts left`);
-      await new Promise((resolve) => setTimeout(resolve, delay)); // Exponential backoff
-      delay *= 2; // Increase delay for next attempt
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2;
     }
   }
 
@@ -159,19 +149,16 @@ export const extractDetailedEntryJSON = async (
  */
 export const extractKeywords = async (
   journalText: string,
-  retryCount = 3, // Retry logic
-  delay = 2000 // Delay between retries
+  retryCount = 3,
+  delay = 2000
 ): Promise<string[]> => {
   if (!journalText.trim()) return [];
 
-  console.log("🔹 Checking internet connection...");
   const connection = await isConnected();
   if (!connection) {
     console.warn("⚠️ No internet connection. Retrying...");
     return [];
   }
-
-  console.log("🔹 Sending request to Together AI...");
 
   while (retryCount > 0) {
     try {
@@ -192,19 +179,16 @@ export const extractKeywords = async (
       });
 
       const data = await response.data;
-      console.log("✅ Response from AI:", data);
 
-      // Extract keywords response
       let rawText: string =
         data.choices?.[0]?.message?.content.split("\n")[0].trim() || "";
-      console.log(rawText);
 
       const keywords = rawText
         .split(",")
         .map((word) =>
           word.trim().replace(/^"|"$/g, "").toLowerCase().replace(/\.$/, "")
-        ) // Remove quotes if present
-        .filter(Boolean); // Remove empty strings
+        )
+        .filter(Boolean);
 
       return keywords;
     } catch (error) {
@@ -216,11 +200,11 @@ export const extractKeywords = async (
 
       if (retryCount === 0) {
         console.warn("⚠️ Max retries reached. Returning empty array.");
-        return []; // Max retries reached, return empty array
+        return [];
       }
       console.warn(`⚠️ Retrying AI Extraction... ${retryCount} attempts left`);
-      await new Promise((resolve) => setTimeout(resolve, delay)); // Exponential backoff
-      delay *= 2; // Increase delay for next attempt
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay *= 2;
     }
   }
 
@@ -230,12 +214,11 @@ export const extractKeywords = async (
 
 export const extractExport = async (
   formattedInput: string,
-  retryCount = 3, // Retry logic
-  delay = 2000 // Delay between retries
+  retryCount = 3,
+  delay = 2000
 ): Promise<string[]> => {
   if (!formattedInput.trim()) return [];
 
-  console.log("🔹 Sending request to Together AI...");
   while (retryCount > 0) {
     try {
       const response = await axiosInstance.post("", {
@@ -270,23 +253,17 @@ export const extractExport = async (
         temperature: 0,
       });
 
-      console.log("✅ Response from AI:", response.data);
-
-      // extract keywords response
       let rawText: string = response.data.choices?.[0]?.message?.content || "";
-      console.log("rawText from AI:", rawText);
       const cleanedSummaries = rawText
         .split("\n")
         .map((line) =>
           line
             .trim()
-            .replace(/^\d+\.\s*/, "") // remove "1. ", "2. ", etc.
-            .replace(/^[-•]\s*/, "") // remove bullet points like "-" or "•"
+            .replace(/^\d+\.\s*/, "")
+            .replace(/^[-•]\s*/, "")
             .trim()
         )
-        .filter(Boolean); // remove empty lines
-
-      console.log("Cleaned summaries:", cleanedSummaries);
+        .filter(Boolean);
 
       return cleanedSummaries;
     } catch (error: any) {
@@ -304,7 +281,7 @@ export const extractExport = async (
       }
       console.warn(`⚠️ Retrying extractExport... ${retryCount} attempts left`);
       await new Promise((resolve) => setTimeout(resolve, delay));
-      delay *= 2; // Exponential backoff
+      delay *= 2;
     }
   }
   console.warn("⚠️ Returning empty array.");

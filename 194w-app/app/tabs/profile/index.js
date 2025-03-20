@@ -20,7 +20,6 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const router = useRouter();
-  const CURRENT_TAB_DETAILS = "/tabs/profile/details";
 
   useEffect(() => {
     async function fetchUser() {
@@ -58,7 +57,7 @@ export default function Profile() {
         "We're working on this, but in the meantime, please check your connection and try again."
       );
     } else {
-      router.replace("/"); // Redirect to login page after sign out
+      router.replace("/");
     }
   }
 
