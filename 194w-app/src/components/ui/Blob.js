@@ -9,11 +9,7 @@ import Svg, {
 } from "react-native-svg";
 import theme from "@/src/theme/theme";
 
-interface BlobProps {
-  size?: number;
-}
-
-export default function Blob({ size = 347 }: BlobProps) {
+export default function Blob({ size = 347 }) {
   const scale = size / 347;
   const height = 310 * scale;
 

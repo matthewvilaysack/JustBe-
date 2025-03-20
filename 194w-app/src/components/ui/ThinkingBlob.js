@@ -7,11 +7,7 @@ import Svg, {
   Stop,
 } from "react-native-svg";
 
-interface BlobProps {
-  size?: number;
-}
-
-export default function Blob({ size = 308 }: BlobProps) {
+export default function Blob({ size = 308 }) {
   const scale = size / 308;
   const height = 253 * scale;
 

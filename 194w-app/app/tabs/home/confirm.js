@@ -11,7 +11,6 @@ export default function Page() {
     }, 2000);
 
     return () => {
-      clearTimeout(loadingTimer);
       clearTimeout(navigationTimer);
     };
   }, [router]);

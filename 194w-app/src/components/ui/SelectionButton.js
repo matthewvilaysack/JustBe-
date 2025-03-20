@@ -1,5 +1,5 @@
 /**
- * @file SelectionButton.tsx
+ * @file SelectionButton.js
  * @description A customizable button component used in the onboarding flow for selecting options.
  * Supports both regular selection buttons and a special "Other" option with text input.
  */
@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ViewStyle,
   View,
   TextInput,
   Animated,
@@ -19,16 +18,6 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import theme from "@/src/theme/theme";
 
-interface SelectionButtonProps {
-  title: string;
-  onPress: () => void;
-  selected?: boolean;
-  style?: ViewStyle;
-  isOther?: boolean;
-  customValue?: string;
-  onCustomValueChange?: (text: string) => void;
-}
-
 export default function SelectionButton({
   title,
   onPress,
@@ -37,7 +26,7 @@ export default function SelectionButton({
   isOther,
   customValue,
   onCustomValueChange,
-}: SelectionButtonProps) {
+}) {
   return (
     <View style={[styles.wrapper, style]}>
       <TouchableOpacity 
