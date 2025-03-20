@@ -230,8 +230,6 @@ export default function Onboarding() {
   );
 
   const handleOptionSelect = (option: string) => {
-    console.log("Option selected:", option, "on slide:", currentIndex);
-
     if (currentIndex === 1) {
       setSelectedPainType(option);
       if (option !== "Other") {
@@ -256,8 +254,6 @@ export default function Onboarding() {
         selectedPainType === "Other" ? customPainType : selectedPainType;
       setPainType(painType);
       setPainDuration(selectedDuration);
-      console.log("Saving to AsyncStorage:", { painType, selectedDuration });
-
       await AsyncStorage.setItem("painType", painType);
       await AsyncStorage.setItem("painDuration", selectedDuration);
       await AsyncStorage.setItem("hasCompletedOnboarding", "true");
@@ -270,10 +266,10 @@ export default function Onboarding() {
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
       (e) => {
         Animated.timing(contentOffset, {
-          toValue: (-e.endCoordinates.height / 2) - 100,
+          toValue: -e.endCoordinates.height / 2 - 100,
           duration: 250,
           useNativeDriver: true,
         }).start();
@@ -287,7 +283,7 @@ export default function Onboarding() {
     );
 
     const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
       () => {
         Animated.timing(contentOffset, {
           toValue: 0,
@@ -315,7 +311,7 @@ export default function Onboarding() {
           <Animated.View
             style={[
               styles.contentWrapper,
-              { transform: [{ translateY: contentOffset }] }
+              { transform: [{ translateY: contentOffset }] },
             ]}
           >
             <FlatList
@@ -355,7 +351,7 @@ export default function Onboarding() {
                   key={index}
                   style={[
                     styles.dot,
-                    { opacity: currentIndex === index ? 1 : 0.5 }
+                    { opacity: currentIndex === index ? 1 : 0.5 },
                   ]}
                 />
               ))}
@@ -383,13 +379,13 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   slideContainer: {
     width,
     alignItems: "center",
     padding: theme.spacing.lg,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: Platform.OS === "ios" ? 60 : 40,
   },
   contentContainer: {
     width: "100%",
@@ -420,7 +416,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginBottom: theme.spacing.lg,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    paddingBottom: Platform.OS === "ios" ? 20 : 10,
   },
   dot: {
     width: 8,

@@ -4,9 +4,7 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   ImageBackground,
-  SafeAreaView,
 } from "react-native";
 import {
   fetchCountData,
@@ -20,7 +18,6 @@ import {
   VictoryPie,
   VictoryBar,
   VictoryLabel,
-  VictoryTooltip,
 } from "victory-native";
 import { useRouter } from "expo-router";
 import BackButton from "@/src/components/ui/BackButton";
@@ -35,19 +32,15 @@ const palette = [
   Theme.colors.primary["900"],
 ];
 
-// Pain Chart Component
 const PainChart = ({ data }) => {
   if (!data || data.length === 0) {
-    return; // <Text>Loading data...</Text>;
+    return;
   }
-  // Format data for VictoryChart
   const formattedData = data.map((d) => ({
-    x: new Date(d.day), // Convert string to Date object
+    x: new Date(d.day),
     y: d.pain_rating,
   }));
-  // console.log("formatted data: ", formattedData);
   return (
-    // <ScrollView horizontal showsHorizontalScrollIndicator={true}>
     <View style={styles.container}>
       <View style={styles.chartContainer}>
         <Text style={styles.title}>Highest Pain Severity Over Time</Text>
@@ -104,36 +97,26 @@ const PainChart = ({ data }) => {
         </VictoryChart>
       </View>
     </View>
-    // </ScrollView>
   );
 };
 
-// Pie chart component
 const PieChart = ({ data, title }) => {
   if (!data || Object.keys(data).length === 0) {
-    return; // <Text>Loading data...</Text>;
+    return;
   }
-  // if (Object.keys(data).length > 5) {
-  //   return <BarChart data={data} title={title} />;
-  // }
-
-  // Convert JSON object into an array format that VictoryPie understands
   let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key,
     y: value,
   }));
   formattedData = formattedData.sort((a, b) => a.y - b.y);
-
-  // console.log("Pie chart formatted data: ", formattedData);
   return (
     <View style={styles.chartContainer}>
       <Text style={styles.title}> Most Common {title} </Text>
       <VictoryPie
         data={formattedData}
-        // colorScale={["#4CAF50", "#FF9800", "#2196F3", "#E91E63", "#9C27B0"]}
         colorScale={palette}
         labelRadius={90}
-        labels={({ datum }) => `${datum.x}: ${datum.y}`} // Display both key and value
+        labels={({ datum }) => `${datum.x}: ${datum.y}`}
         style={{
           labels: { fill: "white", fontSize: 14 },
         }}
@@ -156,21 +139,19 @@ const PieChart = ({ data, title }) => {
 
 const BarChart = ({ data, title }) => {
   if (!data || Object.keys(data).length === 0) {
-    return; // <Text>Loading data...</Text>;
+    return;
   }
   let formattedData = Object.entries(data).map(([key, value]) => ({
     x: key,
     y: value,
   }));
-  formattedData = formattedData.sort((a, b) => a.y - b.y); // limit to 6 
-  console.log(formattedData);
-  formattedData = formattedData.slice(-6); 
+  formattedData = formattedData.sort((a, b) => a.y - b.y);
+  formattedData = formattedData.slice(-6);
 
-  const lenFirstKey = formattedData[formattedData.length-1]["x"].length;
-  // console.log(lenFirstKey);
+  const lenFirstKey = formattedData[formattedData.length - 1]["x"].length;
   const rightPad = 48 + 5 * lenFirstKey;
-  const minChartHeight = 200; // Prevents charts from being too small
-  const maxChartHeight = height * 0.7; // Prevents overly tall charts
+  const minChartHeight = 200;
+  const maxChartHeight = height * 0.7;
   const chartHeight = Math.min(
     maxChartHeight,
     Math.max(minChartHeight, formattedData.length * 30 + 70)
@@ -187,22 +168,20 @@ const BarChart = ({ data, title }) => {
         height={chartHeight}
         padding={{ top: 10, bottom: 50, left: 40, right: rightPad }}
       >
-        {/* X-axis */}
         <VictoryAxis
           style={{
-            axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
-            ticks: { stroke: Theme.colors.darkBlue }, // Changes tick color
+            axis: { stroke: Theme.colors.darkBlue },
+            ticks: { stroke: Theme.colors.darkBlue },
             tickLabels: {
               fill: "transparent",
               fontWeight: "bold",
               fontSize: 12,
-              angle: -15, // Rotates the labels slightly for better fit
+              angle: -15,
               padding: 5,
             },
           }}
         />
 
-        {/* Y-axis */}
         <VictoryAxis
           dependentAxis
           domain={[0, Math.max(...formattedData.map((d) => d.y))]}
@@ -211,8 +190,8 @@ const BarChart = ({ data, title }) => {
             (_, i) => i + 1
           )}
           style={{
-            axis: { stroke: Theme.colors.darkBlue }, // Changes the axis line color
-            ticks: { stroke: "transparent" }, // Changes tick color
+            axis: { stroke: Theme.colors.darkBlue },
+            ticks: { stroke: "transparent" },
             tickLabels: {
               fill: Theme.colors.darkBlue,
               fontWeight: "bold",
@@ -226,7 +205,6 @@ const BarChart = ({ data, title }) => {
           label="Symptom Count"
         />
 
-        {/* Bar chart */}
         <VictoryBar
           data={formattedData}
           barWidth={barWidth}
@@ -234,11 +212,11 @@ const BarChart = ({ data, title }) => {
           labels={({ datum }) => datum.x}
           labelComponent={
             <VictoryLabel
-              textAnchor="start" // Center text inside the bars
-              dx={3} // Keep text centered
-              dy={0} // Adjust for better vertical alignment
+              textAnchor="start"
+              dx={3}
+              dy={0}
               style={{
-                fill: "black", // Ensure visibility inside bars
+                fill: "black",
                 fontSize: 12,
                 fontWeight: "normal",
               }}
@@ -248,7 +226,7 @@ const BarChart = ({ data, title }) => {
             data: {
               fillOpacity: 1,
               strokeWidth: 0,
-              fill: ({ index }) => palette[index % palette.length], // Cycle through colors
+              fill: ({ index }) => palette[index % palette.length],
             },
           }}
         />
@@ -257,18 +235,15 @@ const BarChart = ({ data, title }) => {
   );
 };
 
-// Parent Component: Fetch Data and Pass to PainChart
 const PlotDisplayer = () => {
   const [pain_data, setPainData] = useState([]);
   const [count_data, setCountData] = useState([]);
   const router = useRouter();
 
-  // Async function to fetch data
   async function fetchPainData() {
     try {
       const response = await getHighestPainRatingPerDay();
       setPainData(response);
-      // console.log("HighestPainRatingPerDay: ", response);
     } catch (error) {
       console.error("Error fetching pain data:", error);
     }
@@ -277,13 +252,11 @@ const PlotDisplayer = () => {
     try {
       const response = await fetchCountData();
       setCountData(response);
-      console.log("fetch count data: ", response);
     } catch (error) {
       console.error("Error fetching count data:", error);
     }
   }
 
-  // Fetch data on component mount
   useEffect(() => {
     fetchPainData();
     getCountData();

@@ -41,7 +41,6 @@ export default function GeneratingPage() {
         }
 
         const combinedJournalText = formatEntriesForAI(entries);
-        console.log("raw combined text:", combinedJournalText);
         const output = await extractExport(combinedJournalText);
         if (!output.length) {
           Alert.alert(

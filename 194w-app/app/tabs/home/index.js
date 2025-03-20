@@ -18,7 +18,6 @@ import LoadingSeverePainBlob from "@/src/animations/LoadingSeverePainBlob";
 import LoadingVerySeverePainBlob from "@/src/animations/LoadingVerySeverePainBlob";
 import LoadingWorstPainBlob from "@/src/animations/LoadingWorstPainBlob";
 import { supabase } from "@/src/lib/api/supabase";
-import PainTracker from "@/src/components/ui/PainTracker";
 
 export default function Page() {
   const router = useRouter();
@@ -33,12 +32,11 @@ export default function Page() {
     };
 
     loadData();
-  }, []); // Initial load
+  }, []);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     const todayLogs = journalLogs[today] || [];
-    // Get the first log since it's already the latest
     const latestLog = todayLogs[0];
     setPainRating(latestLog?.pain_rating ?? 0);
   }, [journalLogs]);
@@ -128,7 +126,6 @@ export default function Page() {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* <PainTracker painType={painType} /> */}
       <ImageBackground
         source={require("@/assets/background.png")}
         resizeMode="cover"
