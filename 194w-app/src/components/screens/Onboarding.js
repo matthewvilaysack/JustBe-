@@ -1,5 +1,5 @@
 /**
- * @file Onboarding.tsx
+ * @file Onboarding.js
  * @description Onboarding flow component that guides new users through initial setup,
  * collecting information about their pain type and duration. Uses a slide-based
  * interface with animated transitions.
@@ -32,16 +32,6 @@ import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
 
-interface Slide {
-  id: string;
-  type: "loading" | "question" | "welcome";
-  title: string;
-  subtitle?: string | ((painType: string) => string);
-  options?: string[][];
-  character: boolean;
-  showNext: boolean;
-}
-
 export default function Onboarding() {
   const router = useRouter();
   const { setPainType, setPainDuration } = useUserPainStore();
@@ -51,14 +41,14 @@ export default function Onboarding() {
   const [customPainType, setCustomPainType] = useState("");
   const [isScrolling, setIsScrolling] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const flatListRef = useRef<FlatList<any>>(null);
+  const flatListRef = useRef(null);
   const [fontsLoaded] = useFonts({
     LexendDecaBold: require("@/assets/fonts/LexendDeca-Bold.ttf"),
     LexendDecaRegular: require("@/assets/fonts/LexendDeca-Regular.ttf"),
   });
   const contentOffset = useRef(new Animated.Value(0)).current;
 
-  const slides: Slide[] = [
+  const slides = [
     {
       id: "1",
       type: "loading",
@@ -118,7 +108,7 @@ export default function Onboarding() {
     }
   }, [currentIndex]);
 
-  const isValidScroll = (targetIndex: number) => {
+  const isValidScroll = (targetIndex) => {
     if (targetIndex <= currentIndex) return true;
 
     if (currentIndex === 1) {
@@ -144,7 +134,7 @@ export default function Onboarding() {
     }
   };
 
-  const renderSlide = ({ item }: { item: Slide }) => (
+  const renderSlide = ({ item }) => (
     <View style={styles.slideContainer}>
       {item.type === "loading" ? (
         <View style={[styles.contentContainer, { paddingTop: 100 }]}>
@@ -173,7 +163,7 @@ export default function Onboarding() {
                   maxWidth: 350,
                 }}
               >
-                {item.options.map((row: string[], rowIndex: number) => (
+                {item.options.map((row, rowIndex) => (
                   <View
                     key={rowIndex}
                     style={{
@@ -184,7 +174,7 @@ export default function Onboarding() {
                       width: "100%",
                     }}
                   >
-                    {row.map((option: string) => (
+                    {row.map((option) => (
                       <SelectionButton
                         key={option}
                         title={option}
@@ -209,7 +199,6 @@ export default function Onboarding() {
               </View>
             )}
 
-            {/* Show Get Started button only on welcome slide */}
             {item.id === "4" && (
               <Button
                 title="Get Started"
@@ -229,7 +218,8 @@ export default function Onboarding() {
     </View>
   );
 
-  const handleOptionSelect = (option: string) => {
+  const handleOptionSelect = (option) => {
+    console.log("Pain option selected:", option, "on slide:", currentIndex);
     if (currentIndex === 1) {
       setSelectedPainType(option);
       if (option !== "Other") {
@@ -254,6 +244,8 @@ export default function Onboarding() {
         selectedPainType === "Other" ? customPainType : selectedPainType;
       setPainType(painType);
       setPainDuration(selectedDuration);
+      console.log("Saving to AsyncStorage:", { painType, selectedDuration });
+
       await AsyncStorage.setItem("painType", painType);
       await AsyncStorage.setItem("painDuration", selectedDuration);
       await AsyncStorage.setItem("hasCompletedOnboarding", "true");
@@ -266,10 +258,10 @@ export default function Onboarding() {
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
         Animated.timing(contentOffset, {
-          toValue: -e.endCoordinates.height / 2 - 100,
+          toValue: (-e.endCoordinates.height / 2) - 100,
           duration: 250,
           useNativeDriver: true,
         }).start();
@@ -283,7 +275,7 @@ export default function Onboarding() {
     );
 
     const keyboardWillHide = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
         Animated.timing(contentOffset, {
           toValue: 0,
@@ -311,7 +303,7 @@ export default function Onboarding() {
           <Animated.View
             style={[
               styles.contentWrapper,
-              { transform: [{ translateY: contentOffset }] },
+              { transform: [{ translateY: contentOffset }] }
             ]}
           >
             <FlatList
@@ -351,7 +343,7 @@ export default function Onboarding() {
                   key={index}
                   style={[
                     styles.dot,
-                    { opacity: currentIndex === index ? 1 : 0.5 },
+                    { opacity: currentIndex === index ? 1 : 0.5 }
                   ]}
                 />
               ))}
@@ -379,13 +371,13 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   slideContainer: {
     width,
     alignItems: "center",
     padding: theme.spacing.lg,
-    paddingTop: Platform.OS === "ios" ? 60 : 40,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   contentContainer: {
     width: "100%",
@@ -416,7 +408,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginBottom: theme.spacing.lg,
-    paddingBottom: Platform.OS === "ios" ? 20 : 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
   },
   dot: {
     width: 8,
@@ -425,4 +417,4 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     marginHorizontal: 4,
   },
-});
+}); 
